@@ -6,22 +6,17 @@ export default function Login() {
         let webview = new WebviewWindow("home", {
             url: "/home",
             center: true,
-            width: 1000,
-            minWidth: 800,
+            width: 1010,
+            minWidth: 810,
             height: 750,
             minHeight: 600,
             decorations: false,
             transparent: true
         });
 
-        webview.once('tauri://error', function (e) {
-            console.log(e)
-        });
-
         webview.once("tauri://created", function () {
             appWindow?.close();
         });
-        console.log(webview)
     }
 
     return (

@@ -4,7 +4,7 @@
     line-height: 24px;
     font-weight: 400;
 
-    color: #0f0f0f;
+    color: #1F1F1F;
     background-color: transparent;
 
     font-synthesis: none;
@@ -16,6 +16,7 @@
 body {
     margin: 0;
     padding: 0;
+    overflow: hidden;
 }
 
 img{
