@@ -1,0 +1,19 @@
+.button-icon-container {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 2px;
+    cursor: pointer;
+}
+
+.button-icon-container:hover {
+    background-color: #4C9BFF;
+    color: #FFFFFF;
+}
+
+.button-icon-container:hover.danger {
+    background-color: #ff4c4c;
+    color: #FFFFFF;
+}
