@@ -21,8 +21,13 @@
       {
         "title": "linyu-client",
         "label": "login",
-        "width": 800,
-        "height": 600
+        "width": 360,
+        "height": 510,
+        "center": true,
+        "transparent": true,
+        "decorations": false,
+        "fullscreen": false,
+        "resizable": false
       }
     ],
     "security": {
