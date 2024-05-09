@@ -1,19 +1,32 @@
 import "./index.less"
 import {useState} from "react";
 import {Redirect, Route, Switch, useHistory} from "react-router-dom";
-import Login from "../Login/index.jsx";
 import Chat from "./Chat/index.jsx";
 import Friend from "./Friend/index.jsx";
 import Set from "./Set/index.jsx";
 import Talk from "./Talk/index.jsx";
+import IconButton from "../../componets/IconButton/index.jsx";
+import {appWindow} from "@tauri-apps/api/window";
 
 export default function Home() {
     const [selectedOptionIndex, setSelectedOptionIndex] = useState(0)
     const h = useHistory();
 
+    const onMinimize = () => {
+        appWindow.minimize();
+    }
+
+    const onClose = () => {
+        appWindow.close();
+    }
+
+    const onHide = () => {
+        appWindow.hide();
+    }
+
     const options = [
         {key: "chat", icon: "icon-liaotian", page: "/home/chat"},
-        {key: "friend", icon: "icon-yaoqinghaoyou", page: "/home/friend"},
+        {key: "friend", icon: "icon-haoyou", page: "/home/friend"},
         {key: "talk", icon: "icon-pengyouquan", page: "/home/talk"},
         {key: "set", icon: "icon-shezhi", page: "/home/set"},
     ]
@@ -55,6 +68,17 @@ export default function Home() {
                         <Route path="/home/talk" component={Talk}></Route>
                         <Redirect path="/home" to="/home/chat"/>
                     </Switch>
+                </div>
+                <div className="home-window-operation">
+                    <IconButton
+                        icon={<i className={`iconfont icon-zuixiaohua`} style={{fontSize: 22}}/>}
+                        onClick={onMinimize}
+                    />
+                    <IconButton
+                        danger
+                        icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 22}}/>}
+                        onClick={onHide}
+                    />
                 </div>
             </div>
         </div>

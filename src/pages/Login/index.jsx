@@ -1,32 +1,27 @@
 import "./index.less"
-import {appWindow, WebviewWindow} from "@tauri-apps/api/window";
+import {appWindow} from "@tauri-apps/api/window";
 import CustomUserNameInput from "../../componets/CustomUserNameInput/index.jsx";
 import CustomPwdInput from "../../componets/CustomPwdInput/index.jsx";
+import IconButton from "../../componets/IconButton/index.jsx";
+import CreateHomeWindow from "../Home/window.jsx";
 
 export default function Login() {
 
     const onLogin = () => {
-        let webview = new WebviewWindow("home", {
-            url: "/home",
-            center: true,
-            width: 1010,
-            minWidth: 810,
-            height: 750,
-            minHeight: 600,
-            decorations: false,
-            transparent: true
-        });
-
-        webview.once("tauri://created", function () {
-            appWindow?.close();
-        });
+        CreateHomeWindow()
     }
 
     return (
         <div className="login-container">
             <div data-tauri-drag-region className="login">
                 <div className="login-operate">
-                    <i className={`iconfont icon-guanbi`} style={{fontSize: 25}}/>
+                    <IconButton
+                        danger
+                        icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 22}}/>}
+                        onClick={
+                            () => appWindow.close()
+                        }
+                    />
                 </div>
                 <div className="login-icon">
                     <img style={{height: 120}} src="/logo.png" alt=""/>

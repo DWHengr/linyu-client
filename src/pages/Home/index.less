@@ -8,11 +8,13 @@
     border: 1px solid #E1E0E0;
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
     overflow: hidden;
+    position: relative;
+    height: calc(100vh - 10px);
+    width: calc(100vw - 10px);
 
     .home-nav {
       width: 80px;
       background-color: #EDF2F9;
-      height: calc(100vh - 10px);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -48,6 +50,18 @@
         position: absolute;
         bottom: 20px;
       }
+    }
+
+    .home-content {
+      flex: 1;
+    }
+
+    .home-window-operation {
+      height: 60px;
+      position: absolute;
+      right: 10px;
+      display: flex;
+      align-items: center;
     }
   }
 }
