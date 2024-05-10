@@ -9,6 +9,8 @@
     width: 280px;
     user-select: none;
     border-right: 1px solid #E1E0E0;
+    display: flex;
+    flex-direction: column;
 
     .chat-list-top {
       .chat-list-top-title {
@@ -18,6 +20,10 @@
     }
 
     .chat-list-items {
+      flex: 1;
+      overflow-y: scroll;
+      padding: 0 5px 0;
+
       .chat-list-items-label {
         font-weight: 600;
         font-size: 12px;
@@ -63,20 +69,6 @@
         font-size: 30px;
         color: #646464;
         justify-content: space-between;
-
-        .icon {
-          width: 30px;
-          height: 30px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          cursor: pointer;
-
-          &:hover {
-            background-color: #EDF2F9;
-            border-radius: 5px;
-          }
-        }
       }
 
       .chat-content-send-frame-msg {
@@ -108,13 +100,11 @@
 }
 
 .chat-card {
-  height: 65px;
   border-radius: 10px;
   background-color: #FFFFFF;
-  padding: 0 10px;
+  padding: 10px 10px;
   display: flex;
   align-items: center;
-  margin: 2px 0;
 
   .chat-card-portrait {
     width: 45px;
@@ -126,7 +116,7 @@
 
   .chat-card-content {
     height: 45px;
-    flex: 1;
+    width: calc(100% - 50px);
     display: flex;
     flex-direction: column;
 
@@ -134,6 +124,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      width: 100%;
+
+      .ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
     }
   }
 }
@@ -143,6 +140,5 @@
 }
 
 .chat-card.selected {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   background-color: #4C9BFF;
 }
