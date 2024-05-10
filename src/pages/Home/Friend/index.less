@@ -1,0 +1,92 @@
+.friend {
+  background-color: #F9FBFF;
+  height: 100%;
+  display: flex;
+  flex-direction: row;
+
+  .friend-list {
+    padding: 15px;
+    width: 280px;
+    user-select: none;
+    border-right: 1px solid #E1E0E0;
+    display: flex;
+    flex-direction: column;
+
+    .friend-list-top {
+      position: relative;
+
+      .friend-list-top-title {
+        font-size: 26px;
+        font-weight: bold;
+      }
+
+      .friend-list-top-title-end {
+        display: inline-block;
+        position: absolute;
+        right: 4px;
+      }
+    }
+
+    .friend-list-items {
+      flex: 1;
+      overflow-y: scroll;
+      padding: 0 5px 0;
+
+      .friend-list-items-label {
+        font-weight: 600;
+        font-size: 12px;
+        color: #646464
+      }
+    }
+  }
+
+  .friend-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+
+  }
+}
+
+.friend-card {
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  padding: 10px 10px;
+  display: flex;
+  align-items: center;
+
+  .friend-card-portrait {
+    width: 45px;
+    height: 45px;
+    background-color: #A0D9F6;
+    border-radius: 45px;
+    margin-right: 5px;
+  }
+
+  .friend-card-content {
+    height: 45px;
+    display: flex;
+    width: calc(100% - 50px);
+    text-overflow: ellipsis;
+
+    .friend-card-content-item {
+      display: flex;
+      align-items: center;
+      width: 100%;
+
+      .ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+.friend-card:hover {
+  background-color: #EDF2F9;
+}
+
+.friend-card.selected {
+  background-color: #4C9BFF;
+}
