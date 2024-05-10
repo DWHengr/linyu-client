@@ -1,0 +1,39 @@
+.accordion {
+  .accordion-title {
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    position: relative;
+
+    .ellipsis {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .accordion-title-end {
+      position: absolute;
+      right: 5px;
+    }
+  }
+
+
+  .accordion-title.open .arrow {
+    transform: rotate(90deg);
+  }
+
+  .arrow {
+    transition: transform 0.5s ease;
+  }
+
+  .accordion-content {
+    overflow: hidden;
+    transition: max-height 0.5s ease;
+  }
+
+  .accordion-content.open {
+    padding: 10px;
+  }
+
+}
