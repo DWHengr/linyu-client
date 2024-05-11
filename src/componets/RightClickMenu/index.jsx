@@ -51,19 +51,21 @@ export default function RightClickMenu({position, options, visible = false, onOp
     return (
         <div className="right-click-menu">
             {menuVisible && (
-                <div
-                    ref={menuRef}
-                    style={{
-                        top: menuPosition.y,
-                        left: menuPosition.x,
-                    }}
-                    className="options"
-                >
-                    {options.map((item, index) => (
-                        <div className="option" key={index} onClick={() => onMenuItemClick(item)}>
-                            {item.label}
-                        </div>
-                    ))}
+                <div className="overlay">
+                    <div
+                        ref={menuRef}
+                        style={{
+                            top: menuPosition.y,
+                            left: menuPosition.x,
+                        }}
+                        className="options"
+                    >
+                        {options.map((item, index) => (
+                            <div className="option" key={index} onClick={() => onMenuItemClick(item)}>
+                                {item.label}
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
         </div>
