@@ -11,7 +11,6 @@ export default function Chat() {
 
     const [selectedChatId, setSelectedChatId] = useState("1")
     const [menuPosition, setMenuPosition] = useState(null);
-    const [menuVisible, setMenuVisible] = useState(null);
 
     const topChatsData = [
         {
@@ -157,11 +156,8 @@ export default function Chat() {
                         <CustomSearchInput></CustomSearchInput>
                     </div>
                 </div>
-                <RightClickMenu visible={menuVisible} position={menuPosition} options={chatListRightOptions}/>
+                <RightClickMenu position={menuPosition} options={chatListRightOptions}/>
                 <div
-                    onScroll={e => {
-                        setMenuVisible({visible: false})
-                    }}
                     className="chat-list-items">
                     <div className="chat-list-items-label">置顶</div>
                     {
