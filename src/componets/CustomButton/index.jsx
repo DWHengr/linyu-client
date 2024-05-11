@@ -1,11 +1,11 @@
 import "./index.css"
 
-export default function CustomButton({children, onClick, width}) {
+export default function CustomButton({children, onClick, width, type}) {
     return (
         <>
             <div
                 style={{width: width}}
-                className="custom-button"
+                className={`custom-button ${type}`}
                 onClick={() => {
                     if (onClick) onClick()
                 }}

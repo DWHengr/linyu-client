@@ -9,8 +9,17 @@
     margin: 0 2px;
     justify-content: center;
     align-items: center;
+
+    &:hover {
+        background-color: rgba(76, 155, 255, 0.8);
+    }
 }
 
-.custom-button:hover {
-    background-color: rgba(76, 155, 255, 0.8);
+.custom-button.minor {
+    color: #1F1F1F;
+    background-color: #EDF2F9;
+
+    &:hover {
+        background-color: #E3ECFF;
+    }
 }
