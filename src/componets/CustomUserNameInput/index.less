@@ -1,48 +1,82 @@
+
 .custom-username-input {
-  height: 40px;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #FFF;
-  border-radius: 10px;
-  width: 260px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  flex-direction: column;
+  z-index: 999;
 
-  .placeholder {
-    flex: 1;
-    width: 40px;
-    height: 10px;
-  }
-
-  .operation {
-    flex: 1;
-    width: 40px;
+  .custom-username-input-content {
+    z-index: 999;
+    height: 40px;
+    max-height: 40px;
+    min-height: 40px;
     display: flex;
-    justify-items: center;
+    justify-content: center;
     align-items: center;
+    background-color: #FFF;
+    border-radius: 10px;
+    width: 260px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
 
-    .operation-icon {
-      width: 20px;
+    .placeholder {
+      flex: 1;
+      width: 40px;
+      height: 10px;
+    }
+
+    .operation {
+      flex: 1;
+      width: 40px;
+      display: flex;
+      justify-items: center;
+      align-items: center;
+
+      .operation-icon {
+        width: 20px;
+        font-size: 16px;
+        color: #7F7F7F;
+      }
+    }
+
+
+    input {
       font-size: 16px;
-      color: #7F7F7F;
+      padding: 0;
+      margin: 0;
+      border: none;
+      outline: none;
+      width: 100%;
+      background-color: transparent;
+      text-align: center;
+      flex: 3;
+    }
+
+    input::placeholder {
+      color: #7F7F7F
     }
   }
 
+  .custom-user-input-down {
+    display: flex;
+    flex-direction: column;
+    background-color: rgba(237, 242, 249, 0.8);
+    backdrop-filter: blur(10px);
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    border-radius: 5px;
+    padding: 5px 3px;
+    margin-top: 5px;
+    max-height: 150px;
+    overflow-y: scroll;
 
-  input {
-    font-size: 16px;
-    padding: 0;
-    margin: 0;
-    border: none;
-    outline: none;
-    width: 100%;
-    background-color: transparent;
-    text-align: center;
-    flex: 3;
-  }
+    .custom-user-input-down-item {
+      padding: 6px 4px;
+      user-select: none;
+      cursor: pointer;
+      border-radius: 4px;
 
-  input::placeholder {
-    color: #7F7F7F
+      &:hover {
+        background-color: rgb(220, 234, 255);
+      }
+    }
   }
 
 }
