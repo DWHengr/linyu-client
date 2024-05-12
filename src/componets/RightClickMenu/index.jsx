@@ -1,7 +1,7 @@
 import "./index.less"
 import {useEffect, useRef, useState} from "react";
 
-export default function RightClickMenu({position, options, visible = false, onOptions,}) {
+export default function RightClickMenu({position, options, visible = false, onMenuItemClick}) {
     const [menuVisible, setMenuVisible] = useState(visible);
     const [menuPosition, setMenuPosition] = useState({x: 0, y: 0});
     const menuRef = useRef(null);
@@ -20,6 +20,7 @@ export default function RightClickMenu({position, options, visible = false, onOp
                 position.x = position.x - menuRef.current.clientWidth
             }
             setMenuPosition(position);
+            menuRef.current.focus()
         }
     }, [menuVisible])
 
@@ -27,26 +28,10 @@ export default function RightClickMenu({position, options, visible = false, onOp
         if (menuVisible) setMenuVisible(false);
     }, [visible])
 
-    const onMenuItemClick = (action) => {
-        setMenuVisible(false);
+    const onItemClick = (action) => {
+        setMenuVisible(false)
+        if (onMenuItemClick) onMenuItemClick(action)
     };
-
-    useEffect(() => {
-        const onDocumentClick = (e) => {
-            if (menuVisible && !menuRef.current.contains(e.target)) {
-                setMenuVisible(false);
-            }
-        };
-        const handleDesktopClick = () => {
-            setMenuVisible(false);
-        };
-        document.addEventListener('click', onDocumentClick);
-        document.addEventListener('mousedown', handleDesktopClick);
-        return () => {
-            document.removeEventListener('click', onDocumentClick);
-            document.addEventListener('mousedown', handleDesktopClick);
-        };
-    }, []);
 
     return (
         <div className="right-click-menu">
@@ -59,9 +44,13 @@ export default function RightClickMenu({position, options, visible = false, onOp
                             left: menuPosition.x,
                         }}
                         className="options"
+                        tabIndex="0"
+                        onBlur={() => setMenuVisible(false)}
                     >
                         {options.map((item, index) => (
-                            <div className="option" key={index} onClick={() => onMenuItemClick(item)}>
+                            <div className="option" key={index} onClick={(e) => {
+                                onItemClick(item)
+                            }}>
                                 {item.label}
                             </div>
                         ))}
