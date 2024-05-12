@@ -1,6 +1,7 @@
 import "./index.less"
 import {WebviewWindow} from "@tauri-apps/api/window";
 import {exit} from "@tauri-apps/api/process";
+import CustomLine from "../../componets/CustomLine/index.jsx";
 
 export default function TrayMenu() {
 
@@ -22,7 +23,7 @@ export default function TrayMenu() {
             <div className="tray-menu">
                 <div className="tray-menu-portrait"></div>
                 <div style={{fontSize: 12, fontWeight: 600}}>小红</div>
-                <div className="tray-menu-line"></div>
+                <CustomLine width={1}/>
                 <div className="tray-menu-operation">
                     <div className="tray-menu-operation-item" onClick={onShowHome}>
                         <i className={`iconfont icon-zhuye`} style={{fontSize: 16, marginRight: 5}}/>
