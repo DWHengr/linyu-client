@@ -6,12 +6,14 @@ import RightClickMenu from "../../../componets/RightClickMenu/index.jsx";
 import IconMinorButton from "../../../componets/IconMinorButton/index.jsx";
 import CustomLine from "../../../componets/CustomLine/index.jsx";
 import CustomButton from "../../../componets/CustomButton/index.jsx";
+import {useHistory} from "react-router-dom";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState("1")
     const [groupMenuPosition, setGroupMenuPosition] = useState(null);
     const [addMenuPosition, setAddMenuPosition] = useState(null);
     const [moreMenuPosition, setMoreMenuPosition] = useState(null);
+    const h = useHistory();
 
     const groupRightOptions = [
         {key: "addGroup", label: "添加分组"},
@@ -154,7 +156,11 @@ export default function Friend() {
                                     <i className={`iconfont icon-pengyouquan`} style={{fontSize: 14, marginRight: 5}}/>
                                     <div>朋友圈：</div>
                                 </div>
-                                <div>
+                                <div
+                                    onClick={() => {
+                                        h.push("/home/talk")
+                                    }}
+                                >
                                     <div>今天天气不错！</div>
                                     <div style={{width: 100, height: 100}}>
                                         <img
