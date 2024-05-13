@@ -9,7 +9,7 @@ export default function CustomPwdInput({value, onChange}) {
     }
 
     return (
-        <div className="custom-username-input">
+        <div className="custom-pwd-input">
             <div className="placeholder"></div>
             <input
                 type="password"
