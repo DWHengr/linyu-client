@@ -5,8 +5,8 @@ import Chat from "./Chat/index.jsx";
 import Friend from "./Friend/index.jsx";
 import Set from "./Set/index.jsx";
 import Talk from "./Talk/index.jsx";
-import IconButton from "../../componets/IconButton/index.jsx";
 import {appWindow} from "@tauri-apps/api/window";
+import WindowOperation from "../../componets/WindowOperation/index.jsx";
 
 export default function Home() {
     const [selectedOptionIndex, setSelectedOptionIndex] = useState(0)
@@ -33,6 +33,7 @@ export default function Home() {
 
     return (
         <div className="home-container">
+            <div className="overlay"></div>
             <div className="home">
                 <div data-tauri-drag-region className="home-nav">
                     <div className="home-nav-icon">
@@ -69,17 +70,7 @@ export default function Home() {
                         <Redirect path="/home" to="/home/chat"/>
                     </Switch>
                 </div>
-                <div className="home-window-operation">
-                    <IconButton
-                        icon={<i className={`iconfont icon-zuixiaohua`} style={{fontSize: 22}}/>}
-                        onClick={onMinimize}
-                    />
-                    <IconButton
-                        danger
-                        icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 22}}/>}
-                        onClick={onHide}
-                    />
-                </div>
+                <WindowOperation/>
             </div>
         </div>
     )

@@ -5,7 +5,7 @@ export default function CreateHomeWindow() {
         url: "/home",
         center: true,
         width: 1010,
-        minWidth: 810,
+        minWidth: 900,
         height: 750,
         minHeight: 600,
         decorations: false,
