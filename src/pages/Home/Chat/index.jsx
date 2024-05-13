@@ -1,16 +1,15 @@
 import "./index.less"
 import CustomSearchInput from "../../../componets/CustomSearchInput/index.jsx";
 import {useState} from "react";
-import Time from "./ChatContent/Time/index.jsx";
-import Msg from "./ChatContent/Msg/index.jsx";
-import CustomButton from "../../../componets/CustomButton/index.jsx";
 import RightClickMenu from "../../../componets/RightClickMenu/index.jsx";
-import IconMinorButton from "../../../componets/IconMinorButton/index.jsx";
+import CommonChatFrame from "../../../componets/CommonChatFrame/index.jsx";
+import CreateChatWindow from "../../ChatWindow/window.jsx";
 
 export default function Chat() {
 
     const [selectedChatId, setSelectedChatId] = useState("1")
     const [menuPosition, setMenuPosition] = useState(null);
+    const [rightSelected, setRightSelected] = useState(null)
 
     const topChatsData = [
         {
@@ -85,9 +84,17 @@ export default function Chat() {
         {key: "unTop", label: "取消置顶"},
         {key: "unNoDisturb", label: "设置免打扰"},
         {key: "unNoDisturb ", label: "取消免打扰"},
-        {key: "newWindow", label: "打开独立窗口"},
+        {key: "newChatWindow", label: "打开独立窗口"},
         {key: "deleteChat", label: "从聊天列表中移除"},
     ]
+
+    const onMenuItemClick = (item) => {
+        switch (item.key) {
+            case "newChatWindow" : {
+                CreateChatWindow(rightSelected)
+            }
+        }
+    }
 
     const ChatCard = ({info, onClick, onContextMenu}) => {
         let isSelected = info.id === selectedChatId
@@ -156,7 +163,11 @@ export default function Chat() {
                         <CustomSearchInput></CustomSearchInput>
                     </div>
                 </div>
-                <RightClickMenu position={menuPosition} options={chatListRightOptions}/>
+                <RightClickMenu
+                    position={menuPosition}
+                    options={chatListRightOptions}
+                    onMenuItemClick={onMenuItemClick}
+                />
                 <div
                     className="chat-list-items">
                     <div className="chat-list-items-label">置顶</div>
@@ -164,7 +175,10 @@ export default function Chat() {
                         topChatsData.map(data => {
                             return (
                                 <ChatCard
-                                    onContextMenu={(e) => setMenuPosition({x: e.clientX, y: e.clientY})}
+                                    onContextMenu={(e) => {
+                                        setRightSelected(data.id)
+                                        setMenuPosition({x: e.clientX, y: e.clientY})
+                                    }}
                                     info={data}
                                     onClick={() => setSelectedChatId(data.id)}
                                 />
@@ -176,7 +190,10 @@ export default function Chat() {
                         allChatsData.map(data => {
                             return (
                                 <ChatCard
-                                    onContextMenu={(e) => setMenuPosition({x: e.clientX, y: e.clientY})}
+                                    onContextMenu={(e) => {
+                                        setRightSelected(data.id)
+                                        setMenuPosition({x: e.clientX, y: e.clientY})
+                                    }}
                                     info={data}
                                     onClick={() => setSelectedChatId(data.id)}
                                 />
@@ -186,60 +203,7 @@ export default function Chat() {
                     }
                 </div>
             </div>
-            <div className="chat-content">
-                <div data-tauri-drag-region className="chat-content-title">
-                    <div>
-                        <div style={{
-                            width: 40,
-                            height: 40,
-                            backgroundColor: "#4C9BFF",
-                            borderRadius: 50,
-                            marginLeft: 10
-                        }}>
-                        </div>
-                    </div>
-                    <div style={{
-                        fontWeight: 600,
-                        color: "#1F1F1F",
-                        marginLeft: 10,
-                    }}>
-                        小红
-                    </div>
-                </div>
-                <div className="chat-content-show-frame">
-                    <Time value="昨天 20:20"/>
-                    <Msg value="睡觉了"/>
-                    <Msg value="今天就先不说了"/>
-                    <Msg value="好的" right/>
-                </div>
-                <div className="chat-content-send-frame">
-                    <div className="chat-content-send-frame-operation">
-                        <div style={{display: "flex"}}>
-                            <IconMinorButton
-                                icon={<i className={`iconfont icon icon-biaoqing`} style={{fontSize: 24}}/>}/>
-                            <IconMinorButton
-                                icon={<i className={`iconfont icon icon-wenjian`} style={{fontSize: 26}}/>}/>
-                            <IconMinorButton icon={<i className={`iconfont icon icon-jilu`} style={{fontSize: 22}}/>}/>
-                        </div>
-                        <div style={{display: "flex"}}>
-                            <IconMinorButton
-                                icon={<i className={`iconfont icon icon-dianhua`} style={{fontSize: 24}}/>}/>
-                            <IconMinorButton
-                                icon={<i className={`iconfont icon icon-shipin`} style={{fontSize: 26}}/>}/>
-                        </div>
-                    </div>
-                    <div className="chat-content-send-frame-msg">
-                        <textarea>
-                        </textarea>
-                    </div>
-                    <div className="chat-content-send-frame-operation-bottom">
-                        <CustomButton width={10}>
-                            <i className={`iconfont icon icon-yuyin`} style={{fontSize: 14}}/>
-                        </CustomButton>
-                        <CustomButton width={40}>发送</CustomButton>
-                    </div>
-                </div>
-            </div>
+            <CommonChatFrame/>
         </div>
     )
 }
