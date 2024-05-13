@@ -13,7 +13,8 @@ export default function Login() {
 
     return (
         <div className="login-container">
-            <div data-tauri-drag-region className="login">
+            <div className="login">
+                <div data-tauri-drag-region className="login-drag"></div>
                 <div className="login-operate">
                     <IconButton
                         danger
@@ -27,7 +28,8 @@ export default function Login() {
                     <img style={{height: 120}} src="/logo.png" alt=""/>
                 </div>
                 <div className="login-pwd-input">
-                    <CustomUserNameInput/>
+                    <CustomUserNameInput
+                        reagents={["admin", "xiaohong", "xiaohong", "xiaohong", "xiaohong", "xiaohong", "xiaohong", "xiaohong"]}/>
                 </div>
                 <div className="login-pwd-input">
                     <CustomPwdInput/>
