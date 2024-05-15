@@ -3,12 +3,13 @@ import IconMinorButton from "../IconMinorButton/index.jsx";
 import CustomButton from "../CustomButton/index.jsx";
 import Time from "./ChatContent/Time/index.jsx";
 import Msg from "./ChatContent/Msg/index.jsx";
+import CustomDragDiv from "../CustomDragDiv/index.jsx";
 
 export default function CommonChatFrame() {
     return (
 
         <div className="common-chat-content">
-            <div data-tauri-drag-region className="chat-content-title">
+            <CustomDragDiv className="chat-content-title">
                 <div>
                     <div style={{
                         width: 40,
@@ -26,7 +27,7 @@ export default function CommonChatFrame() {
                 }}>
                     小红
                 </div>
-            </div>
+            </CustomDragDiv>
             <div className="chat-content-show-frame">
                 <Time value="昨天 20:20"/>
                 <Msg value="睡觉了"/>

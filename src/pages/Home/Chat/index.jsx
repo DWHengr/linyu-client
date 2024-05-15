@@ -4,6 +4,7 @@ import {useState} from "react";
 import RightClickMenu from "../../../componets/RightClickMenu/index.jsx";
 import CommonChatFrame from "../../../componets/CommonChatFrame/index.jsx";
 import CreateChatWindow from "../../ChatWindow/window.jsx";
+import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
 
 export default function Chat() {
 
@@ -157,12 +158,12 @@ export default function Chat() {
     return (
         <div className="chat">
             <div className="chat-list">
-                <div data-tauri-drag-region className="chat-list-top">
+                <CustomDragDiv className="chat-list-top">
                     <label className="chat-list-top-title">聊天列表</label>
                     <div>
                         <CustomSearchInput></CustomSearchInput>
                     </div>
-                </div>
+                </CustomDragDiv>
                 <RightClickMenu
                     position={menuPosition}
                     options={chatListRightOptions}

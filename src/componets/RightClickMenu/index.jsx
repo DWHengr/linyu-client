@@ -1,5 +1,6 @@
 import "./index.less"
 import {useEffect, useRef, useState} from "react";
+import {listen} from "@tauri-apps/api/event";
 
 export default function RightClickMenu({position, options, visible = false, onMenuItemClick}) {
     const [menuVisible, setMenuVisible] = useState(visible);
@@ -10,6 +11,15 @@ export default function RightClickMenu({position, options, visible = false, onMe
         if (!position) return
         setMenuVisible(true);
     }, [position])
+
+    useEffect(() => {
+        const unListen = listen('drag-click', (event) => {
+            setMenuVisible(false)
+        });
+        return async () => {
+            (await unListen)()
+        }
+    }, [])
 
     useEffect(() => {
         if (menuVisible) {

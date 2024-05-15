@@ -7,6 +7,7 @@ import IconMinorButton from "../../../componets/IconMinorButton/index.jsx";
 import CustomLine from "../../../componets/CustomLine/index.jsx";
 import CustomButton from "../../../componets/CustomButton/index.jsx";
 import {useHistory} from "react-router-dom";
+import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState("1")
@@ -69,7 +70,7 @@ export default function Friend() {
             <RightClickMenu position={groupMenuPosition} options={groupRightOptions}/>
             <RightClickMenu position={moreMenuPosition} options={moreRightOptions}/>
             <div className="friend-list">
-                <div data-tauri-drag-region className="friend-list-top">
+                <CustomDragDiv className="friend-list-top">
                     <label className="friend-list-top-title">
                         好有列表
                         <div className="friend-list-top-title-end"
@@ -82,7 +83,7 @@ export default function Friend() {
                     <div>
                         <CustomSearchInput></CustomSearchInput>
                     </div>
-                </div>
+                </CustomDragDiv>
                 <div
                     className="friend-list-items">
                     {allFriendData.map(item => {
@@ -103,7 +104,7 @@ export default function Friend() {
                     })}
                 </div>
             </div>
-            <div data-tauri-drag-region className="friend-content">
+            <CustomDragDiv className="friend-content">
                 <div className="friend-content-container">
                     <div className="friend-content-container-top">
                         <div className="friend-content-container-top-info">
@@ -180,6 +181,6 @@ export default function Friend() {
                         </div>
                     </div>
                 </div>
-            </div>
+            </CustomDragDiv>
         </div>)
 }

@@ -2,6 +2,7 @@ import "./index.less"
 import CustomButton from "../../../../componets/CustomButton/index.jsx";
 import CustomTextarea from "../../../../componets/CustomTextarea/index.jsx";
 import {useHistory} from "react-router-dom";
+import CustomDragDiv from "../../../../componets/CustomDragDiv/index.jsx";
 
 export default function AllTalk() {
     let h = useHistory();
@@ -119,7 +120,7 @@ export default function AllTalk() {
 
 
     return (
-        <div data-tauri-drag-region className="all-talk-container">
+        <CustomDragDiv className="all-talk-container">
             <div style={{position: "absolute", top: 20, left: 10}}>
                 <CustomButton onClick={{}}>说一说</CustomButton>
             </div>
@@ -179,6 +180,6 @@ export default function AllTalk() {
                         </div>)
                 })}
             </div>
-        </div>
+        </CustomDragDiv>
     )
 }

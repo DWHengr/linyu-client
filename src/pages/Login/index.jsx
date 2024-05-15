@@ -4,6 +4,7 @@ import CustomUserNameInput from "../../componets/CustomUserNameInput/index.jsx";
 import CustomPwdInput from "../../componets/CustomPwdInput/index.jsx";
 import IconButton from "../../componets/IconButton/index.jsx";
 import CreateHomeWindow from "../Home/window.jsx";
+import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 
 export default function Login() {
 
@@ -13,8 +14,7 @@ export default function Login() {
 
     return (
         <div className="login-container">
-            <div className="login">
-                <div data-tauri-drag-region className="login-drag"></div>
+            <CustomDragDiv className="login">
                 <div className="login-operate">
                     <IconButton
                         danger
@@ -35,7 +35,7 @@ export default function Login() {
                     <CustomPwdInput/>
                 </div>
                 <div className="login-button" onClick={onLogin}>登 录</div>
-            </div>
+            </CustomDragDiv>
         </div>
     )
 }

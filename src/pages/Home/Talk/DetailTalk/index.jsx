@@ -3,6 +3,7 @@ import CustomButton from "../../../../componets/CustomButton/index.jsx";
 import CustomTextarea from "../../../../componets/CustomTextarea/index.jsx";
 import IconMinorButton from "../../../../componets/IconMinorButton/index.jsx";
 import {useHistory} from "react-router-dom";
+import CustomDragDiv from "../../../../componets/CustomDragDiv/index.jsx";
 
 export default function DetailTalk() {
     let h = useHistory();
@@ -38,7 +39,7 @@ export default function DetailTalk() {
 
 
     return (
-        <div data-tauri-drag-region className="all-talk-container">
+        <CustomDragDiv className="all-talk-container">
             <div
                 style={{position: "absolute", top: 15, left: 10}}
                 onClick={() => h.push("/home/talk/all")}
@@ -91,6 +92,6 @@ export default function DetailTalk() {
                     </div>
                 </div>
             </div>
-        </div>
+        </CustomDragDiv>
     )
 }

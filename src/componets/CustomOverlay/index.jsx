@@ -1,5 +1,6 @@
 import "./index.less"
 import {useEffect, useRef, useState} from "react";
+import {listen} from "@tauri-apps/api/event";
 
 export default function CustomOverlay({visible, position, width, children}) {
     const [inVisible, setInVisible] = useState(visible)
@@ -14,6 +15,15 @@ export default function CustomOverlay({visible, position, width, children}) {
             contentRef.current.focus()
         }
     }, [inVisible])
+
+    useEffect(() => {
+        const unListen = listen('drag-click', (event) => {
+            setInVisible(false)
+        });
+        return async () => {
+            (await unListen)()
+        }
+    }, [])
 
     return (
         <div>

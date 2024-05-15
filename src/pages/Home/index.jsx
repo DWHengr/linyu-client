@@ -7,6 +7,7 @@ import Set from "./Set/index.jsx";
 import Talk from "./Talk/index.jsx";
 import {appWindow} from "@tauri-apps/api/window";
 import WindowOperation from "../../componets/WindowOperation/index.jsx";
+import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 
 export default function Home() {
     const [selectedOptionIndex, setSelectedOptionIndex] = useState(0)
@@ -35,7 +36,7 @@ export default function Home() {
         <div className="home-container">
             <div className="overlay"></div>
             <div className="home">
-                <div data-tauri-drag-region className="home-nav">
+                <CustomDragDiv className="home-nav">
                     <div className="home-nav-icon">
                         <img style={{height: 60}} src="/logo.png" alt=""/>
                     </div>
@@ -60,7 +61,7 @@ export default function Home() {
                     <div className="home-nav-my">
                         <div style={{width: 60, height: 60, borderRadius: 60, backgroundColor: "#4C9BFF"}}></div>
                     </div>
-                </div>
+                </CustomDragDiv>
                 <div className="home-content">
                     <Switch>
                         <Route path="/home/chat" component={Chat}></Route>
