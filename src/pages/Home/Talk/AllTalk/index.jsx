@@ -122,7 +122,7 @@ export default function AllTalk() {
     return (
         <CustomDragDiv className="all-talk-container">
             <div style={{position: "absolute", top: 20, left: 10}}>
-                <CustomButton onClick={{}}>说一说</CustomButton>
+                <CustomButton onClick={() => h.push("/home/talk/create")}>说一说</CustomButton>
             </div>
             <div className="talks">
                 {talkAllData?.map((item) => {
