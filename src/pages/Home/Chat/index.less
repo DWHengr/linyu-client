@@ -4,6 +4,10 @@
   display: flex;
   flex-direction: row;
 
+  ::-webkit-scrollbar-thumb {
+    background: transparent;
+  }
+
   .chat-list {
     padding: 15px;
     width: 280px;
@@ -23,6 +27,12 @@
       flex: 1;
       overflow-y: scroll;
       padding: 0 5px 0;
+
+      &:hover {
+        &::-webkit-scrollbar-thumb {
+          background: rgba(117, 117, 117, 0.3);
+        }
+      }
 
       .chat-list-items-label {
         font-weight: 600;
