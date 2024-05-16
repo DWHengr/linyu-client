@@ -29,7 +29,7 @@ export default function Friend() {
     const moreRightOptions = [
         {key: "careFor", label: "特别关心"},
         {key: "unCaraFor", label: "取消特别关心"},
-        {key: "delFriend", label: "删除好有"},
+        {key: "delFriend", label: "删除好友"},
     ]
 
     let allFriendData = [{group: "特别关心", content: [{id: 1, name: "元气少女", remark: "小红"}]}, {
@@ -72,7 +72,7 @@ export default function Friend() {
             <div className="friend-list">
                 <CustomDragDiv className="friend-list-top">
                     <label className="friend-list-top-title">
-                        好有列表
+                        好友列表
                         <div className="friend-list-top-title-end"
                              onClick={(e) => setAddMenuPosition({x: e.clientX, y: e.clientY})}>
                             <IconMinorButton
