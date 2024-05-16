@@ -19,8 +19,7 @@ await listen('tray_menu', async (event) => {
         await trayWindow.setFocus()
     }
 })
-export default function CreateTrayWindow(position) {
-
+export default function CreateTrayWindow() {
     let webview = new WebviewWindow("tray_menu", {
         url: "/tray",
         width: width,
