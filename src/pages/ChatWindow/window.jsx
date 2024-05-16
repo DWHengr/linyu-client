@@ -1,6 +1,13 @@
-import {appWindow, WebviewWindow} from "@tauri-apps/api/window";
+import {WebviewWindow} from "@tauri-apps/api/window";
 
 export default function CreateChatWindow(user) {
+    const window = WebviewWindow.getByLabel('chat-' + user)
+    if (window) {
+        window.show()
+        window.unminimize()
+        window.setFocus()
+        return
+    }
     let webview = new WebviewWindow("chat-" + user, {
         url: "/chat",
         center: true,
