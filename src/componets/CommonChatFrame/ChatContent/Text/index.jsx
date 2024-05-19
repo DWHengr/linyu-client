@@ -1,6 +1,6 @@
 import "./index.less"
 
-export default function Msg({value, right = false}) {
+export default function Text({value, right = false}) {
     return (
         <>
             <div className={"chat-content-msg"}>
