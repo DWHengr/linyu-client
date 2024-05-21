@@ -1,8 +1,12 @@
 import {Body, getClient, ResponseType} from "@tauri-apps/api/http";
+import {invoke} from "@tauri-apps/api/tauri";
 
 const SERVICE_URL = "http://" + "127.0.0.1:9200";
 
-function send(configs) {
+async function send(configs) {
+    let token = await invoke("get_user_info", {}).then(res => {
+        return res.token
+    })
     return new Promise(async (resolve, reject) => {
         const client = await getClient();
         client
@@ -12,10 +16,7 @@ function send(configs) {
                 method: configs.method,
                 timeout: 20,
                 headers: {
-                    ...configs.headers,
-                    "x-token": localStorage.getItem("token")
-                        ? localStorage.getItem("token")
-                        : "",
+                    ...configs.headers, "x-token": token ? token : "",
                 },
                 responseType: ResponseType.JSON,
             })
@@ -39,17 +40,11 @@ function send_api(configs) {
         const client = await getClient();
         client
             .request({
-                url: configs.url,
-                method: configs.method,
-                timeout: 10,
-                body: {
-                    type: "Json",
-                    payload: configs.data ? configs.data : {},
-                },
-                headers: {
+                url: configs.url, method: configs.method, timeout: 10, body: {
+                    type: "Json", payload: configs.data ? configs.data : {},
+                }, headers: {
                     ...configs.headers,
-                },
-                responseType: ResponseType.Text,
+                }, responseType: ResponseType.Text,
             })
             .then((response) => {
                 if (response.ok) {
@@ -75,9 +70,7 @@ function get(url, params = {}) {
         urlParams = SERVICE_URL + url;
     }
     const configs = {
-        url: urlParams,
-        method: "GET",
-        params: {
+        url: urlParams, method: "GET", params: {
             randomTime: new Date().getTime(),
         },
     };
@@ -86,9 +79,7 @@ function get(url, params = {}) {
 
 function post(url, params = {}) {
     const configs = {
-        method: "POST",
-        url: SERVICE_URL + url,
-        data: params,
+        method: "POST", url: SERVICE_URL + url, data: params,
     };
     return send(configs);
 }
@@ -105,9 +96,7 @@ function get_api(api, url, params = {}) {
     }
     console.log(urlParams);
     const configs = {
-        url: urlParams,
-        method: "GET",
-        params: {
+        url: urlParams, method: "GET", params: {
             randomTime: new Date().getTime(),
         },
     };
