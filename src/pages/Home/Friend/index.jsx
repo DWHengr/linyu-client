@@ -1,6 +1,6 @@
 import "./index.less"
 import CustomSearchInput from "../../../componets/CustomSearchInput/index.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import CustomAccordion from "../../../componets/CustomAccordion/index.jsx";
 import RightClickMenu from "../../../componets/RightClickMenu/index.jsx";
 import IconMinorButton from "../../../componets/IconMinorButton/index.jsx";
@@ -8,13 +8,23 @@ import CustomLine from "../../../componets/CustomLine/index.jsx";
 import CustomButton from "../../../componets/CustomButton/index.jsx";
 import {useHistory} from "react-router-dom";
 import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
+import FriendApi from "../../../api/friend.js";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState("1")
     const [groupMenuPosition, setGroupMenuPosition] = useState(null);
     const [addMenuPosition, setAddMenuPosition] = useState(null);
     const [moreMenuPosition, setMoreMenuPosition] = useState(null);
+    const [allFriendData, setAllFriendData] = useState([]);
     const h = useHistory();
+
+    useEffect(() => {
+        FriendApi.list().then(res => {
+            if (res.code === 0) {
+                setAllFriendData(res.data)
+            }
+        })
+    }, [])
 
     const groupRightOptions = [
         {key: "addGroup", label: "添加分组"},
@@ -32,13 +42,14 @@ export default function Friend() {
         {key: "delFriend", label: "删除好友"},
     ]
 
-    let allFriendData = [{group: "特别关心", content: [{id: 1, name: "元气少女", remark: "小红"}]}, {
-        group: "销售部", content: [{id: 2, name: "元气少女222222222222222222222222223122222222222", remark: "小红"}, {
-            id: 3, name: "元气少女", remark: "小红"
-        }, {id: 4, name: "元气少女", remark: "小红"}]
-    }, {group: "企业一部", content: []},]
+    // let allFriendData = [{name: "特别关心", friends: [{id: 1, name: "元气少女", remark: "小红"}]}, {
+    //     name: "销售部", friends: [{id: 2, name: "元气少女222222222222222222222222223122222222222", remark: "小红"}, {
+    //         id: 3, name: "元气少女", remark: "小红"
+    //     }, {id: 4, name: "元气少女", remark: "小红"}]
+    // }, {name: "企业一部", friends: []},]
 
     const FriendCard = ({info, onClick, onContextMenu}) => {
+        console.log(info)
         let isSelected = info.id === selectedFriendId
         return (<div
             className={`friend-card ${isSelected ? "selected" : ""}`}
@@ -89,11 +100,11 @@ export default function Friend() {
                     {allFriendData.map(item => {
                         return (<>
                             <CustomAccordion
-                                title={item.group}
-                                titleEnd={`（${item.content ? item.content.length : 0}）`}
+                                title={item.name}
+                                titleEnd={`（${item.friends ? item.friends.length : 0}）`}
                                 onContextMenu={(e) => setGroupMenuPosition({x: e.clientX, y: e.clientY})}
                             >
-                                {item?.content?.map((friend) => {
+                                {item?.friends?.map((friend) => {
                                     return (<FriendCard
                                         info={friend}
                                         onClick={() => setSelectedFriendId(friend.id)}
