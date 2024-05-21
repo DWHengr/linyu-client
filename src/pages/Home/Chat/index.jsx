@@ -1,84 +1,28 @@
 import "./index.less"
 import CustomSearchInput from "../../../componets/CustomSearchInput/index.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import RightClickMenu from "../../../componets/RightClickMenu/index.jsx";
 import CommonChatFrame from "../../../componets/CommonChatFrame/index.jsx";
 import CreateChatWindow from "../../ChatWindow/window.jsx";
 import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
+import ChatListApi from "../../../api/chatList.js";
 
 export default function Chat() {
 
-    const [selectedChatId, setSelectedChatId] = useState("1")
+    const [selectedChatId, setSelectedChatId] = useState(null)
     const [menuPosition, setMenuPosition] = useState(null);
     const [rightSelected, setRightSelected] = useState(null)
+    const [topChatsData, setTopChatsData] = useState([])
+    const [allChatsData, setAllChatsData] = useState([])
 
-    const topChatsData = [
-        {
-            id: "1",
-            remark: "小红",
-            lastMsg: "你在干什么?",
-            lastMsgTime: "14:20",
-        }
-    ]
-
-    const allChatsData = [
-        {
-            id: "2",
-            remark: "小绿",
-            lastMsg: "你在干什么?",
-            lastMsgTime: "14:20",
-        },
-        {
-            id: "3",
-            remark: "小蓝",
-            lastMsg: "你在干什么?",
-            lastMsgTime: "14:20",
-            unreadNum: 10
-        }
-        ,
-        {
-            id: "8",
-            remark: "小蓝小蓝小蓝小蓝小蓝小蓝小蓝小蓝小蓝",
-            lastMsg: "你在干什么?你在干什么?你在干什么?你在干什么?你在干什么?",
-            lastMsgTime: "14:20",
-            unreadNum: 10
-        },
-        {
-            id: "9",
-            remark: "小蓝",
-            lastMsg: "你在干什么?",
-            lastMsgTime: "14:20",
-            unreadNum: 10
-        },
-        {
-            id: "4",
-            remark: "小蓝",
-            lastMsg: "你在干什么?",
-            lastMsgTime: "14:20",
-            unreadNum: 10
-        },
-        {
-            id: "5",
-            remark: "小蓝",
-            lastMsg: "你在干什么?",
-            lastMsgTime: "14:20",
-            unreadNum: 10
-        },
-        {
-            id: "6",
-            remark: "小蓝",
-            lastMsg: "你在干什么?",
-            lastMsgTime: "14:20",
-            unreadNum: 10
-        },
-        {
-            id: "7",
-            remark: "小蓝",
-            lastMsg: "你在干什么?",
-            lastMsgTime: "14:20",
-            unreadNum: 10
-        }
-    ]
+    useEffect(() => {
+        ChatListApi.list().then(res => {
+            if (res.code === 0) {
+                setTopChatsData(res.data.tops)
+                setAllChatsData(res.data.others)
+            }
+        })
+    }, []);
 
     const chatListRightOptions = [
         {key: "top", label: "置顶"},
@@ -98,7 +42,7 @@ export default function Chat() {
     }
 
     const ChatCard = ({info, onClick, onContextMenu}) => {
-        let isSelected = info.id === selectedChatId
+        let isSelected = info.fromId === selectedChatId
         return (
             <div
                 className={`chat-card ${isSelected ? "selected" : ""}`}
@@ -123,14 +67,14 @@ export default function Chat() {
                         <div style={{
                             fontSize: 10,
                             color: `${isSelected ? "#F6F6F6" : "#646464"}`
-                        }}>{info.lastMsgTime}</div>
+                        }}>{info.updateTime}</div>
                     </div>
                     <div className="chat-card-content-item">
                         <div
                             style={{fontSize: 12, color: `${isSelected ? "#F6F6F6" : "#646464"}`}}
                             className="ellipsis"
                         >
-                            {info.lastMsg}
+                            {info.lastMsgContent.content}
                         </div>
                         {
                             info.unreadNum > 0 ? <div style={{
@@ -171,7 +115,7 @@ export default function Chat() {
                 />
                 <div
                     className="chat-list-items">
-                    <div className="chat-list-items-label">置顶</div>
+                    {topChatsData?.length > 0 && <div className="chat-list-items-label">置顶</div>}
                     {
                         topChatsData.map(data => {
                             return (
@@ -181,7 +125,7 @@ export default function Chat() {
                                         setMenuPosition({x: e.clientX, y: e.clientY})
                                     }}
                                     info={data}
-                                    onClick={() => setSelectedChatId(data.id)}
+                                    onClick={() => setSelectedChatId(data.fromId)}
                                 />
                             )
                         })
@@ -196,7 +140,7 @@ export default function Chat() {
                                         setMenuPosition({x: e.clientX, y: e.clientY})
                                     }}
                                     info={data}
-                                    onClick={() => setSelectedChatId(data.id)}
+                                    onClick={() => setSelectedChatId(data.fromId)}
                                 />
                             )
                         })
@@ -204,7 +148,7 @@ export default function Chat() {
                     }
                 </div>
             </div>
-            <CommonChatFrame/>
+            <CommonChatFrame userId={selectedChatId}/>
         </div>
     )
 }
