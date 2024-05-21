@@ -7,6 +7,7 @@ import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import LoginApi from "../../api/login.js";
 import {useState} from "react";
 import CreateHomeWindow from "../Home/window.jsx";
+import {invoke} from "@tauri-apps/api/tauri";
 
 export default function Login() {
     let [account, setAccount] = useState("")
@@ -23,10 +24,11 @@ export default function Login() {
         LoginApi.login({account: account, password: password})
             .then((res) => {
                 if (res.code === 0) {
-                    localStorage.setItem("token", res.data.token)
-                    localStorage.setItem("userId", res.data.userId)
-                    localStorage.setItem("account", res.data.account)
-                    localStorage.setItem("username", res.data.username)
+                    invoke('save_user_info', {
+                        userid: res.data.userId,
+                        username: res.data.username,
+                        token: res.data.token
+                    })
                     CreateHomeWindow()
                 } else {
                     console.log(res.msg)

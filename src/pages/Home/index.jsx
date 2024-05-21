@@ -1,5 +1,5 @@
 import "./index.less"
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {Redirect, Route, Switch, useHistory} from "react-router-dom";
 import Chat from "./Chat/index.jsx";
 import Friend from "./Friend/index.jsx";
@@ -8,10 +8,21 @@ import Talk from "./Talk/index.jsx";
 import {appWindow} from "@tauri-apps/api/window";
 import WindowOperation from "../../componets/WindowOperation/index.jsx";
 import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
+import ws from "../../utils/ws.js";
+import {invoke} from "@tauri-apps/api/tauri";
 
 export default function Home() {
     const [selectedOptionIndex, setSelectedOptionIndex] = useState(0)
     const h = useHistory();
+
+    useEffect(() => {
+        invoke("get_user_info", {}).then(res => {
+            let token = res.token
+            if (token) {
+                ws.connect(token)
+            }
+        })
+    }, [])
 
     const onMinimize = () => {
         appWindow.minimize();
