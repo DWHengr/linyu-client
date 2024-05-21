@@ -5,7 +5,7 @@ import {listen} from "@tauri-apps/api/event";
 let width = 120
 let height = 160
 
-await listen('tray_menu', async (event) => {
+listen('tray_menu', async (event) => {
     const homeWindow = WebviewWindow.getByLabel('home')
     if (!homeWindow) return
     let position = event.payload[0];
