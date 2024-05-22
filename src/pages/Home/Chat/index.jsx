@@ -148,7 +148,7 @@ export default function Chat() {
                     }
                 </div>
             </div>
-            <CommonChatFrame userId={selectedChatId}/>
+            <CommonChatFrame toId={selectedChatId}/>
         </div>
     )
 }

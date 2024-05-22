@@ -6,19 +6,27 @@ import CustomDragDiv from "../CustomDragDiv/index.jsx";
 import {useEffect, useRef, useState} from "react";
 import {listen} from "@tauri-apps/api/event";
 import MessageApi from "../../api/message.js";
+import {invoke} from "@tauri-apps/api/tauri";
 
-export default function CommonChatFrame({userId}) {
+export default function CommonChatFrame({toId}) {
 
     const [messages, setMessages] = useState([])
     const showFrameRef = useRef(null)
-    const fromId = useRef(userId);
+    const currentToId = useRef(toId);
     const [msgContentValue, setMsgContentValue] = useState(null)
+    const messagesRef = useRef([]);
+    const currentUserId = useRef(toId);
 
     useEffect(() => {
+        invoke("get_user_info", {}).then(res => {
+            currentUserId.current = res.user_id
+        })
         const unListen = listen('on-msg', (event) => {
             let data = event.payload
-            if (fromId.current === data.fromId) messages.push(data)
-            setMessages([...messages])
+            if (currentToId.current === data.fromId) {
+                messagesRef.current.push(data)
+                setMessages(() => [...messagesRef.current])
+            }
         });
         return async () => {
             (await unListen)()
@@ -26,8 +34,8 @@ export default function CommonChatFrame({userId}) {
     }, [])
 
     useEffect(() => {
-        fromId.current = userId
-    }, [userId])
+        currentToId.current = toId
+    }, [toId])
 
     useEffect(() => {
         const container = showFrameRef.current
@@ -35,16 +43,20 @@ export default function CommonChatFrame({userId}) {
     }, [messages])
 
     let onSendMsg = () => {
-        MessageApi.sendMsg({
-            toUserId: fromId,
+        let msg = {
+            toUserId: currentToId.current,
             msgContent: {
                 type: "text",
                 content: msgContentValue
             },
             isShowTime: true
-        }).then(res => {
+        }
+        MessageApi.sendMsg(msg).then(res => {
             if (res.code === 0) {
-
+                if (res.data) {
+                    messagesRef.current.push(res.data)
+                    setMessages(() => [...messagesRef.current])
+                }
             }
         })
         setMsgContentValue("")
@@ -66,7 +78,8 @@ export default function CommonChatFrame({userId}) {
         </CustomDragDiv>
         <div ref={showFrameRef} className="chat-content-show-frame">
             {messages?.map((msg) => {
-                return (<Text key={msg.id} value={msg.msgContent.content}/>)
+                return (
+                    <Text key={msg.id} value={msg.msgContent.content} right={msg.fromId === currentUserId.current}/>)
             })}
         </div>
         <div className="chat-content-send-frame">
