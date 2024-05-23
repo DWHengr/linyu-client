@@ -2,8 +2,18 @@ import "./index.less"
 import {WebviewWindow} from "@tauri-apps/api/window";
 import {exit} from "@tauri-apps/api/process";
 import CustomLine from "../../componets/CustomLine/index.jsx";
+import {useEffect, useState} from "react";
+import {invoke} from "@tauri-apps/api/tauri";
 
 export default function TrayMenu() {
+    const [currentUsername, setCurrentUsername] = useState("");
+
+    useEffect(() => {
+        (async () => {
+            let userInfo = await invoke("get_user_info", {})
+            setCurrentUsername(userInfo.username)
+        })()
+    }, [])
 
     const onShowHome = async () => {
         const homeWindow = WebviewWindow.getByLabel('home')
@@ -22,7 +32,9 @@ export default function TrayMenu() {
         <div className="tray-menu-container">
             <div className="tray-menu">
                 <div className="tray-menu-portrait"></div>
-                <div style={{fontSize: 12, fontWeight: 600}}>小红</div>
+                <div style={{fontSize: 12, fontWeight: 600}}>
+                    {currentUsername}
+                </div>
                 <CustomLine width={1}/>
                 <div className="tray-menu-operation">
                     <div className="tray-menu-operation-item" onClick={onShowHome}>
