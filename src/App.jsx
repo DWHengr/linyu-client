@@ -5,18 +5,9 @@ import {Redirect, Route, Switch} from "react-router-dom";
 import Home from "./pages/Home/index.jsx";
 import Login from "./pages/Login/index.jsx";
 import TrayMenu from "./pages/TrayMenu/index.jsx";
-import CreateTrayWindow from "./pages/TrayMenu/window.jsx";
 import ChatWindow from "./pages/ChatWindow/index.jsx";
 
-CreateTrayWindow()
 function App() {
-    const [greetMsg, setGreetMsg] = useState("");
-    const [name, setName] = useState("");
-
-    async function greet() {
-        setGreetMsg(await invoke("greet", {name}));
-    }
-
     return (
         <div>
             <Switch>
