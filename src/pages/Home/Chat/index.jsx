@@ -1,27 +1,69 @@
 import "./index.less"
 import CustomSearchInput from "../../../componets/CustomSearchInput/index.jsx";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import RightClickMenu from "../../../componets/RightClickMenu/index.jsx";
 import CommonChatFrame from "../../../componets/CommonChatFrame/index.jsx";
 import CreateChatWindow from "../../ChatWindow/window.jsx";
 import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
 import ChatListApi from "../../../api/chatList.js";
+import {useDispatch, useSelector} from "react-redux";
+import {setCurrentChartId} from "../../../store/chart/action.js";
+import {listen} from "@tauri-apps/api/event";
 
 export default function Chat() {
-
-    const [selectedChatId, setSelectedChatId] = useState(null)
+    const chartStoreData = useSelector((state) => state.chartData);
+    const [selectedChatId, setSelectedChatId] = useState(chartStoreData.currentChartId)
+    const currentToId = useRef(chartStoreData.currentChartId)//消息目标用户
+    const [selectedUserInfo, setSelectedUserInfo] = useState(null);
     const [menuPosition, setMenuPosition] = useState(null);
     const [rightSelected, setRightSelected] = useState(null)
     const [topChatsData, setTopChatsData] = useState([])
     const [allChatsData, setAllChatsData] = useState([])
+    const dispatch = useDispatch();
 
-    useEffect(() => {
+    const onGetChartList = () => {
         ChatListApi.list().then(res => {
             if (res.code === 0) {
                 setTopChatsData(res.data.tops)
                 setAllChatsData(res.data.others)
             }
         })
+    }
+
+    useEffect(() => {
+        //监听后端接受到的消息
+        const unReceiveListen = listen('on-receive-msg', (event) => {
+            let data = event.payload
+            if (currentToId.current === data.fromId) {
+                ChatListApi.read(data.fromId).then(() => {
+                    onGetChartList()
+                })
+            } else {
+                onGetChartList()
+            }
+        });
+        //监听前端接受到的消息
+        const unSendListen = listen('on-send-msg', (event) => {
+            onGetChartList()
+        });
+        return async () => {
+            (await unReceiveListen)()
+            (await unSendListen)()
+        }
+    }, [])
+
+    useEffect(() => {
+        setSelectedChatId(chartStoreData.currentChartId)
+    }, [chartStoreData.currentChartId])
+
+
+    useEffect(() => {
+        currentToId.current = selectedChatId
+        dispatch(setCurrentChartId(selectedChatId))
+    }, [selectedChatId])
+
+    useEffect(() => {
+        onGetChartList()
     }, []);
 
     const chatListRightOptions = [
@@ -41,8 +83,20 @@ export default function Chat() {
         }
     }
 
+    const onChartListClick = (data) => {
+        setSelectedChatId(data.fromId)
+        setSelectedUserInfo(data)
+        ChatListApi.read(data.fromId).then(res => {
+            onGetChartList()
+        })
+    }
+
     const ChatCard = ({info, onClick, onContextMenu}) => {
-        let isSelected = info.fromId === selectedChatId
+        let isSelected = false
+        if (info.fromId === selectedChatId) {
+            isSelected = true
+            setSelectedUserInfo(info)
+        }
         return (
             <div
                 className={`chat-card ${isSelected ? "selected" : ""}`}
@@ -63,7 +117,8 @@ export default function Chat() {
                             }}
                             className="ellipsis"
                         >
-                            {info.remark ? info.remark : info.name}</div>
+                            {info.remark ? info.remark : info.name}
+                        </div>
                         <div style={{
                             fontSize: 10,
                             color: `${isSelected ? "#F6F6F6" : "#646464"}`
@@ -74,10 +129,10 @@ export default function Chat() {
                             style={{fontSize: 12, color: `${isSelected ? "#F6F6F6" : "#646464"}`}}
                             className="ellipsis"
                         >
-                            {info.lastMsgContent.content}
+                            {info.lastMsgContent?.content}
                         </div>
                         {
-                            info.unreadNum > 0 ? <div style={{
+                            info.unreadNum > 0 && !isSelected ? <div style={{
                                     width: 18,
                                     minWidth: 18,
                                     height: 18,
@@ -89,7 +144,7 @@ export default function Chat() {
                                     justifyContent: "center",
                                     color: "#fff"
                                 }}>
-                                    {info.unreadNum}
+                                    {info.unreadNum < 99 ? info.unreadNum : "99+"}
                                 </div> :
                                 <></>
                         }
@@ -125,7 +180,7 @@ export default function Chat() {
                                         setMenuPosition({x: e.clientX, y: e.clientY})
                                     }}
                                     info={data}
-                                    onClick={() => setSelectedChatId(data.fromId)}
+                                    onClick={() => onChartListClick(data)}
                                 />
                             )
                         })
@@ -140,15 +195,21 @@ export default function Chat() {
                                         setMenuPosition({x: e.clientX, y: e.clientY})
                                     }}
                                     info={data}
-                                    onClick={() => setSelectedChatId(data.fromId)}
+                                    onClick={() => onChartListClick(data)}
                                 />
                             )
                         })
-
                     }
                 </div>
             </div>
-            <CommonChatFrame toId={selectedChatId}/>
+            {
+                selectedUserInfo ?
+                    <CommonChatFrame userInfo={selectedUserInfo}/>
+                    :
+                    <CustomDragDiv style={{display: "flex", flex: 1, alignItems: "center", justifyContent: "center"}}>
+                        <img style={{height: 120}} src="/bg.png" alt=""/>
+                    </CustomDragDiv>
+            }
         </div>
     )
 }

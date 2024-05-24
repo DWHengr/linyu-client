@@ -9,14 +9,21 @@ import CustomButton from "../../../componets/CustomButton/index.jsx";
 import {useHistory} from "react-router-dom";
 import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
 import FriendApi from "../../../api/friend.js";
+import {calculateAge, getDateDayAndMonth} from "../../../utils/date.js";
+import {useDispatch} from "react-redux";
+import {setCurrentChartId} from "../../../store/chart/action.js";
+import ChatListApi from "../../../api/chatList.js";
+import {setCurrentOption} from "../../../store/home/action.js";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState("1")
-    const [groupMenuPosition, setGroupMenuPosition] = useState(null);
-    const [addMenuPosition, setAddMenuPosition] = useState(null);
-    const [moreMenuPosition, setMoreMenuPosition] = useState(null);
-    const [allFriendData, setAllFriendData] = useState([]);
-    const h = useHistory();
+    const [groupMenuPosition, setGroupMenuPosition] = useState(null)
+    const [addMenuPosition, setAddMenuPosition] = useState(null)
+    const [moreMenuPosition, setMoreMenuPosition] = useState(null)
+    const [allFriendData, setAllFriendData] = useState([])
+    const h = useHistory()
+    const [friendDetails, setFriendDetails] = useState(null)
+    const dispatch = useDispatch();
 
     useEffect(() => {
         FriendApi.list().then(res => {
@@ -42,15 +49,28 @@ export default function Friend() {
         {key: "delFriend", label: "删除好友"},
     ]
 
-    // let allFriendData = [{name: "特别关心", friends: [{id: 1, name: "元气少女", remark: "小红"}]}, {
-    //     name: "销售部", friends: [{id: 2, name: "元气少女222222222222222222222222223122222222222", remark: "小红"}, {
-    //         id: 3, name: "元气少女", remark: "小红"
-    //     }, {id: 4, name: "元气少女", remark: "小红"}]
-    // }, {name: "企业一部", friends: []},]
+    const onFriendDetails = (friendId) => {
+        if (friendId === selectedFriendId) return
+        setSelectedFriendId(friendId)
+        FriendApi.details(friendId).then(res => {
+            if (res.code === 0) {
+                setFriendDetails(res.data)
+            }
+        })
+    }
+
+    const onSendMsgClick = () => {
+        ChatListApi.create({userId: selectedFriendId}).then(res => {
+            if (res.code === 0) {
+                dispatch(setCurrentChartId(selectedFriendId))
+                dispatch(setCurrentOption("chart"))
+                h.push("/home/chat")
+            }
+        })
+    }
 
     const FriendCard = ({info, onClick, onContextMenu}) => {
-        console.log(info)
-        let isSelected = info.id === selectedFriendId
+        let isSelected = info.friendId === selectedFriendId
         return (<div
             className={`friend-card ${isSelected ? "selected" : ""}`}
             onClick={() => onClick(info)}
@@ -107,7 +127,7 @@ export default function Friend() {
                                 {item?.friends?.map((friend) => {
                                     return (<FriendCard
                                         info={friend}
-                                        onClick={() => setSelectedFriendId(friend.id)}
+                                        onClick={() => onFriendDetails(friend.friendId)}
                                     />)
                                 })}
                             </CustomAccordion>
@@ -115,83 +135,110 @@ export default function Friend() {
                     })}
                 </div>
             </div>
-            <CustomDragDiv className="friend-content">
-                <div className="friend-content-container">
-                    <div className="friend-content-container-top">
-                        <div className="friend-content-container-top-info">
-                            <div className="info-icon"></div>
-                            <div className="info-content">
-                                <div style={{display: "flex", justifyContent: "space-between"}}>
-                                    <div style={{fontSize: 30, fontWeight: 600, letterSpacing: 2}}>小红</div>
-                                    <div style={{display: "flex", alignItems: "center"}}>
-                                        <i className={`iconfont icon-star`} style={{fontSize: 22, color: "#4C9BFF"}}/>
-                                        <IconMinorButton
-                                            onClick={(e) => setMoreMenuPosition({x: e.clientX, y: e.clientY})}
-                                            icon={<i className={`iconfont icon-gengduo`} style={{fontSize: 32}}/>}
-                                        />
-                                    </div>
-                                </div>
-                                <div>
-                                    <div style={{fontSize: 16, color: "#989898"}}>昵称：元气少女</div>
-                                    <div style={{fontSize: 16, color: "#989898"}}>账号：xiaohong</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="friend-content-container-mid">
-                        <div className="info-item">
-                            <i className={`iconfont icon-nv`} style={{fontSize: 14, marginRight: 5, color: "#FFA0CF"}}/>
-                            <div>女</div>
-                            <CustomLine size={12} width={1} direction="vertical"/>
-                            <div>18岁</div>
-                            <CustomLine size={12} width={1} direction="vertical"/>
-                            <div>9月20日</div>
-                        </div>
-                        <div className="info-item">
-                            <i className={`iconfont icon-beizhu`} style={{fontSize: 14, marginRight: 5}}/>
-                            <div>备注：</div>
-                            <div>小红</div>
-                        </div>
-                        <div className="info-item">
-                            <i className={`iconfont icon-fenzu`} style={{fontSize: 14, marginRight: 5}}/>
-                            <div>分组：</div>
-                            <div>财务部</div>
-                        </div>
-                        <div className="info-item">
-                            <i className={`iconfont icon-qianming`} style={{fontSize: 14, marginRight: 5}}/>
-                            <div>签名：</div>
-                            <div>不一样的小红花</div>
-                        </div>
-                        <div className="info-item">
-                            <div style={{display: "flex", flexDirection: "column"}}>
-                                <div style={{display: "flex"}}>
-                                    <i className={`iconfont icon-pengyouquan`} style={{fontSize: 14, marginRight: 5}}/>
-                                    <div>朋友圈：</div>
-                                </div>
-                                <div
-                                    onClick={() => {
-                                        h.push("/home/talk")
-                                    }}
-                                >
-                                    <div>今天天气不错！</div>
-                                    <div style={{width: 100, height: 100}}>
-                                        <img
-                                            style={{width: "100%", height: "100%", objectFit: "cover", borderRadius: 5}}
-                                            src="https://th.bing.com/th/id/OIP.kt5NiXbTpov01ELs6cs8tQHaEo?rs=1&pid=ImgDetMain"
-                                        />
+            {
+                friendDetails ?
+                    <CustomDragDiv className="friend-content">
+                        <div className="friend-content-container">
+                            <div className="friend-content-container-top">
+                                <div className="friend-content-container-top-info">
+                                    <div className="info-icon"></div>
+                                    <div className="info-content">
+                                        <div style={{display: "flex", justifyContent: "space-between"}}>
+                                            <div style={{
+                                                fontSize: 30,
+                                                fontWeight: 600,
+                                                letterSpacing: 2
+                                            }}>{friendDetails.name}</div>
+                                            <div style={{display: "flex", alignItems: "center"}}>
+                                                <i className={`iconfont icon-star`}
+                                                   style={{fontSize: 22, color: "#4C9BFF"}}/>
+                                                <IconMinorButton
+                                                    onClick={(e) => setMoreMenuPosition({x: e.clientX, y: e.clientY})}
+                                                    icon={<i className={`iconfont icon-gengduo`}
+                                                             style={{fontSize: 32}}/>}
+                                                />
+                                            </div>
+                                        </div>
+                                        <div>
+                                            <div style={{
+                                                fontSize: 16,
+                                                color: "#989898"
+                                            }}>账号：{friendDetails.account}</div>
+                                            <div style={{height: 16}}></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+                            <div className="friend-content-container-mid">
+                                <div className="info-item">
+                                    <i className={`iconfont ${friendDetails.sex === 'nv' ? 'icon-nv' : 'icon-nan'}`}
+                                       style={{
+                                           fontSize: 14,
+                                           marginRight: 5,
+                                           color: friendDetails.sex === 'nv' ? "#FFA0CF" : "#4C9BFF"
+                                       }}/>
+                                    <div>{friendDetails.sex}</div>
+                                    <CustomLine size={12} width={1} direction="vertical"/>
+                                    <div>{calculateAge(friendDetails.birthday)}岁</div>
+                                    <CustomLine size={12} width={1} direction="vertical"/>
+                                    <div>{getDateDayAndMonth(friendDetails.birthday)}</div>
+                                </div>
+                                <div className="info-item">
+                                    <i className={`iconfont icon-beizhu`} style={{fontSize: 14, marginRight: 5}}/>
+                                    <div>备注：</div>
+                                    <div>{friendDetails.remark}</div>
+                                </div>
+                                <div className="info-item">
+                                    <i className={`iconfont icon-fenzu`} style={{fontSize: 14, marginRight: 5}}/>
+                                    <div>分组：</div>
+                                    <div>{friendDetails.groupName}</div>
+                                </div>
+                                <div className="info-item">
+                                    <i className={`iconfont icon-qianming`} style={{fontSize: 14, marginRight: 5}}/>
+                                    <div>签名：</div>
+                                    <div>{friendDetails.signature}</div>
+                                </div>
+                                <div className="info-item">
+                                    <div style={{display: "flex", flexDirection: "column"}}>
+                                        <div style={{display: "flex"}}>
+                                            <i className={`iconfont icon-pengyouquan`}
+                                               style={{fontSize: 14, marginRight: 5}}/>
+                                            <div>朋友圈：</div>
+                                        </div>
+                                        <div
+                                            onClick={() => {
+                                                h.push("/home/talk")
+                                            }}
+                                        >
+                                            <div>今天天气不错！</div>
+                                            <div style={{width: 100, height: 100}}>
+                                                <img
+                                                    style={{
+                                                        width: "100%",
+                                                        height: "100%",
+                                                        objectFit: "cover",
+                                                        borderRadius: 5
+                                                    }}
+                                                    src="https://th.bing.com/th/id/OIP.kt5NiXbTpov01ELs6cs8tQHaEo?rs=1&pid=ImgDetMain"
+                                                />
+                                            </div>
+                                        </div>
+                                    </div>
 
+                                </div>
+                            </div>
+                            <div className="friend-content-container-bottom">
+                                <div style={{display: "flex"}}>
+                                    <CustomButton type="" width={100} onClick={onSendMsgClick}>发消息</CustomButton>
+                                    <CustomButton type="minor" width={100}>视频聊天</CustomButton>
+                                </div>
+                            </div>
                         </div>
-                    </div>
-                    <div className="friend-content-container-bottom">
-                        <div style={{display: "flex"}}>
-                            <CustomButton type="" width={100}>发消息</CustomButton>
-                            <CustomButton type="minor" width={100}>视频聊天</CustomButton>
-                        </div>
-                    </div>
-                </div>
-            </CustomDragDiv>
+                    </CustomDragDiv>
+                    :
+                    <CustomDragDiv style={{display: "flex", flex: 1, alignItems: "center", justifyContent: "center"}}>
+                        <img style={{height: 120}} src="/bg.png" alt=""/>
+                    </CustomDragDiv>
+            }
         </div>)
 }

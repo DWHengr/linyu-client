@@ -10,10 +10,15 @@ import WindowOperation from "../../componets/WindowOperation/index.jsx";
 import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import ws from "../../utils/ws.js";
 import {invoke} from "@tauri-apps/api/tauri";
+import CreateTrayWindow from "../TrayMenu/window.jsx";
+import {useDispatch, useSelector} from "react-redux";
+import {setCurrentOption} from "../../store/home/action.js";
 
 export default function Home() {
-    const [selectedOptionIndex, setSelectedOptionIndex] = useState(0)
+    const homeStoreData = useSelector(store => store.homeData);
+    const [selectedOptionIndex, setSelectedOptionIndex] = useState("chart")
     const h = useHistory();
+    const dispatch = useDispatch();
 
     useEffect(() => {
         invoke("get_user_info", {}).then(res => {
@@ -22,7 +27,13 @@ export default function Home() {
                 ws.connect(token)
             }
         })
+        CreateTrayWindow()
     }, [])
+
+    useEffect(() => {
+        if (homeStoreData.currentOption)
+            setSelectedOptionIndex(homeStoreData.currentOption)
+    }, [homeStoreData.currentOption])
 
     const onMinimize = () => {
         appWindow.minimize();
@@ -37,7 +48,7 @@ export default function Home() {
     }
 
     const options = [
-        {key: "chat", icon: "icon-liaotian", page: "/home/chat"},
+        {key: "chart", icon: "icon-liaotian", page: "/home/chart"},
         {key: "friend", icon: "icon-haoyou", page: "/home/friend"},
         {key: "talk", icon: "icon-pengyouquan", page: "/home/talk"},
         {key: "set", icon: "icon-shezhi", page: "/home/set"},
@@ -53,13 +64,14 @@ export default function Home() {
                     </div>
                     <div className="home-nav-options">
                         {
-                            options.map((option, index) => {
+                            options.map((option) => {
                                 return (
                                     <div
-                                        key={index}
-                                        className={`home-nav-option ${index === selectedOptionIndex ? "selected" : ""}`}
+                                        key={option.key}
+                                        className={`home-nav-option ${option.key === selectedOptionIndex ? "selected" : ""}`}
                                         onClick={() => {
-                                            setSelectedOptionIndex(index)
+                                            setSelectedOptionIndex(option.key)
+                                            dispatch(setCurrentOption(option.key))
                                             h.push(option.page)
                                         }}
                                     >

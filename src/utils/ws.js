@@ -15,7 +15,7 @@ function response(msg) {
         if (msg.data.code === -1) {
             onCloseHandler()
         } else {
-            emit('on-msg', JSON.parse(msg.data))
+            emit('on-receive-msg', JSON.parse(msg.data))
         }
     } else {
         onCloseHandler()
