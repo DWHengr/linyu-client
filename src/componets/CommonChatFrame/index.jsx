@@ -4,9 +4,9 @@ import CustomButton from "../CustomButton/index.jsx";
 import Text from "./ChatContent/Text/index.jsx";
 import CustomDragDiv from "../CustomDragDiv/index.jsx";
 import {useEffect, useRef, useState} from "react";
-import {listen} from "@tauri-apps/api/event";
+import {emit, listen} from "@tauri-apps/api/event";
 import MessageApi from "../../api/message.js";
-import {invoke} from "@tauri-apps/api/tauri";
+import {invoke} from "@tauri-apps/api/core";
 
 export default function CommonChatFrame({userInfo}) {
 
@@ -39,32 +39,8 @@ export default function CommonChatFrame({userInfo}) {
         }
     }, [])
 
-    useEffect(() => {
-        //滚动条顶部触发加载记录
-        const handleScroll = () => {
-            if (isQueryComplete.current) return
-            if (showFrameRef.current && !scrollTriggered.current) {
-                const scrollTop = showFrameRef.current.scrollTop;
-                const threshold = 0;
-                if (scrollTop <= threshold) {
-                    scrollTriggered.current = true
-                    onMessageRecord()
-                }
-            }
-        };
-        const scrollContainer = showFrameRef.current;
-        if (scrollContainer) {
-            scrollContainer.addEventListener('scroll', handleScroll);
-        }
-        return () => {
-            if (scrollContainer) {
-                scrollContainer.removeEventListener('scroll', handleScroll);
-            }
-        };
-    }, [])
-
-
     const onMessageRecord = () => {
+        if (isQueryComplete.current) return
         //记录当前滚动条位置
         const container = showFrameRef.current;
         const scrollHeightBeforeLoad = container.scrollHeight;
@@ -74,6 +50,7 @@ export default function CommonChatFrame({userInfo}) {
             targetId: userInfoRef.current.fromId, index: currentMsgRecordIndex.current, num: 20
         }).then(res => {
             if (res.code === 0) {
+                console.log(res)
                 if (res.data.length > 0) {
                     messagesRef.current = [...res.data, ...messagesRef.current]
                     setMessages([...messagesRef.current])
@@ -100,7 +77,32 @@ export default function CommonChatFrame({userInfo}) {
         messagesRef.current = []
         setMessages([])
         currentToId.current = userInfo.fromId
-        onMessageRecord()
+
+        //滚动条顶部触发加载记录
+        const handleScroll = () => {
+            if (isQueryComplete.current) return
+            if (showFrameRef.current && !scrollTriggered.current) {
+                const scrollTop = showFrameRef.current.scrollTop;
+                const threshold = 0;
+                if (scrollTop <= threshold) {
+                    scrollTriggered.current = true
+                    onMessageRecord()
+                }
+            }
+        };
+        const scrollContainer = showFrameRef.current;
+        if (scrollContainer) {
+            if (scrollContainer.scrollTop !== 0) {
+                scrollContainer.addEventListener('scroll', handleScroll);
+            } else {
+                handleScroll();
+            }
+        }
+        return () => {
+            if (scrollContainer) {
+                scrollContainer.removeEventListener('scroll', handleScroll);
+            }
+        };
     }, [userInfo])
 
     useEffect(() => {
@@ -123,8 +125,8 @@ export default function CommonChatFrame({userInfo}) {
         MessageApi.sendMsg(msg).then(res => {
             if (res.code === 0) {
                 if (res.data) {
+                    setMessages(() => [...messagesRef.current, res.data])
                     messagesRef.current.push(res.data)
-                    setMessages(() => [...messagesRef.current])
                     emit("on-send-msg", {})
                 }
             }

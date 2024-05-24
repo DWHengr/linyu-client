@@ -1,9 +1,9 @@
 import "./index.less"
-import {WebviewWindow} from "@tauri-apps/api/window";
-import {exit} from "@tauri-apps/api/process";
+import {exit} from "@tauri-apps/plugin-process";
 import CustomLine from "../../componets/CustomLine/index.jsx";
 import {useEffect, useState} from "react";
-import {invoke} from "@tauri-apps/api/tauri";
+import {invoke} from "@tauri-apps/api/core";
+import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 
 export default function TrayMenu() {
     const [currentUsername, setCurrentUsername] = useState("");

@@ -1,4 +1,4 @@
-import {WebviewWindow} from "@tauri-apps/api/window";
+import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
 
 export default function CreateChatWindow(user) {
     const window = WebviewWindow.getByLabel('chart-' + user)

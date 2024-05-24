@@ -1,25 +1,19 @@
 import "./index.less"
 import IconButton from "../IconButton/index.jsx";
-import {appWindow, WebviewWindow} from "@tauri-apps/api/window";
+import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 
 export default function WindowOperation({hide = true}) {
 
     const onMinimize = () => {
-        WebviewWindow.getFocusedWindow().then((window) => {
-            appWindow.minimize();
-        })
+        WebviewWindow.getCurrent().minimize()
     }
 
     const onClose = () => {
-        WebviewWindow.getFocusedWindow().then((window) => {
-            appWindow.close();
-        })
+        WebviewWindow.getCurrent().close()
     }
 
     const onHide = () => {
-        WebviewWindow.getFocusedWindow().then((window) => {
-            appWindow.hide();
-        })
+        WebviewWindow.getCurrent().hide()
     }
 
     return (

@@ -1,0 +1,53 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Capability for the main window",
+  "windows": [
+    "*"
+  ],
+  "permissions": [
+    "path:default",
+    "event:default",
+    "window:default",
+    "window:allow-start-dragging",
+    "window:allow-close",
+    "window:allow-hide",
+    "window:allow-center",
+    "window:allow-show",
+    "window:allow-maximize",
+    "window:allow-minimize",
+    "window:allow-destroy",
+    "window:allow-is-focused",
+    "window:allow-is-fullscreen",
+    "window:allow-set-focus",
+    "window:allow-set-position",
+    "window:allow-scale-factor",
+    "window:allow-unminimize",
+    "app:default",
+    "image:default",
+    "resources:default",
+    "menu:default",
+    "tray:default",
+    "tray:allow-new",
+    "tray:allow-set-tooltip",
+    "shell:allow-open",
+    "websocket:default",
+    "http:default",
+    "process:default",
+    "process:allow-exit",
+    "webview:default",
+    "webview:allow-create-webview",
+    "webview:allow-create-webview-window",
+    {
+      "identifier": "http:default",
+      "allow": [
+        {
+          "url": "http://127.0.0.1:9200"
+        },
+        {
+          "url": "http://127.0.0.1:9100"
+        }
+      ]
+    }
+  ]
+}

@@ -1,4 +1,4 @@
-import WebSocket from "tauri-plugin-websocket-api";
+import WebSocket from '@tauri-apps/plugin-websocket';
 import {emit} from "@tauri-apps/api/event";
 
 let ws = null

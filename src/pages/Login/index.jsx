@@ -1,5 +1,4 @@
 import "./index.less"
-import {appWindow} from "@tauri-apps/api/window";
 import CustomUserNameInput from "../../componets/CustomUserNameInput/index.jsx";
 import CustomPwdInput from "../../componets/CustomPwdInput/index.jsx";
 import IconButton from "../../componets/IconButton/index.jsx";
@@ -7,7 +6,8 @@ import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import LoginApi from "../../api/login.js";
 import {useState} from "react";
 import CreateHomeWindow from "../Home/window.jsx";
-import {invoke} from "@tauri-apps/api/tauri";
+import {invoke} from "@tauri-apps/api/core";
+import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 
 export default function Login() {
     let [account, setAccount] = useState("")
@@ -47,7 +47,10 @@ export default function Login() {
                         danger
                         icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 22}}/>}
                         onClick={
-                            () => appWindow.close()
+                            () => {
+                                const appWindow = WebviewWindow.getByLabel('login')
+                                appWindow.close()
+                            }
                         }
                     />
                 </div>

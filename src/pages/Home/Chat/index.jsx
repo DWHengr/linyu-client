@@ -84,6 +84,8 @@ export default function Chat() {
     }
 
     const onChartListClick = (data) => {
+        if (selectedChatId === data.fromId)
+            return
         setSelectedChatId(data.fromId)
         setSelectedUserInfo(data)
         ChatListApi.read(data.fromId).then(res => {

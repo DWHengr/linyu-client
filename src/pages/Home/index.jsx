@@ -5,16 +5,17 @@ import Chat from "./Chat/index.jsx";
 import Friend from "./Friend/index.jsx";
 import Set from "./Set/index.jsx";
 import Talk from "./Talk/index.jsx";
-import {appWindow} from "@tauri-apps/api/window";
 import WindowOperation from "../../componets/WindowOperation/index.jsx";
 import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import ws from "../../utils/ws.js";
-import {invoke} from "@tauri-apps/api/tauri";
+import {invoke} from "@tauri-apps/api/core";
 import CreateTrayWindow from "../TrayMenu/window.jsx";
 import {useDispatch, useSelector} from "react-redux";
 import {setCurrentOption} from "../../store/home/action.js";
+import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 
 export default function Home() {
+    CreateTrayWindow()
     const homeStoreData = useSelector(store => store.homeData);
     const [selectedOptionIndex, setSelectedOptionIndex] = useState("chart")
     const h = useHistory();
@@ -27,7 +28,6 @@ export default function Home() {
                 ws.connect(token)
             }
         })
-        CreateTrayWindow()
     }, [])
 
     useEffect(() => {
@@ -36,14 +36,17 @@ export default function Home() {
     }, [homeStoreData.currentOption])
 
     const onMinimize = () => {
+        const appWindow = WebviewWindow.getByLabel('login')
         appWindow.minimize();
     }
 
     const onClose = () => {
+        const appWindow = WebviewWindow.getByLabel('login')
         appWindow.close();
     }
 
     const onHide = () => {
+        const appWindow = WebviewWindow.getByLabel('login')
         appWindow.hide();
     }
 
