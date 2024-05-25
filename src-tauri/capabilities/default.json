@@ -23,6 +23,7 @@
     "window:allow-set-position",
     "window:allow-scale-factor",
     "window:allow-unminimize",
+    "window:allow-set-always-on-top",
     "app:default",
     "image:default",
     "resources:default",

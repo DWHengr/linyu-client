@@ -28,8 +28,9 @@ export default function Login() {
                         userid: res.data.userId,
                         username: res.data.username,
                         token: res.data.token
+                    }).then(() => {
+                        CreateHomeWindow()
                     })
-                    CreateHomeWindow()
                 } else {
                     console.log(res.msg)
                 }
