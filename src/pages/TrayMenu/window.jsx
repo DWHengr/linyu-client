@@ -1,6 +1,6 @@
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
 import {listen} from "@tauri-apps/api/event";
-import {LogicalPosition, PhysicalPosition, Window} from "@tauri-apps/api/window";
+import {PhysicalPosition} from "@tauri-apps/api/window";
 
 
 let width = 120
@@ -16,6 +16,7 @@ listen('tray_menu', async (event) => {
         let logicalPosition = new PhysicalPosition(position.x, position.y).toLogical(scaleFactor);
         logicalPosition = new PhysicalPosition(logicalPosition.x, logicalPosition.y).toLogical(scaleFactor);
         logicalPosition.y = logicalPosition.y - height
+        await trayWindow.setAlwaysOnTop(true)
         await trayWindow.setPosition(logicalPosition)
         await trayWindow.show()
         await trayWindow.setFocus()
@@ -26,15 +27,13 @@ export default function CreateTrayWindow() {
         url: "/tray",
         width: width,
         height: height,
-        alwaysOnTop: true,
         skipTaskbar: true,
         decorations: false,
         focus: false,
         center: true,
         transparent: true,
         resizable: false,
-        shadow: false
-
+        shadow: false,
     });
     webview.listen("tauri://blur", function () {
         const trayWindow = WebviewWindow.getByLabel('tray_menu')
