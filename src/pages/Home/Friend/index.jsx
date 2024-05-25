@@ -120,6 +120,7 @@ export default function Friend() {
                     {allFriendData.map(item => {
                         return (<>
                             <CustomAccordion
+                                key={item.id}
                                 title={item.name}
                                 titleEnd={`（${item.friends ? item.friends.length : 0}）`}
                                 onContextMenu={(e) => setGroupMenuPosition({x: e.clientX, y: e.clientY})}
