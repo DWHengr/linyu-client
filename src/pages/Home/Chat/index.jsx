@@ -7,16 +7,17 @@ import CreateChatWindow from "../../ChatWindow/window.jsx";
 import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
 import ChatListApi from "../../../api/chatList.js";
 import {useDispatch, useSelector} from "react-redux";
-import {setCurrentChartId} from "../../../store/chart/action.js";
+import {addChartWindowUser, setCurrentChartId} from "../../../store/chart/action.js";
 import {listen} from "@tauri-apps/api/event";
 
 export default function Chat() {
     const chartStoreData = useSelector((state) => state.chartData);
     const [selectedChatId, setSelectedChatId] = useState(chartStoreData.currentChartId)
     const currentToId = useRef(chartStoreData.currentChartId)//消息目标用户
-    const [selectedUserInfo, setSelectedUserInfo] = useState(null);
+    const [selectedUserInfo, setSelectedUserInfo] = useState(chartStoreData.currentChartUserInfo);
+    const selectedRightUserInfo = useRef(null);
+    const rightSelected = useRef(null);
     const [menuPosition, setMenuPosition] = useState(null);
-    const [rightSelected, setRightSelected] = useState(null)
     const [topChatsData, setTopChatsData] = useState([])
     const [allChatsData, setAllChatsData] = useState([])
     const dispatch = useDispatch();
@@ -47,8 +48,8 @@ export default function Chat() {
             onGetChartList()
         });
         return async () => {
-            (await unReceiveListen)()
-            (await unSendListen)()
+            (await unReceiveListen)();
+            (await unSendListen)();
         }
     }, [])
 
@@ -59,7 +60,6 @@ export default function Chat() {
 
     useEffect(() => {
         currentToId.current = selectedChatId
-        dispatch(setCurrentChartId(selectedChatId))
     }, [selectedChatId])
 
     useEffect(() => {
@@ -78,7 +78,8 @@ export default function Chat() {
     const onMenuItemClick = (item) => {
         switch (item.key) {
             case "newChatWindow" : {
-                CreateChatWindow(rightSelected)
+                dispatch(addChartWindowUser(selectedRightUserInfo.current))
+                CreateChatWindow(rightSelected.current)
             }
         }
     }
@@ -86,6 +87,7 @@ export default function Chat() {
     const onChartListClick = (data) => {
         if (selectedChatId === data.fromId)
             return
+        dispatch(setCurrentChartId(data.fromId, data))
         setSelectedChatId(data.fromId)
         setSelectedUserInfo(data)
         ChatListApi.read(data.fromId).then(res => {
@@ -97,7 +99,6 @@ export default function Chat() {
         let isSelected = false
         if (info.fromId === selectedChatId) {
             isSelected = true
-            setSelectedUserInfo(info)
         }
         return (
             <div
@@ -177,8 +178,10 @@ export default function Chat() {
                         topChatsData.map(data => {
                             return (
                                 <ChatCard
+                                    key={data.id}
                                     onContextMenu={(e) => {
-                                        setRightSelected(data.id)
+                                        rightSelected.current = data.fromId;
+                                        selectedRightUserInfo.current = data;
                                         setMenuPosition({x: e.clientX, y: e.clientY})
                                     }}
                                     info={data}
@@ -192,8 +195,10 @@ export default function Chat() {
                         allChatsData.map(data => {
                             return (
                                 <ChatCard
+                                    key={data.id}
                                     onContextMenu={(e) => {
-                                        setRightSelected(data.id)
+                                        rightSelected.current = data.fromId;
+                                        selectedRightUserInfo.current = data;
                                         setMenuPosition({x: e.clientX, y: e.clientY})
                                     }}
                                     info={data}

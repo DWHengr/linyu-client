@@ -1,6 +1,7 @@
 import "./index.less"
+import {memo} from "react";
 
-export default function Text({value, right = false}) {
+const Text = memo(({value, right = false}) => {
     return (
         <>
             <div className={"chat-content-msg"}>
@@ -10,4 +11,5 @@ export default function Text({value, right = false}) {
             </div>
         </>
     )
-}
+})
+export default Text;

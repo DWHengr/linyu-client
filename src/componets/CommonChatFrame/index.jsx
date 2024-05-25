@@ -3,17 +3,17 @@ import IconMinorButton from "../IconMinorButton/index.jsx";
 import CustomButton from "../CustomButton/index.jsx";
 import Text from "./ChatContent/Text/index.jsx";
 import CustomDragDiv from "../CustomDragDiv/index.jsx";
-import {useEffect, useRef, useState} from "react";
+import {memo, useEffect, useRef, useState} from "react";
 import {emit, listen} from "@tauri-apps/api/event";
 import MessageApi from "../../api/message.js";
 import {invoke} from "@tauri-apps/api/core";
 
-export default function CommonChatFrame({userInfo}) {
+function CommonChatFrame({userInfo}) {
 
     const [messages, setMessages] = useState([])
     const showFrameRef = useRef(null)
     const currentToId = useRef(userInfo.fromId)//消息目标用户
-    const [msgContentValue, setMsgContentValue] = useState(null)//输入框消息内容
+    const msgContentRef = useRef(null)//输入框消息内容
     const messagesRef = useRef([])//保持会话的消息
     const currentUserId = useRef(null)//当前用户
     const currentMsgRecordIndex = useRef(0)//消息记录查询的索引
@@ -30,14 +30,38 @@ export default function CommonChatFrame({userInfo}) {
         const unListen = listen('on-receive-msg', (event) => {
             let data = event.payload
             if (currentToId.current === data.fromId) {
-                messagesRef.current.push(data)
-                setMessages(() => [...messagesRef.current])
+                // messagesRef.current.push(data)
+                // setMessages(() => [...messagesRef.current])
             }
         });
         return async () => {
             (await unListen)()
         }
     }, [])
+
+    useEffect(() => {
+        //滚动条顶部触发加载记录
+        const handleScroll = () => {
+            if (isQueryComplete.current) return
+            if (showFrameRef.current && !scrollTriggered.current) {
+                const scrollTop = showFrameRef.current.scrollTop;
+                const threshold = 20;
+                if (10 < scrollTop && scrollTop <= threshold) {
+                    scrollTriggered.current = true
+                    onMessageRecord()
+                }
+            }
+        };
+        const scrollContainer = showFrameRef.current;
+        if (scrollContainer) {
+            scrollContainer.addEventListener('scroll', handleScroll);
+        }
+        return () => {
+            if (scrollContainer) {
+                scrollContainer.removeEventListener('scroll', handleScroll);
+            }
+        };
+    }, []);
 
     const onMessageRecord = () => {
         if (isQueryComplete.current) return
@@ -50,10 +74,9 @@ export default function CommonChatFrame({userInfo}) {
             targetId: userInfoRef.current.fromId, index: currentMsgRecordIndex.current, num: 20
         }).then(res => {
             if (res.code === 0) {
-                console.log(res)
                 if (res.data.length > 0) {
                     messagesRef.current = [...res.data, ...messagesRef.current]
-                    setMessages([...messagesRef.current])
+                    setMessages(messagesRef.current)
                     currentMsgRecordIndex.current += 20
                     //调整滚动条
                     requestAnimationFrame(() => {
@@ -73,36 +96,13 @@ export default function CommonChatFrame({userInfo}) {
         //会话切换，重置
         isQueryComplete.current = false
         currentMsgRecordIndex.current = 0
-        scrollTriggered.current = false
+        scrollTriggered.current = true
         messagesRef.current = []
         setMessages([])
         currentToId.current = userInfo.fromId
-
-        //滚动条顶部触发加载记录
-        const handleScroll = () => {
-            if (isQueryComplete.current) return
-            if (showFrameRef.current && !scrollTriggered.current) {
-                const scrollTop = showFrameRef.current.scrollTop;
-                const threshold = 0;
-                if (scrollTop <= threshold) {
-                    scrollTriggered.current = true
-                    onMessageRecord()
-                }
-            }
-        };
-        const scrollContainer = showFrameRef.current;
-        if (scrollContainer) {
-            if (scrollContainer.scrollTop !== 0) {
-                scrollContainer.addEventListener('scroll', handleScroll);
-            } else {
-                handleScroll();
-            }
-        }
-        return () => {
-            if (scrollContainer) {
-                scrollContainer.removeEventListener('scroll', handleScroll);
-            }
-        };
+        const container = showFrameRef.current
+        container.scrollTop = container.scrollHeight
+        onMessageRecord()
     }, [userInfo])
 
     useEffect(() => {
@@ -116,22 +116,22 @@ export default function CommonChatFrame({userInfo}) {
     }, [messages])
 
     let onSendMsg = () => {
-        if (!msgContentValue) return
+        if (!msgContentRef.current.value) return
         let msg = {
             toUserId: currentToId.current, msgContent: {
-                type: "text", content: msgContentValue
+                type: "text", content: msgContentRef.current.value
             }, isShowTime: true
         }
         MessageApi.sendMsg(msg).then(res => {
             if (res.code === 0) {
                 if (res.data) {
-                    setMessages(() => [...messagesRef.current, res.data])
                     messagesRef.current.push(res.data)
+                    setMessages(() => [...messagesRef.current])
                     emit("on-send-msg", {})
                 }
             }
         })
-        setMsgContentValue("")
+        msgContentRef.current.value = ""
     }
 
     const onContentKeyDown = (event) => {
@@ -180,8 +180,7 @@ export default function CommonChatFrame({userInfo}) {
             </div>
             <div className="chat-content-send-frame-msg">
                         <textarea
-                            value={msgContentValue}
-                            onChange={(e) => setMsgContentValue(e.target.value)}
+                            ref={msgContentRef}
                             onKeyDown={(e) => onContentKeyDown(e)}
                         >
                         </textarea>
@@ -200,3 +199,5 @@ export default function CommonChatFrame({userInfo}) {
         </div>
     </div>)
 }
+
+export default memo(CommonChatFrame)

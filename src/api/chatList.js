@@ -10,4 +10,7 @@ export default {
     read(param) {
         return Http.get(`/v1/api/chat-list/read/${param}`)
     },
+    detail(param) {
+        return Http.get(`/v1/api/chat-list/detail/${param}`)
+    },
 };

@@ -16,6 +16,7 @@ export default function CreateChatWindow(user) {
         height: 800,
         minHeight: 600,
         decorations: false,
-        transparent: true
+        transparent: true,
+        shadow: false
     });
 }
