@@ -1,45 +1,27 @@
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
-import {listen} from "@tauri-apps/api/event";
-import {PhysicalPosition} from "@tauri-apps/api/window";
 
 
-let width = 120
-let height = 160
+export let trayWindowWidth = 120
+export let trayWindowHeight = 160
 
-listen('tray_menu', async (event) => {
-    const homeWindow = WebviewWindow.getByLabel('home')
-    if (!homeWindow) return
-    let position = event.payload;
-    const trayWindow = WebviewWindow.getByLabel('tray_menu')
-    if (trayWindow) {
-        let scaleFactor = await homeWindow.scaleFactor();
-        let logicalPosition = new PhysicalPosition(position.x, position.y).toLogical(scaleFactor);
-        logicalPosition = new PhysicalPosition(logicalPosition.x, logicalPosition.y).toLogical(scaleFactor);
-        logicalPosition.y = logicalPosition.y - height
-        await trayWindow.setAlwaysOnTop(true)
-        await trayWindow.setPosition(logicalPosition)
-        await trayWindow.show()
-        await trayWindow.setFocus()
-    }
-})
-export default function CreateTrayWindow() {
+export default function CreateTrayWindow(position) {
     let webview = new WebviewWindow("tray_menu", {
         url: "/tray",
-        width: width,
-        height: height,
+        width: trayWindowWidth,
+        height: trayWindowHeight,
         skipTaskbar: true,
         decorations: false,
         focus: false,
-        center: true,
+        center: false,
         transparent: true,
         resizable: false,
-        shadow: false,
+        shadow: false
     });
+    webview.setAlwaysOnTop(true)
+    webview.setPosition(position)
+    webview.show()
+    webview.setFocus()
     webview.listen("tauri://blur", function () {
-        const trayWindow = WebviewWindow.getByLabel('tray_menu')
-        trayWindow.hide();
-    });
-    webview.once("tauri://webview-created", function () {
         const trayWindow = WebviewWindow.getByLabel('tray_menu')
         trayWindow.hide();
     });
