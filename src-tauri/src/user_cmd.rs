@@ -21,11 +21,12 @@ lazy_static! {
 
 // 保存用户信息的方法
 #[tauri::command]
-pub fn save_user_info(userid: &str, username: &str, token: &str) {
+pub fn save_user_info(userid: &str, username: &str, token: &str) -> i32 {
     let mut user_info = USER_INFO.write().unwrap();
     user_info.user_id = userid.to_string();
     user_info.username = username.to_string();
     user_info.token = token.to_string();
+    0
 }
 
 // 获取用户信息的方法
