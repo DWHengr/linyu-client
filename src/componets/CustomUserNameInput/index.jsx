@@ -67,9 +67,9 @@ export default function CustomUserNameInput({value, onChange, reagents}) {
                     ref={recentRef}
                 >
                     {
-                        reagents?.map((item) => {
+                        reagents?.map((item, index) => {
                             return (
-                                <div className="custom-user-input-down-item">{item}</div>
+                                <div key={index} className="custom-user-input-down-item">{item}</div>
                             )
                         })
                     }
