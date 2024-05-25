@@ -15,7 +15,5 @@ export default function CreateHomeWindow() {
     webview.once("tauri://webview-created", function () {
         const appWindow = WebviewWindow.getByLabel('login')
         appWindow?.close();
-        const trayWindow = WebviewWindow.getByLabel('tray_menu')
-        trayWindow?.hide();
     });
 }

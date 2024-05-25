@@ -9,13 +9,11 @@ import WindowOperation from "../../componets/WindowOperation/index.jsx";
 import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import ws from "../../utils/ws.js";
 import {invoke} from "@tauri-apps/api/core";
-import CreateTrayWindow from "../TrayMenu/window.jsx";
 import {useDispatch, useSelector} from "react-redux";
 import {setCurrentOption} from "../../store/home/action.js";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
-
+import CreateTrayWindow from "../TrayMenu/window.jsx";
 export default function Home() {
-    CreateTrayWindow()
     const homeStoreData = useSelector(store => store.homeData);
     const [selectedOptionIndex, setSelectedOptionIndex] = useState("chart")
     const h = useHistory();
@@ -23,6 +21,7 @@ export default function Home() {
 
     useEffect(() => {
         invoke("get_user_info", {}).then(res => {
+            CreateTrayWindow()
             let token = res.token
             if (token) {
                 ws.connect(token)
