@@ -7,14 +7,14 @@ import CreateChatWindow from "../../ChatWindow/window.jsx";
 import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
 import ChatListApi from "../../../api/chatList.js";
 import {useDispatch, useSelector} from "react-redux";
-import {addChartWindowUser, setCurrentChartId} from "../../../store/chart/action.js";
+import {addChatWindowUser, setCurrentChatId} from "../../../store/chat/action.js";
 import {listen} from "@tauri-apps/api/event";
 
 export default function Chat() {
-    const chartStoreData = useSelector((state) => state.chartData);
-    const [selectedChatId, setSelectedChatId] = useState(chartStoreData.currentChartId)
-    const currentToId = useRef(chartStoreData.currentChartId)//消息目标用户
-    const [selectedUserInfo, setSelectedUserInfo] = useState(chartStoreData.currentChartUserInfo);
+    const chatStoreData = useSelector((state) => state.chatData);
+    const [selectedChatId, setSelectedChatId] = useState(chatStoreData.currentChatId)
+    const currentToId = useRef(chatStoreData.currentChatId)//消息目标用户
+    const [selectedUserInfo, setSelectedUserInfo] = useState(chatStoreData.currentChatUserInfo);
     const selectedRightUserInfo = useRef(null);
     const rightSelected = useRef(null);
     const [menuPosition, setMenuPosition] = useState(null);
@@ -22,7 +22,7 @@ export default function Chat() {
     const [allChatsData, setAllChatsData] = useState([])
     const dispatch = useDispatch();
 
-    const onGetChartList = () => {
+    const onGetChatList = () => {
         ChatListApi.list().then(res => {
             if (res.code === 0) {
                 setTopChatsData(res.data.tops)
@@ -37,15 +37,15 @@ export default function Chat() {
             let data = event.payload
             if (currentToId.current === data.fromId) {
                 ChatListApi.read(data.fromId).then(() => {
-                    onGetChartList()
+                    onGetChatList()
                 })
             } else {
-                onGetChartList()
+                onGetChatList()
             }
         });
         //监听前端接受到的消息
         const unSendListen = listen('on-send-msg', (event) => {
-            onGetChartList()
+            onGetChatList()
         });
         return async () => {
             (await unReceiveListen)();
@@ -54,8 +54,8 @@ export default function Chat() {
     }, [])
 
     useEffect(() => {
-        setSelectedChatId(chartStoreData.currentChartId)
-    }, [chartStoreData.currentChartId])
+        setSelectedChatId(chatStoreData.currentChatId)
+    }, [chatStoreData.currentChatId])
 
 
     useEffect(() => {
@@ -63,7 +63,7 @@ export default function Chat() {
     }, [selectedChatId])
 
     useEffect(() => {
-        onGetChartList()
+        onGetChatList()
     }, []);
 
     const chatListRightOptions = [
@@ -78,20 +78,20 @@ export default function Chat() {
     const onMenuItemClick = (item) => {
         switch (item.key) {
             case "newChatWindow" : {
-                dispatch(addChartWindowUser(selectedRightUserInfo.current))
+                dispatch(addChatWindowUser(selectedRightUserInfo.current))
                 CreateChatWindow(rightSelected.current)
             }
         }
     }
 
-    const onChartListClick = (data) => {
+    const onChatListClick = (data) => {
         if (selectedChatId === data.fromId)
             return
-        dispatch(setCurrentChartId(data.fromId, data))
+        dispatch(setCurrentChatId(data.fromId, data))
         setSelectedChatId(data.fromId)
         setSelectedUserInfo(data)
         ChatListApi.read(data.fromId).then(res => {
-            onGetChartList()
+            onGetChatList()
         })
     }
 
@@ -185,7 +185,7 @@ export default function Chat() {
                                         setMenuPosition({x: e.clientX, y: e.clientY})
                                     }}
                                     info={data}
-                                    onClick={() => onChartListClick(data)}
+                                    onClick={() => onChatListClick(data)}
                                 />
                             )
                         })
@@ -202,7 +202,7 @@ export default function Chat() {
                                         setMenuPosition({x: e.clientX, y: e.clientY})
                                     }}
                                     info={data}
-                                    onClick={() => onChartListClick(data)}
+                                    onClick={() => onChatListClick(data)}
                                 />
                             )
                         })

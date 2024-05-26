@@ -11,7 +11,7 @@ import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
 import FriendApi from "../../../api/friend.js";
 import {calculateAge, getDateDayAndMonth} from "../../../utils/date.js";
 import {useDispatch} from "react-redux";
-import {setCurrentChartId} from "../../../store/chart/action.js";
+import {setCurrentChatId} from "../../../store/chat/action.js";
 import ChatListApi from "../../../api/chatList.js";
 import {setCurrentOption} from "../../../store/home/action.js";
 
@@ -62,8 +62,8 @@ export default function Friend() {
     const onSendMsgClick = () => {
         ChatListApi.create({userId: selectedFriendId}).then(res => {
             if (res.code === 0) {
-                dispatch(setCurrentChartId(selectedFriendId))
-                dispatch(setCurrentOption("chart"))
+                dispatch(setCurrentChatId(selectedFriendId))
+                dispatch(setCurrentOption("chat"))
                 h.push("/home/chat")
             }
         })

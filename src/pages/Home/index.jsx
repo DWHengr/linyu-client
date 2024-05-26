@@ -15,7 +15,7 @@ import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData);
-    const [selectedOptionIndex, setSelectedOptionIndex] = useState("chart")
+    const [selectedOptionIndex, setSelectedOptionIndex] = useState("chat")
     const h = useHistory();
     const dispatch = useDispatch();
 
@@ -49,7 +49,7 @@ export default function Home() {
     }
 
     const options = [
-        {key: "chart", icon: "icon-liaotian", page: "/home/chart"},
+        {key: "chat", icon: "icon-liaotian", page: "/home/chat"},
         {key: "friend", icon: "icon-haoyou", page: "/home/friend"},
         {key: "talk", icon: "icon-pengyouquan", page: "/home/talk"},
         {key: "set", icon: "icon-shezhi", page: "/home/set"},

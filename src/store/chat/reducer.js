@@ -1,21 +1,21 @@
 import * as type from "./type";
-import {Add_Chart_Window_User} from "./type";
+import {Add_Chat_Window_User} from "./type";
 
 
 let defaultState = {
-    currentChartId: "",
-    currentChartUserInfo: null,
+    currentChatId: "",
+    currentChatUserInfo: null,
     chatWindowUsers: {},
 };
 
-export const chartData = (state = defaultState, action) => {
+export const chatData = (state = defaultState, action) => {
     switch (action.type) {
-        case type.Set_CurrentChartId:
+        case type.Set_CurrentChatId:
             return {
                 ...state,
-                ...{currentChartId: action.currentChartId, currentChartUserInfo: action.currentChartUserInfo},
+                ...{currentChatId: action.currentChatId, currentChatUserInfo: action.currentChatUserInfo},
             };
-        case type.Add_Chart_Window_User:
+        case type.Add_Chat_Window_User:
             state.chatWindowUsers[action.userInfo.from] = action.userInfo
             return {
                 ...state
