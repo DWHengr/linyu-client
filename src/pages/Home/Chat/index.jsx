@@ -7,7 +7,7 @@ import CreateChatWindow from "../../ChatWindow/window.jsx";
 import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
 import ChatListApi from "../../../api/chatList.js";
 import {useDispatch, useSelector} from "react-redux";
-import {addChatWindowUser, setCurrentChatId} from "../../../store/chat/action.js";
+import {addChatWindowUser, deleteChatWindowUser, setCurrentChatId} from "../../../store/chat/action.js";
 import {listen} from "@tauri-apps/api/event";
 
 export default function Chat() {
@@ -21,6 +21,7 @@ export default function Chat() {
     const [topChatsData, setTopChatsData] = useState([])
     const [allChatsData, setAllChatsData] = useState([])
     const dispatch = useDispatch();
+    const chatWindowUsersRef = useRef(chatStoreData.chatWindowUsers);
 
     const onGetChatList = () => {
         ChatListApi.list().then(res => {
@@ -47,11 +48,24 @@ export default function Chat() {
         const unSendListen = listen('on-send-msg', (event) => {
             onGetChatList()
         });
+        //监听聊天窗口是否销毁
+        const unChatDestroyed = listen('chat-destroyed', (event) => {
+            let storeUserInfo = chatWindowUsersRef.current.get(event.payload.fromId);
+            if (currentToId.current === storeUserInfo.fromId) {
+                setSelectedUserInfo(storeUserInfo)
+            }
+            dispatch(deleteChatWindowUser(event.payload.fromId))
+        })
         return async () => {
             (await unReceiveListen)();
             (await unSendListen)();
+            (await unChatDestroyed)();
         }
     }, [])
+
+    useEffect(() => {
+        chatWindowUsersRef.current = chatStoreData.chatWindowUsers
+    }, [chatStoreData.chatWindowUsers])
 
     useEffect(() => {
         setSelectedChatId(chatStoreData.currentChatId)
@@ -80,15 +94,24 @@ export default function Chat() {
             case "newChatWindow" : {
                 dispatch(addChatWindowUser(selectedRightUserInfo.current))
                 CreateChatWindow(rightSelected.current)
+                if (selectedChatId === rightSelected.current) {
+                    setSelectedUserInfo(null)
+                }
             }
         }
     }
 
     const onChatListClick = (data) => {
+        setSelectedChatId(data.fromId)
+        let storeUserInfo = chatStoreData.chatWindowUsers.get(data.fromId);
+        if (storeUserInfo) {
+            setSelectedUserInfo(null)
+            CreateChatWindow(storeUserInfo.fromId)
+            return
+        }
         if (selectedChatId === data.fromId)
             return
         dispatch(setCurrentChatId(data.fromId, data))
-        setSelectedChatId(data.fromId)
         setSelectedUserInfo(data)
         ChatListApi.read(data.fromId).then(res => {
             onGetChatList()

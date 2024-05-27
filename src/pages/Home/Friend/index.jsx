@@ -62,7 +62,7 @@ export default function Friend() {
     const onSendMsgClick = () => {
         ChatListApi.create({userId: selectedFriendId}).then(res => {
             if (res.code === 0) {
-                dispatch(setCurrentChatId(selectedFriendId))
+                dispatch(setCurrentChatId(selectedFriendId, res.data))
                 dispatch(setCurrentOption("chat"))
                 h.push("/home/chat")
             }

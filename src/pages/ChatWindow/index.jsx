@@ -4,10 +4,13 @@ import {useEffect, useState} from "react";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import ChatListApi from "../../api/chatList.js";
 import CommonChatFrame from "../../componets/CommonChatFrame/index.jsx";
+import {useDispatch} from "react-redux";
+import {addChatWindowUser} from "../../store/chat/action.js";
 
 export default function ChatWindow() {
 
     const [userInfo, setUserInfo] = useState(null);
+    let dispatch = useDispatch();
 
     useEffect(() => {
         let label = WebviewWindow.getCurrent().label;
@@ -15,6 +18,7 @@ export default function ChatWindow() {
         ChatListApi.detail(fromId).then(res => {
             if (res.code === 0) {
                 setUserInfo(res.data)
+                dispatch(addChatWindowUser(res))
             }
         })
     }, [])

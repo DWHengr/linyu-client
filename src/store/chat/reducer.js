@@ -1,11 +1,10 @@
 import * as type from "./type";
-import {Add_Chat_Window_User} from "./type";
 
 
 let defaultState = {
     currentChatId: "",
     currentChatUserInfo: null,
-    chatWindowUsers: {},
+    chatWindowUsers: new Map(),
 };
 
 export const chatData = (state = defaultState, action) => {
@@ -16,9 +15,19 @@ export const chatData = (state = defaultState, action) => {
                 ...{currentChatId: action.currentChatId, currentChatUserInfo: action.currentChatUserInfo},
             };
         case type.Add_Chat_Window_User:
-            state.chatWindowUsers[action.userInfo.from] = action.userInfo
+            const updatedChatWindowUsers = new Map(state.chatWindowUsers);
+            updatedChatWindowUsers.set(action.userInfo.fromId, action.userInfo);
             return {
-                ...state
+                ...state,
+                chatWindowUsers: updatedChatWindowUsers
+            };
+        case type.Delete_Chat_Window_User:
+            const chatWindowUsersAfterDeletion = new Map(state.chatWindowUsers);
+            chatWindowUsersAfterDeletion.delete(action.userId);
+            console.log(chatWindowUsersAfterDeletion, 12321312, action.userId)
+            return {
+                ...state,
+                chatWindowUsers: chatWindowUsersAfterDeletion
             };
         default:
             return state;
