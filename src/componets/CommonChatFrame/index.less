@@ -22,6 +22,23 @@
     overflow-y: scroll;
     display: flex;
     flex-direction: column;
+    position: relative;
+
+    .hint {
+      padding: 2px 10px;
+      background-color: white;
+      position: fixed;
+      right: 15px;
+      bottom: 265px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 20px;
+      box-shadow: 0 0 5px 0.1px #999;
+      user-select: none;
+      color: #4C9BFF;
+      cursor: pointer;
+    }
   }
 
   .chat-content-send-frame {
@@ -48,7 +65,6 @@
       textarea {
         font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
         font-size: 14px;
-        letter-spacing: 0.5px;
         width: 100%;
         height: 100%;
         overflow-y: scroll;
@@ -57,6 +73,7 @@
         border: none;
         resize: none;
         outline: none;
+        line-height: 18px;
       }
     }
 
@@ -67,4 +84,32 @@
     }
   }
 
+}
+
+.biao-qing-pop {
+  border-radius: 5px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(2px);
+  display: flex;
+  flex-wrap: wrap;
+  overflow-y: scroll;
+  padding: 4px 0 4px 4px;
+
+  .biao-qing {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    user-select: none;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
+    margin: 2px;
+    font-size: 20px;
+
+    &:hover {
+      border-radius: 2px;
+      background-color: rgb(220, 234, 255);
+    }
+  }
 }

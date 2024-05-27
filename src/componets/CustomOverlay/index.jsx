@@ -2,7 +2,7 @@ import "./index.less"
 import {useEffect, useRef, useState} from "react";
 import {listen} from "@tauri-apps/api/event";
 
-export default function CustomOverlay({visible, position, width, children}) {
+export default function CustomOverlay({visible, position, width, children, onClose}) {
     const [inVisible, setInVisible] = useState(visible)
     const contentRef = useRef(null);
 
@@ -19,6 +19,7 @@ export default function CustomOverlay({visible, position, width, children}) {
     useEffect(() => {
         const unListen = listen('drag-click', (event) => {
             setInVisible(false)
+            if (onClose) onClose()
         });
         return async () => {
             (await unListen)()
@@ -34,7 +35,10 @@ export default function CustomOverlay({visible, position, width, children}) {
                         className="content"
                         style={{top: position.x, left: position.y, width: width, outline: "none"}}
                         tabIndex="0"
-                        onBlur={() => setInVisible(false)}
+                        onBlur={() => {
+                            setInVisible(false);
+                            if (onClose) onClose()
+                        }}
                     >
                         {children}
                     </div>
