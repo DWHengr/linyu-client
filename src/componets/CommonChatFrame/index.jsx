@@ -10,6 +10,8 @@ import {invoke} from "@tauri-apps/api/core";
 import CustomOverlay from "../CustomOverlay/index.jsx";
 import {emojis} from "../../utils/emoji.js";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import Time from "./ChatContent/Time/index.jsx";
+import {formatChatTime} from "../../utils/date.js";
 
 function CommonChatFrame({userInfo}) {
 
@@ -77,6 +79,7 @@ function CommonChatFrame({userInfo}) {
         const handleScroll = () => {
             //是否到底底部
             const {scrollTop, scrollHeight, clientHeight} = showFrameRef.current;
+            const div = showFrameRef.current;
             if (scrollTop + clientHeight + 2 >= scrollHeight) {
                 newMsgUnreadNumRef.current = 0
                 setNewMsgUnreadNum(newMsgUnreadNumRef.current)
@@ -86,15 +89,13 @@ function CommonChatFrame({userInfo}) {
             if (isQueryComplete.current) return
             if (showFrameRef.current && !scrollTriggered.current) {
                 const scrollTop = showFrameRef.current.scrollTop;
-                const threshold = 10;
-                if (0 < scrollTop && scrollTop <= threshold) {
+                if (0 === scrollTop) {
                     scrollTriggered.current = true
                     onMessageRecord()
                 }
             }
 
             //获取滚动条方向
-            const div = showFrameRef.current;
             if (scrollTop > div._prevScrollPosition) {
                 setScrollDirection('down');
             } else {
@@ -259,7 +260,14 @@ function CommonChatFrame({userInfo}) {
         <div ref={showFrameRef} className="chat-content-show-frame">
             {messages?.map((msg) => {
                 return (
-                    <Text key={msg.id} value={msg.msgContent?.content} right={msg.fromId === currentUserId.current}/>)
+                    <>
+                        {msg.isShowTime && <Time value={formatChatTime(msg.updateTime)}/>}
+                        <Text
+                            key={msg.id} value={msg.msgContent?.content}
+                            right={msg.fromId === currentUserId.current}
+                        />
+                    </>
+                )
             })}
             {newMsgUnreadNum !== 0 && <div className="hint" onClick={onScrollToBottom}>
                 <i className={`iconfont icon icon-xiala`} style={{fontSize: 12}}/>

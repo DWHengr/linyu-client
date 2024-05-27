@@ -15,3 +15,36 @@ export function getDateDayAndMonth(date) {
     const month = initDate.getMonth() + 1;
     return `${month}月${day}日`;
 }
+
+export function formatChatTime(dateStr) {
+    console.log(dateStr)
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now - date;
+    const oneDay = 24 * 60 * 60 * 1000;
+    const oneWeek = 7 * oneDay;
+
+    if (diffMs < oneDay) {
+        // 当天消息
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        const period = hours < 12 ? '上午' : '下午';
+        const formattedHours = hours % 12 || 12; // 把24小时制转换为12小时制
+        return `${period} ${formattedHours}:${minutes < 10 ? '0' + minutes : minutes}`;
+    } else if (diffMs < oneWeek) {
+        // 超过1天，小于1周
+        const daysOfWeek = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+        const day = daysOfWeek[date.getDay()];
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        return `${day} ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+    } else {
+        // 大于1周
+        const year = date.getFullYear();
+        const month = date.getMonth() + 1; // 月份从0开始
+        const day = date.getDate();
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day} ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+    }
+}

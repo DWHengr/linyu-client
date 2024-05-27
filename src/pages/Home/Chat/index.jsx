@@ -9,6 +9,7 @@ import ChatListApi from "../../../api/chatList.js";
 import {useDispatch, useSelector} from "react-redux";
 import {addChatWindowUser, deleteChatWindowUser, setCurrentChatId} from "../../../store/chat/action.js";
 import {listen} from "@tauri-apps/api/event";
+import {formatChatTime} from "../../../utils/date.js";
 
 export default function Chat() {
     const chatStoreData = useSelector((state) => state.chatData);
@@ -93,7 +94,8 @@ export default function Chat() {
         switch (item.key) {
             case "newChatWindow" : {
                 dispatch(addChatWindowUser(selectedRightUserInfo.current))
-                CreateChatWindow(rightSelected.current)
+                let title = selectedRightUserInfo.current.remark ? selectedRightUserInfo.current.remark : selectedRightUserInfo.current.name
+                CreateChatWindow(rightSelected.current, title ? title : "linyu")
                 if (selectedChatId === rightSelected.current) {
                     setSelectedUserInfo(null)
                 }
@@ -106,7 +108,7 @@ export default function Chat() {
         let storeUserInfo = chatStoreData.chatWindowUsers.get(data.fromId);
         if (storeUserInfo) {
             setSelectedUserInfo(null)
-            CreateChatWindow(storeUserInfo.fromId)
+            CreateChatWindow(storeUserInfo.fromId, "linyu")
             return
         }
         if (selectedChatId === data.fromId)
@@ -149,7 +151,7 @@ export default function Chat() {
                         <div style={{
                             fontSize: 10,
                             color: `${isSelected ? "#F6F6F6" : "#646464"}`
-                        }}>{info.updateTime}</div>
+                        }}>{formatChatTime(info.updateTime)}</div>
                     </div>
                     <div className="chat-card-content-item">
                         <div
