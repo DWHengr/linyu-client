@@ -27,7 +27,8 @@ export default function Login() {
                     invoke('save_user_info', {
                         userid: res.data.userId,
                         username: res.data.username,
-                        token: res.data.token
+                        token: res.data.token,
+                        portrait: res.data.portrait,
                     }).then(() => {
                         CreateHomeWindow()
                     })

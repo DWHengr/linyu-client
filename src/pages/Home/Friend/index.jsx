@@ -79,7 +79,8 @@ export default function Friend() {
                 if (onContextMenu) onContextMenu(e)
             }}
         >
-            <div className="friend-card-portrait"></div>
+            <img className="friend-card-portrait" src={info.portrait}
+                 alt={info.portrait}/>
             <div className="friend-card-content">
                 <div className="friend-card-content-item">
                     <div
@@ -142,7 +143,9 @@ export default function Friend() {
                         <div className="friend-content-container">
                             <div className="friend-content-container-top">
                                 <div className="friend-content-container-top-info">
-                                    <div className="info-icon"></div>
+                                    <img className="info-icon"
+                                         src={friendDetails.portrait}
+                                         alt={friendDetails.portrait}/>
                                     <div className="info-content">
                                         <div style={{display: "flex", justifyContent: "space-between"}}>
                                             <div style={{
@@ -172,11 +175,11 @@ export default function Friend() {
                             </div>
                             <div className="friend-content-container-mid">
                                 <div className="info-item">
-                                    <i className={`iconfont ${friendDetails.sex === 'nv' ? 'icon-nv' : 'icon-nan'}`}
+                                    <i className={`iconfont ${friendDetails.sex === '女' ? 'icon-nv' : 'icon-nan'}`}
                                        style={{
                                            fontSize: 14,
                                            marginRight: 5,
-                                           color: friendDetails.sex === 'nv' ? "#FFA0CF" : "#4C9BFF"
+                                           color: friendDetails.sex === '女' ? "#FFA0CF" : "#4C9BFF"
                                        }}/>
                                     <div>{friendDetails.sex}</div>
                                     <CustomLine size={12} width={1} direction="vertical"/>

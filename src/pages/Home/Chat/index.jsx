@@ -132,7 +132,8 @@ export default function Chat() {
                     if (onContextMenu) onContextMenu(e)
                 }}
             >
-                <div className="chat-card-portrait"></div>
+                <img className="chat-card-portrait" src={info.portrait}
+                     alt={info.portrait}/>
                 <div className="chat-card-content">
                     <div className="chat-card-content-item">
                         <div

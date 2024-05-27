@@ -3,6 +3,10 @@ import * as type from "./type";
 
 let defaultState = {
     currentOption: null,
+    userId: "",
+    username: "",
+    account: "",
+    portrait: ""
 };
 
 export const homeData = (state = defaultState, action) => {
@@ -11,6 +15,11 @@ export const homeData = (state = defaultState, action) => {
             return {
                 ...state,
                 ...{currentOption: action.currentOption},
+            };
+        case type.Set_User_Info:
+            return {
+                ...state,
+                ...action,
             };
         default:
             return state;

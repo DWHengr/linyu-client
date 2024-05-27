@@ -8,6 +8,7 @@ pub struct UserInfo {
     user_id: String,
     username: String,
     token: String,
+    portrait: String,
 }
 
 // 全局变量
@@ -16,16 +17,18 @@ lazy_static! {
         user_id: String::new(),
         username: String::new(),
         token: String::new(),
+        portrait: String::new(),
     }));
 }
 
 // 保存用户信息的方法
 #[tauri::command]
-pub fn save_user_info(userid: &str, username: &str, token: &str) -> i32 {
+pub fn save_user_info(userid: &str, username: &str, token: &str, portrait: &str) -> i32 {
     let mut user_info = USER_INFO.write().unwrap();
     user_info.user_id = userid.to_string();
     user_info.username = username.to_string();
     user_info.token = token.to_string();
+    user_info.portrait = portrait.to_string();
     0
 }
 

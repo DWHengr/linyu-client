@@ -9,6 +9,7 @@ import MessageApi from "../../api/message.js";
 import {invoke} from "@tauri-apps/api/core";
 import CustomOverlay from "../CustomOverlay/index.jsx";
 import {emojis} from "../../utils/emoji.js";
+import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 
 function CommonChatFrame({userInfo}) {
 
@@ -57,6 +58,18 @@ function CommonChatFrame({userInfo}) {
         return async () => {
             (await unListen)()
         }
+    }, [])
+
+    useEffect(() => {
+        const handleEscKey = (event) => {
+            if (event.key === 'Escape' || event.keyCode === 27) {
+                WebviewWindow.getCurrent().close()
+            }
+        };
+        document.addEventListener('keydown', handleEscKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscKey);
+        };
     }, [])
 
     useEffect(() => {
@@ -142,6 +155,7 @@ function CommonChatFrame({userInfo}) {
     }
 
     useEffect(() => {
+        msgContentRef.current.value = ""
         userInfoRef.current = userInfo
         //会话切换，重置
         isQueryComplete.current = false
@@ -230,12 +244,12 @@ function CommonChatFrame({userInfo}) {
     return (<div className="common-chat-content">
         <BiaoQingPop/>
         <CustomDragDiv className="chat-content-title">
-            <div>
-                <div style={{
+            <img
+                style={{
                     width: 40, height: 40, backgroundColor: "#4C9BFF", borderRadius: 50, marginLeft: 10
-                }}>
-                </div>
-            </div>
+                }}
+                src={userInfo.portrait}
+                alt={userInfo.portrait}/>
             <div style={{
                 fontWeight: 600, color: "#1F1F1F", marginLeft: 10,
             }}>

@@ -6,12 +6,12 @@ import {invoke} from "@tauri-apps/api/core";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 
 export default function TrayMenu() {
-    const [currentUsername, setCurrentUsername] = useState("");
+    const [userInfo, setUserInfo] = useState("");
 
     useEffect(() => {
         (async () => {
             let userInfo = await invoke("get_user_info", {})
-            setCurrentUsername(userInfo.username)
+            setUserInfo(userInfo)
         })()
     }, [])
 
@@ -31,9 +31,13 @@ export default function TrayMenu() {
     return (
         <div className="tray-menu-container">
             <div className="tray-menu">
-                <div className="tray-menu-portrait"></div>
+                <img
+                    className="tray-menu-portrait"
+                    style={{width: 60, height: 60, borderRadius: 60,}}
+                    src={userInfo.portrait}
+                    alt={userInfo.portrait}/>
                 <div style={{fontSize: 12, fontWeight: 600}}>
-                    {currentUsername}
+                    {userInfo.username}
                 </div>
                 <CustomLine width={1}/>
                 <div className="tray-menu-operation">

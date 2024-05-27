@@ -24,7 +24,6 @@ export const chatData = (state = defaultState, action) => {
         case type.Delete_Chat_Window_User:
             const chatWindowUsersAfterDeletion = new Map(state.chatWindowUsers);
             chatWindowUsersAfterDeletion.delete(action.userId);
-            console.log(chatWindowUsersAfterDeletion, 12321312, action.userId)
             return {
                 ...state,
                 chatWindowUsers: chatWindowUsersAfterDeletion

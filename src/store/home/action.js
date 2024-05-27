@@ -6,3 +6,13 @@ export const setCurrentOption = (currentOption) => {
         currentOption: currentOption,
     };
 };
+
+export const setCurrentLoginUserInfo = (userId, username, account, portrait) => {
+    return {
+        type: type.Set_User_Info,
+        userId,
+        username,
+        account,
+        portrait
+    };
+};

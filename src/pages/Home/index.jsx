@@ -10,7 +10,7 @@ import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import ws from "../../utils/ws.js";
 import {invoke} from "@tauri-apps/api/core";
 import {useDispatch, useSelector} from "react-redux";
-import {setCurrentOption} from "../../store/home/action.js";
+import {setCurrentLoginUserInfo, setCurrentOption} from "../../store/home/action.js";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import CreateTrayWindow from "../TrayMenu/window.jsx";
 
@@ -22,6 +22,7 @@ export default function Home() {
 
     useEffect(() => {
         invoke("get_user_info", {}).then(res => {
+            dispatch(setCurrentLoginUserInfo(res.user_id, res.username, res.account, res.portrait))
             let token = res.token
             if (token) {
                 ws.connect(token)
@@ -35,20 +36,17 @@ export default function Home() {
             setSelectedOptionIndex(homeStoreData.currentOption)
     }, [homeStoreData.currentOption])
 
-    const onMinimize = () => {
-        const appWindow = WebviewWindow.getByLabel('login')
-        appWindow.minimize();
-    }
-
-    const onClose = () => {
-        const appWindow = WebviewWindow.getByLabel('login')
-        appWindow.close();
-    }
-
-    const onHide = () => {
-        const appWindow = WebviewWindow.getByLabel('login')
-        appWindow.hide();
-    }
+    useEffect(() => {
+        const handleEscKey = (event) => {
+            if (event.key === 'Escape' || event.keyCode === 27) {
+                WebviewWindow.getCurrent().hide()
+            }
+        };
+        document.addEventListener('keydown', handleEscKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscKey);
+        };
+    }, [])
 
     const options = [
         {key: "chat", icon: "icon-liaotian", page: "/home/chat"},
@@ -85,7 +83,10 @@ export default function Home() {
                         }
                     </div>
                     <div className="home-nav-my">
-                        <div style={{width: 60, height: 60, borderRadius: 60, backgroundColor: "#4C9BFF"}}></div>
+                        <div>
+                            <img style={{width: 60, height: 60, borderRadius: 60,}} src={homeStoreData.portrait}
+                                 alt={homeStoreData.portrait}/>
+                        </div>
                     </div>
                 </CustomDragDiv>
                 <div className="home-content">
