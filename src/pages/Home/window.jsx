@@ -1,7 +1,7 @@
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
 import {listen} from "@tauri-apps/api/event";
 import {PhysicalPosition} from "@tauri-apps/api/window";
-import CreateTrayWindow, {trayWindowHeight} from "../TrayMenu/window.jsx";
+import {trayWindowHeight} from "../TrayMenu/window.jsx";
 
 listen('tray_menu', async (event) => {
 
@@ -14,14 +14,12 @@ listen('tray_menu', async (event) => {
     logicalPosition = new PhysicalPosition(logicalPosition.x, logicalPosition.y).toLogical(scaleFactor);
     logicalPosition.y = logicalPosition.y - trayWindowHeight
 
-    const trayWindow = WebviewWindow.getByLabel('tray_menu')
+    let trayWindow = WebviewWindow.getByLabel('tray_menu')
     if (trayWindow) {
         await trayWindow.setAlwaysOnTop(true)
         await trayWindow.setPosition(logicalPosition)
         await trayWindow.show()
         await trayWindow.setFocus()
-    } else {
-        CreateTrayWindow(logicalPosition)
     }
 })
 

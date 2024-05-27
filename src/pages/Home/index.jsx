@@ -12,6 +12,7 @@ import {invoke} from "@tauri-apps/api/core";
 import {useDispatch, useSelector} from "react-redux";
 import {setCurrentOption} from "../../store/home/action.js";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import CreateTrayWindow from "../TrayMenu/window.jsx";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData);
@@ -24,6 +25,7 @@ export default function Home() {
             let token = res.token
             if (token) {
                 ws.connect(token)
+                CreateTrayWindow()
             }
         })
     }, [])
