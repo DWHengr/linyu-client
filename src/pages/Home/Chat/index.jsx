@@ -10,6 +10,9 @@ import {useDispatch, useSelector} from "react-redux";
 import {addChatWindowUser, deleteChatWindowUser, setCurrentChatId} from "../../../store/chat/action.js";
 import {listen} from "@tauri-apps/api/event";
 import {formatChatTime} from "../../../utils/date.js";
+import FriendApi from "../../../api/friend.js";
+import {useHistory} from "react-router-dom";
+import FriendSearchCard from "../../../componets/FriendSearchCard/index.jsx";
 
 export default function Chat() {
     const chatStoreData = useSelector((state) => state.chatData);
@@ -23,6 +26,11 @@ export default function Chat() {
     const [allChatsData, setAllChatsData] = useState([])
     const dispatch = useDispatch();
     const chatWindowUsersRef = useRef(chatStoreData.chatWindowUsers);
+    let h = useHistory();
+
+    //搜索
+    const [searchInfo, setSearchInfo] = useState("")
+    const [searchFriendsList, setSearchFriendsList] = useState([])
 
     const onGetChatList = () => {
         ChatListApi.list().then(res => {
@@ -102,6 +110,16 @@ export default function Chat() {
             }
         }
     }
+
+    useEffect(() => {
+        if (searchInfo) {
+            FriendApi.search({friendInfo: searchInfo}).then(res => {
+                if (res.code === 0) {
+                    setSearchFriendsList(res.data)
+                }
+            })
+        }
+    }, [searchInfo])
 
     const onChatListClick = (data) => {
         setSelectedChatId(data.fromId)
@@ -183,13 +201,26 @@ export default function Chat() {
         )
     }
 
+    const onSendMsgClick = (friendId) => {
+        setSearchInfo("")
+        ChatListApi.create({userId: friendId}).then(res => {
+            if (res.code === 0) {
+                dispatch(setCurrentChatId(friendId, res.data))
+                setSelectedUserInfo(res.data)
+            }
+        })
+    }
+
     return (
         <div className="chat">
             <div className="chat-list">
                 <CustomDragDiv className="chat-list-top">
                     <label className="chat-list-top-title">聊天列表</label>
                     <div>
-                        <CustomSearchInput></CustomSearchInput>
+                        <CustomSearchInput
+                            value={searchInfo}
+                            onChange={(v) => setSearchInfo(v)}
+                        />
                     </div>
                 </CustomDragDiv>
                 <RightClickMenu
@@ -197,43 +228,72 @@ export default function Chat() {
                     options={chatListRightOptions}
                     onMenuItemClick={onMenuItemClick}
                 />
-                <div
-                    className="chat-list-items">
-                    {topChatsData?.length > 0 && <div className="chat-list-items-label">置顶</div>}
-                    {
-                        topChatsData.map(data => {
-                            return (
-                                <ChatCard
-                                    key={data.id}
-                                    onContextMenu={(e) => {
-                                        rightSelected.current = data.fromId;
-                                        selectedRightUserInfo.current = data;
-                                        setMenuPosition({x: e.clientX, y: e.clientY})
-                                    }}
-                                    info={data}
-                                    onClick={() => onChatListClick(data)}
-                                />
-                            )
-                        })
-                    }
-                    <div className="chat-list-items-label">全部</div>
-                    {
-                        allChatsData.map(data => {
-                            return (
-                                <ChatCard
-                                    key={data.id}
-                                    onContextMenu={(e) => {
-                                        rightSelected.current = data.fromId;
-                                        selectedRightUserInfo.current = data;
-                                        setMenuPosition({x: e.clientX, y: e.clientY})
-                                    }}
-                                    info={data}
-                                    onClick={() => onChatListClick(data)}
-                                />
-                            )
-                        })
-                    }
-                </div>
+                {!searchInfo ?
+                    <div
+                        className="chat-list-items">
+                        {topChatsData?.length > 0 && <div className="chat-list-items-label">置顶</div>}
+                        {
+                            topChatsData.map(data => {
+                                return (
+                                    <ChatCard
+                                        key={data.id}
+                                        onContextMenu={(e) => {
+                                            rightSelected.current = data.fromId;
+                                            selectedRightUserInfo.current = data;
+                                            setMenuPosition({x: e.clientX, y: e.clientY})
+                                        }}
+                                        info={data}
+                                        onClick={() => onChatListClick(data)}
+                                    />
+                                )
+                            })
+                        }
+                        <div className="chat-list-items-label">全部</div>
+                        {
+                            allChatsData.map(data => {
+                                return (
+                                    <ChatCard
+                                        key={data.id}
+                                        onContextMenu={(e) => {
+                                            rightSelected.current = data.fromId;
+                                            selectedRightUserInfo.current = data;
+                                            setMenuPosition({x: e.clientX, y: e.clientY})
+                                        }}
+                                        info={data}
+                                        onClick={() => onChatListClick(data)}
+                                    />
+                                )
+                            })
+                        }
+                    </div>
+                    : <div className="chat-list-items">
+                        {searchFriendsList.length > 0 ?
+                            <div>
+                                {
+                                    searchFriendsList.map((friend) => {
+                                        return (
+                                            <FriendSearchCard
+                                                info={friend}
+                                                onClick={() => onSendMsgClick(friend.friendId)}
+                                            />
+                                        )
+                                    })
+                                }
+                            </div>
+                            : <div style={{
+                                width: "100%",
+                                height: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexDirection: "column",
+                            }}>
+                                <img style={{width: 130, height: 80}} src="/empty.svg" alt="empty"/>
+                                <div style={{fontSize: 14, marginBottom: 200}}>搜索结果为空~</div>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
             {
                 selectedUserInfo ?

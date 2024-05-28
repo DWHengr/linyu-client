@@ -14,9 +14,10 @@ import {useDispatch} from "react-redux";
 import {setCurrentChatId} from "../../../store/chat/action.js";
 import ChatListApi from "../../../api/chatList.js";
 import {setCurrentOption} from "../../../store/home/action.js";
+import FriendSearchCard from "../../../componets/FriendSearchCard/index.jsx";
 
 export default function Friend() {
-    const [selectedFriendId, setSelectedFriendId] = useState("1")
+    const [selectedFriendId, setSelectedFriendId] = useState(null)
     const [groupMenuPosition, setGroupMenuPosition] = useState(null)
     const [addMenuPosition, setAddMenuPosition] = useState(null)
     const [moreMenuPosition, setMoreMenuPosition] = useState(null)
@@ -24,6 +25,10 @@ export default function Friend() {
     const h = useHistory()
     const [friendDetails, setFriendDetails] = useState(null)
     const dispatch = useDispatch();
+
+    //搜索
+    const [searchInfo, setSearchInfo] = useState("")
+    const [searchFriendsList, setSearchFriendsList] = useState([])
 
     useEffect(() => {
         FriendApi.list().then(res => {
@@ -59,15 +64,25 @@ export default function Friend() {
         })
     }
 
-    const onSendMsgClick = () => {
-        ChatListApi.create({userId: selectedFriendId}).then(res => {
+    const onSendMsgClick = (friendId) => {
+        ChatListApi.create({userId: friendId}).then(res => {
             if (res.code === 0) {
-                dispatch(setCurrentChatId(selectedFriendId, res.data))
+                dispatch(setCurrentChatId(friendId, res.data))
                 dispatch(setCurrentOption("chat"))
                 h.push("/home/chat")
             }
         })
     }
+
+    useEffect(() => {
+        if (searchInfo) {
+            FriendApi.search({friendInfo: searchInfo}).then(res => {
+                if (res.code === 0) {
+                    setSearchFriendsList(res.data)
+                }
+            })
+        }
+    }, [searchInfo])
 
     const FriendCard = ({info, onClick, onContextMenu}) => {
         let isSelected = info.friendId === selectedFriendId
@@ -113,29 +128,61 @@ export default function Friend() {
                         </div>
                     </label>
                     <div>
-                        <CustomSearchInput></CustomSearchInput>
+                        <CustomSearchInput
+                            value={searchInfo}
+                            onChange={(v) => setSearchInfo(v)}
+                        />
                     </div>
                 </CustomDragDiv>
-                <div
-                    className="friend-list-items">
-                    {allFriendData.map(item => {
-                        return (<>
-                            <CustomAccordion
-                                key={item.id}
-                                title={item.name}
-                                titleEnd={`（${item.friends ? item.friends.length : 0}）`}
-                                onContextMenu={(e) => setGroupMenuPosition({x: e.clientX, y: e.clientY})}
-                            >
-                                {item?.friends?.map((friend) => {
-                                    return (<FriendCard
-                                        info={friend}
-                                        onClick={() => onFriendDetails(friend.friendId)}
-                                    />)
-                                })}
-                            </CustomAccordion>
-                        </>)
-                    })}
-                </div>
+                {!searchInfo ? <div
+                        className="friend-list-items">
+                        {allFriendData.map(item => {
+                            return (<>
+                                <CustomAccordion
+                                    key={item.id}
+                                    title={item.name}
+                                    titleEnd={`（${item.friends ? item.friends.length : 0}）`}
+                                    onContextMenu={(e) => setGroupMenuPosition({x: e.clientX, y: e.clientY})}
+                                >
+                                    {item?.friends?.map((friend) => {
+                                        return (<FriendCard
+                                            info={friend}
+                                            onClick={() => onFriendDetails(friend.friendId)}
+                                        />)
+                                    })}
+                                </CustomAccordion>
+                            </>)
+                        })}
+                    </div>
+                    :
+                    <div className="friend-list-items">
+                        {searchFriendsList.length > 0 ?
+                            <div>
+                                {
+                                    searchFriendsList.map((friend) => {
+                                        return (
+                                            <FriendSearchCard
+                                                info={friend}
+                                                onClick={() => onSendMsgClick(friend.friendId)}
+                                            />
+                                        )
+                                    })
+                                }
+                            </div>
+                            : <div style={{
+                                width: "100%",
+                                height: "100%",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                flexDirection: "column",
+                            }}>
+                                <img style={{width: 130, height: 80}} src="/empty.svg" alt="empty"/>
+                                <div style={{fontSize: 14, marginBottom: 200}}>搜索结果为空~</div>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
             {
                 friendDetails ?
@@ -233,7 +280,13 @@ export default function Friend() {
                             </div>
                             <div className="friend-content-container-bottom">
                                 <div style={{display: "flex"}}>
-                                    <CustomButton type="" width={100} onClick={onSendMsgClick}>发消息</CustomButton>
+                                    <CustomButton
+                                        type=""
+                                        width={100}
+                                        onClick={() => onSendMsgClick(selectedFriendId)}
+                                    >
+                                        发消息
+                                    </CustomButton>
                                     <CustomButton type="minor" width={100}>视频聊天</CustomButton>
                                 </div>
                             </div>

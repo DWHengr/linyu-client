@@ -1,0 +1,42 @@
+.friend-search-card {
+  border-radius: 10px;
+  background-color: #FFFFFF;
+  padding: 10px 10px;
+  display: flex;
+  align-items: center;
+
+  .friend-search-card-portrait {
+    width: 45px;
+    height: 45px;
+    border-radius: 45px;
+    margin-right: 5px;
+  }
+
+  .friend-search-card-content {
+    height: 45px;
+    width: calc(100% - 50px);
+    display: flex;
+    flex-direction: column;
+
+    .friend-search-card-content-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+
+      .ellipsis {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+    }
+  }
+}
+
+.friend-search-card:hover {
+  background-color: #EDF2F9;
+}
+
+.friend-search-card.selected {
+  background-color: #4C9BFF;
+}

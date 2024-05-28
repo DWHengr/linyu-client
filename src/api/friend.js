@@ -6,5 +6,8 @@ export default {
     },
     details(param) {
         return Http.get(`/v1/api/friend/details/${param}`)
+    },
+    search(param) {
+        return Http.post(`/v1/api/friend/search`, param)
     }
 };

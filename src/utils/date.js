@@ -17,7 +17,6 @@ export function getDateDayAndMonth(date) {
 }
 
 export function formatChatTime(dateStr) {
-    console.log(dateStr)
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now - date;

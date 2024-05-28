@@ -65,7 +65,6 @@ const onCloseHandler = () => {
         return
     }
     timer = setTimeout(() => {
-        console.log("lockReconnect", reconnectCount)
         connect(token)
         reconnectCount++
         lockReconnect = false
