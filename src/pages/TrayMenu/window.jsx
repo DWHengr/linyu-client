@@ -8,6 +8,7 @@ export let trayWindowHeight = 160
 export default async function CreateTrayWindow() {
     let webview = new WebviewWindow("tray_menu", {
         url: "/tray",
+        title: "linyu",
         width: trayWindowWidth,
         height: trayWindowHeight,
         skipTaskbar: true,

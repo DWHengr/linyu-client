@@ -26,6 +26,7 @@ listen('tray_menu', async (event) => {
 export default function CreateHomeWindow() {
     let webview = new WebviewWindow("home", {
         url: "/home",
+        title: "linyu",
         center: true,
         width: 1010,
         minWidth: 900,
