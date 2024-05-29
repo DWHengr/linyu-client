@@ -8,11 +8,12 @@ import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
 import ChatListApi from "../../../api/chatList.js";
 import {useDispatch, useSelector} from "react-redux";
 import {addChatWindowUser, deleteChatWindowUser, setCurrentChatId} from "../../../store/chat/action.js";
-import {listen} from "@tauri-apps/api/event";
-import {formatChatTime} from "../../../utils/date.js";
+import {emit, listen} from "@tauri-apps/api/event";
+import {formatTime} from "../../../utils/date.js";
 import FriendApi from "../../../api/friend.js";
 import {useHistory} from "react-router-dom";
 import FriendSearchCard from "../../../componets/FriendSearchCard/index.jsx";
+import CustomEmpty from "../../../componets/CustomEmpty/index.jsx";
 
 export default function Chat() {
     const chatStoreData = useSelector((state) => state.chatData);
@@ -48,6 +49,7 @@ export default function Chat() {
             if (currentToId.current === data.fromId) {
                 ChatListApi.read(data.fromId).then(() => {
                     onGetChatList()
+                    emit("on-unread-info", {})
                 })
             } else {
                 onGetChatList()
@@ -92,14 +94,30 @@ export default function Chat() {
     const chatListRightOptions = [
         {key: "top", label: "置顶"},
         {key: "unTop", label: "取消置顶"},
-        {key: "unNoDisturb", label: "设置免打扰"},
-        {key: "unNoDisturb ", label: "取消免打扰"},
+        // {key: "unNoDisturb", label: "设置免打扰"},
+        // {key: "unNoDisturb ", label: "取消免打扰"},
         {key: "newChatWindow", label: "打开独立窗口"},
         {key: "deleteChat", label: "从聊天列表中移除"},
     ]
 
     const onMenuItemClick = (item) => {
         switch (item.key) {
+            case "top": {
+                ChatListApi.top({chatListId: selectedRightUserInfo.current.id, isTop: true}).then(res => {
+                    if (res.code === 0) {
+                        onGetChatList()
+                    }
+                })
+                break
+            }
+            case "unTop": {
+                ChatListApi.top({chatListId: selectedRightUserInfo.current.id, isTop: false}).then(res => {
+                    if (res.code === 0) {
+                        onGetChatList()
+                    }
+                })
+                break
+            }
             case "newChatWindow" : {
                 dispatch(addChatWindowUser(selectedRightUserInfo.current))
                 let title = selectedRightUserInfo.current.remark ? selectedRightUserInfo.current.remark : selectedRightUserInfo.current.name
@@ -107,6 +125,19 @@ export default function Chat() {
                 if (selectedChatId === rightSelected.current) {
                     setSelectedUserInfo(null)
                 }
+                break
+            }
+            case "deleteChat": {
+                ChatListApi.delete({chatListId: selectedRightUserInfo.current.id}).then(res => {
+                    if (res.code === 0) {
+                        if (selectedChatId === selectedRightUserInfo.current.fromId) {
+                            setSelectedUserInfo(null)
+                            setSelectedChatId(null)
+                        }
+                        onGetChatList()
+                    }
+                })
+                break
             }
         }
     }
@@ -133,10 +164,14 @@ export default function Chat() {
             return
         dispatch(setCurrentChatId(data.fromId, data))
         setSelectedUserInfo(data)
-        ChatListApi.read(data.fromId).then(res => {
-            onGetChatList()
-        })
     }
+
+    useEffect(() => {
+        ChatListApi.read(chatStoreData.currentChatId).then(res => {
+            onGetChatList()
+            emit("on-unread-info", {})
+        })
+    }, [chatStoreData.currentChatId]);
 
     const ChatCard = ({info, onClick, onContextMenu}) => {
         let isSelected = false
@@ -169,7 +204,7 @@ export default function Chat() {
                         <div style={{
                             fontSize: 10,
                             color: `${isSelected ? "#F6F6F6" : "#646464"}`
-                        }}>{formatChatTime(info.updateTime)}</div>
+                        }}>{formatTime(info.updateTime)}</div>
                     </div>
                     <div className="chat-card-content-item">
                         <div
@@ -248,7 +283,7 @@ export default function Chat() {
                                 )
                             })
                         }
-                        <div className="chat-list-items-label">全部</div>
+                        {allChatsData?.length > 0 && <div className="chat-list-items-label">全部</div>}
                         {
                             allChatsData.map(data => {
                                 return (
@@ -280,17 +315,7 @@ export default function Chat() {
                                     })
                                 }
                             </div>
-                            : <div style={{
-                                width: "100%",
-                                height: "100%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexDirection: "column",
-                            }}>
-                                <img style={{width: 130, height: 80}} src="/empty.svg" alt="empty"/>
-                                <div style={{fontSize: 14, marginBottom: 200}}>搜索结果为空~</div>
-                            </div>
+                            : <CustomEmpty/>
                         }
                     </div>
                 }

@@ -15,7 +15,17 @@ function response(msg) {
         if (msg.data.code === -1) {
             onCloseHandler()
         } else {
-            emit('on-receive-msg', JSON.parse(msg.data))
+            let weContent = JSON.parse(msg.data)
+            switch (weContent.type) {
+                case "msg": {
+                    emit('on-receive-msg', weContent.content)
+                    break
+                }
+                case "notify": {
+                    emit('on-receive-notify', weContent.content)
+                    break
+                }
+            }
         }
     } else {
         onCloseHandler()
