@@ -2,7 +2,7 @@ import * as type from "./type";
 
 
 let defaultState = {
-    currentOption: null,
+    currentOption: "chat",
     userId: "",
     username: "",
     account: "",

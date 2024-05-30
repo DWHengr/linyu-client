@@ -1,5 +1,5 @@
 import "./index.less"
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Redirect, Route, Switch, useHistory} from "react-router-dom";
 import Chat from "./Chat/index.jsx";
 import Friend from "./Friend/index.jsx";
@@ -13,28 +13,81 @@ import {useDispatch, useSelector} from "react-redux";
 import {setCurrentLoginUserInfo, setCurrentOption} from "../../store/home/action.js";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import CreateTrayWindow from "../TrayMenu/window.jsx";
+import Notify from "./Notify/index.jsx";
+import UserApi from "../../api/user.js";
+import {listen} from "@tauri-apps/api/event";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData);
+    const chatStoreData = useSelector((state) => state.chatData);
+    const currentOption = useRef(homeStoreData.currentOption)
+    const currentToId = useRef(chatStoreData.currentChatId)//消息目标用户
     const [selectedOptionIndex, setSelectedOptionIndex] = useState("chat")
     const h = useHistory();
     const dispatch = useDispatch();
+    const [unreadInfo, setUnreadInfo] = useState({})
 
     useEffect(() => {
+        const appWindow = WebviewWindow.getByLabel('home')
+        appWindow.listen("tauri://close-requested", function (e) {
+            appWindow.hide()
+        });
         invoke("get_user_info", {}).then(res => {
             dispatch(setCurrentLoginUserInfo(res.user_id, res.username, res.account, res.portrait))
             let token = res.token
             if (token) {
                 ws.connect(token)
                 CreateTrayWindow()
+                onGetUserUnreadNum()
             }
         })
     }, [])
 
     useEffect(() => {
+        //监听后端接受到的消息
+        const unMsgListen = listen('on-receive-msg', (event) => {
+            if (currentOption.current !== "chat") {
+                onGetUserUnreadNum()
+                return
+            }
+            let data = event.payload
+            if (currentToId.current !== data.fromId) {
+                onGetUserUnreadNum()
+            }
+        });
+        const unUnreadListen = listen('on-unread-info', (event) => {
+            onGetUserUnreadNum()
+        });
+        const unNotifyListen = listen('on-receive-notify', (event) => {
+            if (currentOption.current !== "notify") {
+                onGetUserUnreadNum()
+            }
+        });
+        return async () => {
+            (await unMsgListen)();
+            (await unUnreadListen)();
+            (await unNotifyListen)();
+        }
+    }, [])
+
+    let onGetUserUnreadNum = () => {
+        UserApi.unread().then(res => {
+            if (res.code === 0) {
+                setUnreadInfo(res.data)
+            }
+        })
+    }
+
+    useEffect(() => {
+        currentOption.current = homeStoreData.currentOption
         if (homeStoreData.currentOption)
             setSelectedOptionIndex(homeStoreData.currentOption)
     }, [homeStoreData.currentOption])
+
+
+    useEffect(() => {
+        currentToId.current = chatStoreData.currentChatId
+    }, [chatStoreData.currentChatId])
 
     useEffect(() => {
         const handleEscKey = (event) => {
@@ -52,6 +105,7 @@ export default function Home() {
         {key: "chat", icon: "icon-liaotian", page: "/home/chat"},
         {key: "friend", icon: "icon-haoyou", page: "/home/friend"},
         {key: "talk", icon: "icon-pengyouquan", page: "/home/talk"},
+        {key: "notify", icon: "icon-tongzhi", page: "/home/notify"},
         {key: "set", icon: "icon-shezhi", page: "/home/set"},
     ]
 
@@ -77,6 +131,13 @@ export default function Home() {
                                         }}
                                     >
                                         <i className={`iconfont ${option.icon}`} style={{fontSize: 30}}/>
+                                        {
+                                            unreadInfo[option.key] && unreadInfo[option.key] > 0 ?
+                                                <div className="home-nav-option-tip">
+                                                    {unreadInfo[option.key]}
+                                                </div>
+                                                : <></>
+                                        }
                                     </div>
                                 )
                             })
@@ -94,6 +155,7 @@ export default function Home() {
                         <Route path="/home/chat" component={Chat}></Route>
                         <Route path="/home/friend" component={Friend}></Route>
                         <Route path="/home/set" component={Set}></Route>
+                        <Route path="/home/notify" component={Notify}></Route>
                         <Route path="/home/talk" component={Talk}></Route>
                         <Redirect path="/home" to="/home/chat"/>
                     </Switch>
