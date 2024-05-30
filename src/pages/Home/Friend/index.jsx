@@ -1,6 +1,6 @@
 import "./index.less"
 import CustomSearchInput from "../../../componets/CustomSearchInput/index.jsx";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import CustomAccordion from "../../../componets/CustomAccordion/index.jsx";
 import RightClickMenu from "../../../componets/RightClickMenu/index.jsx";
 import IconMinorButton from "../../../componets/IconMinorButton/index.jsx";
@@ -15,6 +15,12 @@ import {setCurrentChatId} from "../../../store/chat/action.js";
 import ChatListApi from "../../../api/chatList.js";
 import {setCurrentOption} from "../../../store/home/action.js";
 import FriendSearchCard from "../../../componets/FriendSearchCard/index.jsx";
+import CustomModal from "../../../componets/CustomModal/index.jsx";
+import IconButton from "../../../componets/IconButton/index.jsx";
+import UserApi from "../../../api/user.js";
+import CustomEmpty from "../../../componets/CustomEmpty/index.jsx";
+import NotifyApi from "../../../api/notify.js";
+import CustomTextarea from "../../../componets/CustomTextarea/index.jsx";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState(null)
@@ -25,10 +31,17 @@ export default function Friend() {
     const h = useHistory()
     const [friendDetails, setFriendDetails] = useState(null)
     const dispatch = useDispatch();
+    const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false);
+    const [isAddFriendContentModalOpen, setIsAddFriendContentModalOpen] = useState(false);
 
-    //搜索
+    //好友搜索
     const [searchInfo, setSearchInfo] = useState("")
     const [searchFriendsList, setSearchFriendsList] = useState([])
+    //添加用户搜索
+    const [searchUsersInfo, setSearchUsersInfo] = useState("")
+    const [searchUsersList, setSearchUsersList] = useState([])
+    const applyUserId = useRef()
+    const [applyContent, setApplyContent] = useState("")
 
     useEffect(() => {
         FriendApi.list().then(res => {
@@ -84,6 +97,33 @@ export default function Friend() {
         }
     }, [searchInfo])
 
+    useEffect(() => {
+        if (searchUsersInfo) {
+            UserApi.search({userInfo: searchUsersInfo}).then(res => {
+                if (res.code === 0) {
+                    setSearchUsersList(res.data)
+                }
+            })
+        }
+    }, [searchUsersInfo])
+
+    let onAddMenuClick = (action) => {
+        switch (action.key) {
+            case "addFriend": {
+                setIsAddFriendModalOpen(true)
+                break
+            }
+        }
+    }
+
+    let onFriendApply = (userId, content) => {
+        NotifyApi.friendApply({userId: userId, content: content}).then(res => {
+
+        })
+        setIsAddFriendContentModalOpen(false)
+        setApplyContent("")
+    }
+
     const FriendCard = ({info, onClick, onContextMenu}) => {
         let isSelected = info.friendId === selectedFriendId
         return (<div
@@ -111,9 +151,102 @@ export default function Friend() {
         </div>)
     }
 
+
     return (
         <div className="friend">
-            <RightClickMenu position={addMenuPosition} options={addRightOptions}/>
+            <div>
+                <CustomModal
+                    isOpen={isAddFriendModalOpen}
+                >
+                    <CustomModal
+                        isOpen={isAddFriendContentModalOpen}
+                        onClose={() => setIsAddFriendContentModalOpen(false)}
+                    >
+                        <div style={{
+                            width: 300,
+                            padding: 10,
+                            display: "flex",
+                            flexDirection: "column",
+                            alignItems: "center"
+                        }}>
+                            <CustomTextarea
+                                height={100}
+                                placeholder="请填写验证消息"
+                                value={applyContent}
+                                onChange={(v) => setApplyContent(v)}
+                            >
+                                <
+                                    CustomButton
+                                    onClick={() => onFriendApply(applyUserId.current, applyContent)}
+                                >
+                                    发送
+                                </CustomButton>
+                            </CustomTextarea>
+                        </div>
+                    </CustomModal>
+                    <div className="user-search-modal">
+                        <div className="user-search-modal-top">
+                            <div style={{fontSize: 14}}>
+                                添加好友
+                            </div>
+                            <div style={{position: "absolute", right: 0}}>
+                                <IconButton
+                                    danger
+                                    icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 20}}/>}
+                                    onClick={() => setIsAddFriendModalOpen(false)}
+                                />
+                            </div>
+                        </div>
+                        <CustomSearchInput
+                            value={searchUsersInfo}
+                            onChange={(v) => setSearchUsersInfo(v)}
+                            placeholder="账号/手机号/邮箱"
+                        />
+                        <div className="user-search-modal-content">
+                            {searchUsersInfo ? (
+                                searchUsersList.length > 0
+                                    ?
+                                    searchUsersList.map(user => (
+                                        <div className="user-search-modal-content-item">
+                                            <div style={{display: "flex"}}>
+                                                <img
+                                                    style={{width: 45, height: 45, borderRadius: 45}}
+                                                    src={user.portrait}
+                                                    alt={user.portrait}
+                                                />
+                                                <div style={{marginLeft: 10, fontSize: 14}}>
+                                                    <div>
+                                                        {user.name}
+                                                    </div>
+                                                    <div style={{fontSize: 12}}>
+                                                        {user.account}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <CustomButton
+                                                    style={{fontSize: 12, paddingTop: 0, paddingBottom: 0}}
+                                                    width={36}
+                                                    type="minor"
+                                                    onClick={() => {
+                                                        applyUserId.current = user.id
+                                                        setIsAddFriendContentModalOpen(true)
+                                                    }}
+                                                >
+                                                    添加
+                                                </CustomButton>
+                                            </div>
+                                        </div>
+                                    ))
+                                    : <CustomEmpty placeholder="搜索的用户为不存在~"/>
+
+                            ) : <CustomEmpty placeholder="请输入关键词吧~"/>
+                            }
+                        </div>
+                    </div>
+                </CustomModal>
+            </div>
+            <RightClickMenu position={addMenuPosition} options={addRightOptions} onMenuItemClick={onAddMenuClick}/>
             <RightClickMenu position={groupMenuPosition} options={groupRightOptions}/>
             <RightClickMenu position={moreMenuPosition} options={moreRightOptions}/>
             <div className="friend-list">
@@ -137,7 +270,7 @@ export default function Friend() {
                 {!searchInfo ? <div
                         className="friend-list-items">
                         {allFriendData.map(item => {
-                            return (<>
+                            return (
                                 <CustomAccordion
                                     key={item.id}
                                     title={item.name}
@@ -151,7 +284,7 @@ export default function Friend() {
                                         />)
                                     })}
                                 </CustomAccordion>
-                            </>)
+                            )
                         })}
                     </div>
                     :
@@ -169,17 +302,7 @@ export default function Friend() {
                                     })
                                 }
                             </div>
-                            : <div style={{
-                                width: "100%",
-                                height: "100%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                flexDirection: "column",
-                            }}>
-                                <img style={{width: 130, height: 80}} src="/empty.svg" alt="empty"/>
-                                <div style={{fontSize: 14, marginBottom: 200}}>搜索结果为空~</div>
-                            </div>
+                            : <CustomEmpty/>
                         }
                     </div>
                 }
