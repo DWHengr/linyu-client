@@ -35,7 +35,7 @@ const DropdownButton = ({options, defaultOption, onOptionSelect}) => {
                 <CustomButton
                     style={{fontSize: 12, paddingTop: 0, paddingBottom: 0}}
                     width={36}
-                >
+                    onClick={() => handleOptionSelect(selectedOption)}>
                     {selectedOption.label}
                 </CustomButton>
                 <div

@@ -1,13 +1,12 @@
 import "./index.less"
 
-export default function CustomSearchInput({value, onChange}) {
-
+export default function CustomSearchInput({value, onChange, placeholder = "搜索"}) {
     return (
         <div className="custom-search-input">
             <input
                 value={value}
                 type="text"
-                placeholder={"搜索"}
+                placeholder={placeholder}
                 onChange={(e) => {
                     if (onChange) onChange(e.target.value)
                 }}

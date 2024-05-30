@@ -11,7 +11,7 @@ import CustomOverlay from "../CustomOverlay/index.jsx";
 import {emojis} from "../../utils/emoji.js";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import Time from "./ChatContent/Time/index.jsx";
-import {formatChatTime} from "../../utils/date.js";
+import {formatTime} from "../../utils/date.js";
 
 function CommonChatFrame({userInfo}) {
 
@@ -261,7 +261,7 @@ function CommonChatFrame({userInfo}) {
             {messages?.map((msg) => {
                 return (
                     <>
-                        {msg.isShowTime && <Time value={formatChatTime(msg.updateTime)}/>}
+                        {msg.isShowTime && <Time value={formatTime(msg.updateTime)}/>}
                         <Text
                             key={msg.id} value={msg.msgContent?.content}
                             right={msg.fromId === currentUserId.current}
