@@ -13,4 +13,10 @@ export default {
     detail(param) {
         return Http.get(`/v1/api/chat-list/detail/${param}`)
     },
+    delete(param) {
+        return Http.post("/v1/api/chat-list/delete", param);
+    },
+    top(param) {
+        return Http.post("/v1/api/chat-list/top", param);
+    }
 };

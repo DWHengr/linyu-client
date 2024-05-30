@@ -9,5 +9,8 @@ export default {
     },
     search(param) {
         return Http.post(`/v1/api/friend/search`, param)
+    },
+    agree(param) {
+        return Http.post(`/v1/api/friend/agree`, param)
     }
 };
