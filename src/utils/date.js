@@ -16,7 +16,7 @@ export function getDateDayAndMonth(date) {
     return `${month}月${day}日`;
 }
 
-export function formatChatTime(dateStr) {
+export function formatTime(dateStr) {
     const date = new Date(dateStr);
     const now = new Date();
     const diffMs = now - date;

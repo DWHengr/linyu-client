@@ -6,7 +6,7 @@ let heartTimer = null
 let timer = null
 let lockReconnect = false
 let token = null
-const reconnectCountMax = 100
+const reconnectCountMax = 200
 let reconnectCount = 0
 let isConnect = false
 
@@ -38,6 +38,7 @@ function connect(tokenStr) {
     token = tokenStr
     try {
         WebSocket.connect("ws://127.0.0.1:9100/ws?x-token=" + token).then((r) => {
+            console.log("连接服务器")
             ws = r
             ws.addListener(response);
             clearTimer()
@@ -63,6 +64,7 @@ const sendHeartPack = () => {
 
 const onCloseHandler = () => {
     clearHeartPackTimer()
+    ws = null
     isConnect = false
     if (lockReconnect) return
     lockReconnect = true
@@ -78,12 +80,12 @@ const onCloseHandler = () => {
         connect(token)
         reconnectCount++
         lockReconnect = false
-    }, 2000)
+    }, 5000)
 }
 
 
 const clearHeartPackTimer = () => {
-    console.log("销毁clearHeartPackTimer")
+    console.log("关闭连接")
     if (heartTimer) {
         clearInterval(heartTimer)
         heartTimer = null
