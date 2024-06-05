@@ -1,0 +1,71 @@
+.message-box-container {
+  padding: 5px;
+
+  .message-box {
+    background-image: linear-gradient(to bottom, #EDF2F9, #fff);
+    border: 1px solid #E1E0E0;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    height: calc(100vh - 10px);
+    border-radius: 10px;
+    user-select: none;
+
+    .message-box-top {
+      height: 40px;
+      margin: 0 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .message-box-content {
+
+      .message-box-content-item {
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        height: 50px;
+        cursor: pointer;
+
+        .chat-card-portrait {
+          width: 45px;
+          height: 45px;
+          border-radius: 45px;
+          margin-right: 5px;
+        }
+
+        .chat-card-content {
+          height: 45px;
+          width: calc(100% - 50px);
+          display: flex;
+          flex-direction: column;
+
+          .chat-card-content-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+
+            .ellipsis {
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+
+        &:hover {
+          background-color: #EDF2F9;
+        }
+      }
+    }
+
+    .message-box-bottom {
+      font-weight: 600;
+      color: #4C9BFF;
+      font-size: 14px;
+      height: 40px;
+      margin: 0 10px;
+      display: flex;
+      align-items: center;
+    }
+  }
+}
