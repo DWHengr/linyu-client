@@ -1,6 +1,9 @@
 use lazy_static::lazy_static;
 use serde::Serialize;
 use std::sync::{Arc, RwLock};
+use tauri::{
+    Manager, Runtime,AppHandle,ResourceId,Webview
+};
 
 // 定义用户信息结构体
 #[derive(Debug, Clone, Serialize)]
@@ -37,4 +40,15 @@ pub fn save_user_info(userid: &str, username: &str, token: &str, portrait: &str)
 pub fn get_user_info() -> UserInfo {
     let user_info = USER_INFO.read().unwrap();
     user_info.clone()
+}
+
+#[tauri::command]
+pub fn default_window_icon<R: Runtime>(
+  webview: Webview<R>,
+  app: AppHandle<R>,
+) -> Option<ResourceId> {
+  app.default_window_icon().cloned().map(|icon| {
+    let mut resources_table = webview.resources_table();
+    resources_table.add(icon.to_owned())
+  })
 }

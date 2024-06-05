@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod tray;
 mod user_cmd;
-use user_cmd::{get_user_info, save_user_info};
+use user_cmd::{get_user_info, save_user_info,default_window_icon};
 
 fn main() {
     tauri::Builder::default()
@@ -14,7 +14,7 @@ fn main() {
             tray::create_tray(app.handle())?;
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_user_info, save_user_info])
+        .invoke_handler(tauri::generate_handler![get_user_info, save_user_info,default_window_icon])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

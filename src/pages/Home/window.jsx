@@ -11,7 +11,6 @@ listen('tray_menu', async (event) => {
     let position = event.payload;
     let scaleFactor = await homeWindow.scaleFactor();
     let logicalPosition = new PhysicalPosition(position.x, position.y).toLogical(scaleFactor);
-    logicalPosition = new PhysicalPosition(logicalPosition.x, logicalPosition.y).toLogical(scaleFactor);
     logicalPosition.y = logicalPosition.y - trayWindowHeight
 
     let trayWindow = WebviewWindow.getByLabel('tray_menu')
@@ -21,6 +20,14 @@ listen('tray_menu', async (event) => {
         await trayWindow.show()
         await trayWindow.setFocus()
     }
+})
+
+listen('tray_enter', async (event) => {
+    console.log("tray_enter")
+})
+
+listen('tray_leave', async (event) => {
+    console.log("tray_leave")
 })
 
 export default function CreateHomeWindow() {
