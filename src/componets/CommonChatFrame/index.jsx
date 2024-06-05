@@ -88,13 +88,11 @@ function CommonChatFrame({userInfo}) {
             //是否触发顶部获取记录
             if (isQueryComplete.current) return
             if (showFrameRef.current && !scrollTriggered.current) {
-                const scrollTop = showFrameRef.current.scrollTop;
                 if (0 === scrollTop) {
                     scrollTriggered.current = true
                     onMessageRecord()
                 }
             }
-
             //获取滚动条方向
             if (scrollTop > div._prevScrollPosition) {
                 setScrollDirection('down');
@@ -163,7 +161,6 @@ function CommonChatFrame({userInfo}) {
         currentMsgRecordIndex.current = 0
         scrollTriggered.current = true
         messagesRef.current = []
-        setMessages([])
         currentToId.current = userInfo.fromId
         const container = showFrameRef.current
         container.scrollTop = container.scrollHeight
@@ -260,13 +257,13 @@ function CommonChatFrame({userInfo}) {
         <div ref={showFrameRef} className="chat-content-show-frame">
             {messages?.map((msg) => {
                 return (
-                    <>
+                    <div key={msg.id}>
                         {msg.isShowTime && <Time value={formatTime(msg.updateTime)}/>}
                         <Text
-                            key={msg.id} value={msg.msgContent?.content}
+                            value={msg.msgContent?.content}
                             right={msg.fromId === currentUserId.current}
                         />
-                    </>
+                    </div>
                 )
             })}
             {newMsgUnreadNum !== 0 && <div className="hint" onClick={onScrollToBottom}>
