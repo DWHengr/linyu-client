@@ -15,7 +15,10 @@ import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import CreateTrayWindow from "../TrayMenu/window.jsx";
 import Notify from "./Notify/index.jsx";
 import UserApi from "../../api/user.js";
-import {listen} from "@tauri-apps/api/event";
+import {emit, listen} from "@tauri-apps/api/event";
+import CrateMessageBox from "../MessageBox/window.jsx";
+import {setCurrentChatId} from "../../store/chat/action.js";
+import ChatListApi from "../../api/chatList.js";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData);
@@ -38,14 +41,24 @@ export default function Home() {
             if (token) {
                 ws.connect(token)
                 CreateTrayWindow()
+                CrateMessageBox()
                 onGetUserUnreadNum()
             }
         })
     }, [])
 
+    const onGetChatList = () => {
+        ChatListApi.list().then(res => {
+            if (res.code === 0) {
+                emit("chat-list", [...res.data.tops, ...res.data.others])
+            }
+        })
+    }
+
     useEffect(() => {
         //监听后端接受到的消息
         const unMsgListen = listen('on-receive-msg', (event) => {
+            onGetChatList()
             if (currentOption.current !== "chat") {
                 onGetUserUnreadNum()
                 return
@@ -60,13 +73,25 @@ export default function Home() {
         });
         const unNotifyListen = listen('on-receive-notify', (event) => {
             if (currentOption.current !== "notify") {
+                onGetChatList()
                 onGetUserUnreadNum()
             }
         });
+        let unChatListJumpListen = listen('chat-list-jump', async (event) => {
+            let info = event.payload
+            const window = WebviewWindow.getByLabel('home')
+            window.show()
+            window.unminimize()
+            window.setFocus()
+            dispatch(setCurrentChatId(info.fromId, info))
+            dispatch(setCurrentOption("chat"))
+            h.push("/home/chat")
+        })
         return async () => {
             (await unMsgListen)();
             (await unUnreadListen)();
             (await unNotifyListen)();
+            (await unChatListJumpListen)();
         }
     }, [])
 
@@ -110,7 +135,14 @@ export default function Home() {
     ]
 
     return (
-        <div className="home-container">
+        <div
+            tabIndex="0"
+            className="home-container"
+            // onFocus={(e) => {
+            //     emit("home-focus", {})
+            //     e.stopPropagation()
+            // }}
+        >
             <div className="overlay"></div>
             <div className="home">
                 <CustomDragDiv className="home-nav">
