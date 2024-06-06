@@ -57,8 +57,20 @@ function CommonChatFrame({userInfo}) {
                 setMessages(() => [...messagesRef.current])
             }
         });
+        //窗口聚焦
+        const window = WebviewWindow.getCurrent()
+        let unFocus = null;
+        if (window.label !== "home") {
+            let unFocus = window.listen("tauri://focus", (e) => {
+                let fromId = window.label.split('-')[1]
+                emit("refresh-chat", {id: fromId})
+                e.stopPropagation()
+            });
+        }
         return async () => {
-            (await unListen)()
+            (await unListen)();
+            if (unFocus)
+                (await unFocus)();
         }
     }, [])
 
