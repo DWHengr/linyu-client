@@ -2,10 +2,11 @@ import "./index.less"
 import {useEffect, useRef, useState} from "react";
 import {listen} from "@tauri-apps/api/event";
 
-export default function RightClickMenu({position, options, visible = false, onMenuItemClick}) {
+export default function RightClickMenu({position, options, visible = false, onMenuItemClick, filter = []}) {
     const [menuVisible, setMenuVisible] = useState(visible);
     const [menuPosition, setMenuPosition] = useState({x: 0, y: 0});
     const menuRef = useRef(null);
+    const [menuOptions, setMenuOption] = useState(options)
 
     useEffect(() => {
         if (!position) return
@@ -20,6 +21,14 @@ export default function RightClickMenu({position, options, visible = false, onMe
             (await unListen)()
         }
     }, [])
+
+    useEffect(() => {
+        if (!filter || filter.length <= 0) return
+        let ops = options.filter((option) => {
+            return !filter.includes(option.key)
+        })
+        setMenuOption(ops)
+    }, [filter])
 
     useEffect(() => {
         if (menuVisible) {
@@ -57,13 +66,18 @@ export default function RightClickMenu({position, options, visible = false, onMe
                         tabIndex="0"
                         onBlur={() => setMenuVisible(false)}
                     >
-                        {options.map((item, index) => (
-                            <div className="option" key={index} onClick={(e) => {
-                                onItemClick(item)
-                            }}>
-                                {item.label}
-                            </div>
-                        ))}
+                        {menuOptions.map((item, index) => {
+                            if (filter.includes(index.key)) {
+                                return <></>
+                            }
+                            return (
+                                <div className="option" key={item.key} onClick={(e) => {
+                                    onItemClick(item)
+                                }}>
+                                    {item.label}
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
             )}
