@@ -31,10 +31,17 @@ export default function Chat() {
     const dispatch = useDispatch();
     const chatWindowUsersRef = useRef(chatStoreData.chatWindowUsers);
     let h = useHistory();
-
+    const [chatListRightOptionsFilter, setChatListRightOptionsFilter] = useState([])
     //搜索
     const [searchInfo, setSearchInfo] = useState("")
     const [searchFriendsList, setSearchFriendsList] = useState([])
+
+    const chatListRightOptions = [{key: "top", label: "置顶"}, {
+        key: "unTop",
+        label: "取消置顶"
+    }, // {key: "unNoDisturb", label: "设置免打扰"},
+        // {key: "unNoDisturb ", label: "取消免打扰"},
+        {key: "newChatWindow", label: "打开独立窗口"}, {key: "deleteChat", label: "从聊天列表中移除"},]
 
     const onGetChatList = () => {
         ChatListApi.list().then(res => {
@@ -47,7 +54,10 @@ export default function Chat() {
     }
 
     useEffect(() => {
-        setSelectedUserInfo(chatStoreData.currentChatUserInfo)
+        // setSelectedUserInfo(chatStoreData.currentChatUserInfo)
+        if (chatStoreData.currentChatUserInfo) {
+            onChatListClick(chatStoreData.currentChatUserInfo)
+        }
     }, [chatStoreData.currentChatUserInfo])
 
     useEffect(() => {
@@ -66,6 +76,10 @@ export default function Chat() {
         const window = WebviewWindow.getByLabel('home')
         let unFocus = window.listen("tauri://focus", (e) => {
             onRead(currentToId.current)
+            e.stopPropagation()
+        });
+        let unRefreshChat = window.listen("refresh-chat", (e) => {
+            onRead(e.payload.id)
             e.stopPropagation()
         });
         //监听后端接受到的消息
@@ -98,6 +112,7 @@ export default function Chat() {
             (await unReceiveListen)();
             (await unSendListen)();
             (await unChatDestroyed)();
+            (await unRefreshChat)();
         }
     }, [])
 
@@ -106,9 +121,9 @@ export default function Chat() {
     }, [chatStoreData.chatWindowUsers])
 
     useEffect(() => {
+        onRead(chatStoreData.currentChatId)
         setSelectedChatId(chatStoreData.currentChatId)
     }, [chatStoreData.currentChatId])
-
 
     useEffect(() => {
         currentToId.current = selectedChatId
@@ -118,12 +133,6 @@ export default function Chat() {
         onGetChatList()
     }, []);
 
-    const chatListRightOptions = [{key: "top", label: "置顶"}, {
-        key: "unTop",
-        label: "取消置顶"
-    }, // {key: "unNoDisturb", label: "设置免打扰"},
-        // {key: "unNoDisturb ", label: "取消免打扰"},
-        {key: "newChatWindow", label: "打开独立窗口"}, {key: "deleteChat", label: "从聊天列表中移除"},]
 
     const onMenuItemClick = (item) => {
         switch (item.key) {
@@ -189,10 +198,6 @@ export default function Chat() {
         setSelectedUserInfo(data)
         dispatch(setCurrentChatId(data.fromId, data))
     }
-
-    useEffect(() => {
-        onRead(chatStoreData.currentChatId)
-    }, [chatStoreData.currentChatId]);
 
     const ChatCard = ({info, onClick, onContextMenu}) => {
         let isSelected = false
@@ -261,6 +266,13 @@ export default function Chat() {
         })
     }
 
+    const onChatListRightMenu = (e, data) => {
+        setChatListRightOptionsFilter([data.isTop ? "top" : "unTop"])
+        rightSelected.current = data.fromId;
+        selectedRightUserInfo.current = data;
+        setMenuPosition({x: e.clientX, y: e.clientY})
+    }
+
     return (<div className="chat">
         <div className="chat-list">
             <CustomDragDiv className="chat-list-top">
@@ -275,6 +287,7 @@ export default function Chat() {
             <RightClickMenu
                 position={menuPosition}
                 options={chatListRightOptions}
+                filter={chatListRightOptionsFilter}
                 onMenuItemClick={onMenuItemClick}
             />
             {!searchInfo ? <div
@@ -283,11 +296,7 @@ export default function Chat() {
                 {topChatsData.map(data => {
                     return (<ChatCard
                         key={data.id}
-                        onContextMenu={(e) => {
-                            rightSelected.current = data.fromId;
-                            selectedRightUserInfo.current = data;
-                            setMenuPosition({x: e.clientX, y: e.clientY})
-                        }}
+                        onContextMenu={(e) => onChatListRightMenu(e, data)}
                         info={data}
                         onClick={() => onChatListClick(data)}
                     />)
@@ -296,11 +305,7 @@ export default function Chat() {
                 {allChatsData.map(data => {
                     return (<ChatCard
                         key={data.id}
-                        onContextMenu={(e) => {
-                            rightSelected.current = data.fromId;
-                            selectedRightUserInfo.current = data;
-                            setMenuPosition({x: e.clientX, y: e.clientY})
-                        }}
+                        onContextMenu={(e) => onChatListRightMenu(e, data)}
                         info={data}
                         onClick={() => onChatListClick(data)}
                     />)
