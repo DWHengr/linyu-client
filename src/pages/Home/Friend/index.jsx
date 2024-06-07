@@ -21,6 +21,9 @@ import UserApi from "../../../api/user.js";
 import CustomEmpty from "../../../componets/CustomEmpty/index.jsx";
 import NotifyApi from "../../../api/notify.js";
 import CustomTextarea from "../../../componets/CustomTextarea/index.jsx";
+import CustomInput from "../../../componets/CustomInput/index.jsx";
+import GroupApi from "../../../api/group.js";
+import CustomAffirmModal from "../../../componets/CustomAffirmModal/index.jsx";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState(null)
@@ -42,15 +45,26 @@ export default function Friend() {
     const [searchUsersList, setSearchUsersList] = useState([])
     const applyUserId = useRef()
     const [applyContent, setApplyContent] = useState("")
+    //分组
+    const [isGroupModalOpen, setIsGroupModalOpen] = useState(false)
+    const [groupUpdateInfo, setGroupUpdateInfo] = useState(null)
+    const [isGroupAdd, setIsGroupAdd] = useState(true)
+    const selectedGroupId = useRef(null)
+    const [isGroupDelAffirmModalOpen, setIsGroupDelAffirmModalOpen] = useState(false)
 
     useEffect(() => {
+        onFriendList()
+    }, [])
+
+    const onFriendList = () => {
         FriendApi.list().then(res => {
             if (res.code === 0) {
                 setAllFriendData(res.data)
             }
         })
-    }, [])
+    }
 
+    const [groupRightOptionsFilter, setGroupRightOptionsFilter] = useState([])
     const groupRightOptions = [
         {key: "addGroup", label: "添加分组"},
         {key: "modifyGroup", label: "重命名分组"},
@@ -116,6 +130,55 @@ export default function Friend() {
         }
     }
 
+    const onCreateGroup = () => {
+        if (selectedGroupId.current) {
+            GroupApi.update({groupId: selectedGroupId.current, groupName: groupUpdateInfo}).then(res => {
+                if (res.code === 0) {
+                    onFriendList()
+                }
+            })
+        } else {
+            GroupApi.create({groupName: groupUpdateInfo}).then(res => {
+                if (res.code === 0) {
+                    onFriendList()
+                }
+            })
+        }
+        setIsGroupModalOpen(false)
+    }
+
+    let onGroupMenuClick = (action) => {
+        switch (action.key) {
+            case "addGroup": {
+                selectedGroupId.current = null
+                setIsGroupAdd(true)
+                setGroupUpdateInfo(null)
+                setIsGroupModalOpen(true)
+                break
+            }
+            case "modifyGroup": {
+                setIsGroupAdd(false)
+                setIsGroupModalOpen(true)
+                break
+            }
+            case "deleteGroup": {
+                setIsGroupDelAffirmModalOpen(true)
+                break
+            }
+        }
+    }
+
+    const onDeleteGroup = () => {
+        if (selectedGroupId.current) {
+            GroupApi.delete({groupId: selectedGroupId.current}).then(res => {
+                if (res.code === 0) {
+                    onFriendList()
+                }
+            })
+        }
+        setIsGroupDelAffirmModalOpen(false)
+    }
+
     let onFriendApply = (userId, content) => {
         NotifyApi.friendApply({userId: userId, content: content}).then(res => {
 
@@ -151,9 +214,9 @@ export default function Friend() {
         </div>)
     }
 
-
     return (
         <div className="friend">
+            {/*好有添加弹窗*/}
             <div>
                 <CustomModal
                     isOpen={isAddFriendModalOpen}
@@ -246,8 +309,86 @@ export default function Friend() {
                     </div>
                 </CustomModal>
             </div>
+            {/*分组设置弹窗*/}
+            <div>
+                <CustomModal
+                    isOpen={isGroupModalOpen}
+                >
+                    <div style={{
+                        width: 300,
+                        height: 120,
+                        backgroundColor: "white",
+                        borderRadius: 10,
+                        padding: 10,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        position: "relative",
+                        justifyContent: "center"
+                    }}>
+                        <div style={{
+                            display: "flex",
+                            position: "absolute",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: "100%",
+                            height: 30,
+                            top: 5,
+                            borderBottom: "#f1f1f1 1px solid"
+                        }}>
+                            <div style={{fontSize: 12}}>
+                                {isGroupAdd ? "添加分组" : "修改分组"}
+                            </div>
+                            <div style={{position: "absolute", right: 10}}>
+                                <IconButton
+                                    danger
+                                    icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 20}}/>}
+                                    onClick={() => {
+                                        setIsGroupModalOpen(false)
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div style={{width: "100%"}}>
+                            <CustomInput
+                                value={groupUpdateInfo}
+                                placeholder="填写分组名称"
+                                onChange={(v) => setGroupUpdateInfo(v)}
+                            />
+                        </div>
+                        <div style={{display: "flex", position: "absolute", right: 10, bottom: 10}}>
+                            <CustomButton
+                                width={55}
+                                disabled={!groupUpdateInfo}
+                                onClick={onCreateGroup}
+                            >
+                                确定
+                            </CustomButton>
+                            <CustomButton
+                                width={55}
+                                type="minor"
+                                onClick={() => {
+                                    setIsGroupModalOpen(false)
+                                }}
+                            >
+                                取消
+                            </CustomButton>
+                        </div>
+                    </div>
+                </CustomModal>
+            </div>
+            <CustomAffirmModal
+                isOpen={isGroupDelAffirmModalOpen}
+                txt="确认删除分组?"
+                onOk={onDeleteGroup}
+                onCancel={() => setIsGroupDelAffirmModalOpen(false)}
+            />
             <RightClickMenu position={addMenuPosition} options={addRightOptions} onMenuItemClick={onAddMenuClick}/>
-            <RightClickMenu position={groupMenuPosition} options={groupRightOptions}/>
+            <RightClickMenu position={groupMenuPosition}
+                            options={groupRightOptions}
+                            filter={groupRightOptionsFilter}
+                            onMenuItemClick={onGroupMenuClick}
+            />
             <RightClickMenu position={moreMenuPosition} options={moreRightOptions}/>
             <div className="friend-list">
                 <CustomDragDiv className="friend-list-top">
@@ -272,10 +413,15 @@ export default function Friend() {
                         {allFriendData.map(item => {
                             return (
                                 <CustomAccordion
-                                    key={item.id}
+                                    key={item.groupId}
                                     title={item.name}
                                     titleEnd={`（${item.friends ? item.friends.length : 0}）`}
-                                    onContextMenu={(e) => setGroupMenuPosition({x: e.clientX, y: e.clientY})}
+                                    onContextMenu={(e) => {
+                                        setGroupRightOptionsFilter(item.isCustom ? [""] : ["modifyGroup", "deleteGroup"])
+                                        selectedGroupId.current = item.groupId
+                                        setGroupUpdateInfo(item.name)
+                                        setGroupMenuPosition({x: e.clientX, y: e.clientY})
+                                    }}
                                 >
                                     {item?.friends?.map((friend) => {
                                         return (<FriendCard
