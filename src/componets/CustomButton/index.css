@@ -9,6 +9,7 @@
     margin: 0 2px;
     justify-content: center;
     align-items: center;
+    user-select: none;
 
     &:hover {
         background-color: rgba(76, 155, 255, 0.8);
@@ -21,5 +22,14 @@
 
     &:hover {
         background-color: #E3ECFF;
+    }
+}
+
+.custom-button.disabled {
+    cursor: not-allowed;
+    background-color: rgba(76, 155, 255, 0.5);
+
+    &:hover {
+        background-color: rgba(76, 155, 255, 0.5);
     }
 }
