@@ -136,12 +136,7 @@ export default function Home() {
 
     return (
         <div
-            tabIndex="0"
             className="home-container"
-            // onFocus={(e) => {
-            //     emit("home-focus", {})
-            //     e.stopPropagation()
-            // }}
         >
             <div className="overlay"></div>
             <div className="home">
