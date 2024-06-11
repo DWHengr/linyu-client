@@ -24,6 +24,8 @@ import CustomTextarea from "../../../componets/CustomTextarea/index.jsx";
 import CustomInput from "../../../componets/CustomInput/index.jsx";
 import GroupApi from "../../../api/group.js";
 import CustomAffirmModal from "../../../componets/CustomAffirmModal/index.jsx";
+import {useToast} from "../../../componets/CustomToast/index.jsx";
+import CustomEditableText from "../../../componets/CustomEditableText/index.jsx";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState(null)
@@ -36,6 +38,7 @@ export default function Friend() {
     const dispatch = useDispatch();
     const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false);
     const [isAddFriendContentModalOpen, setIsAddFriendContentModalOpen] = useState(false);
+    const showToast = useToast();
 
     //好友搜索
     const [searchInfo, setSearchInfo] = useState("")
@@ -172,6 +175,7 @@ export default function Friend() {
         if (selectedGroupId.current) {
             GroupApi.delete({groupId: selectedGroupId.current}).then(res => {
                 if (res.code === 0) {
+                    showToast("删除分组成功~")
                     onFriendList()
                 }
             })
@@ -185,6 +189,15 @@ export default function Friend() {
         })
         setIsAddFriendContentModalOpen(false)
         setApplyContent("")
+    }
+
+    let onSetRemark = (friendId, remark) => {
+        FriendApi.setRemark({friendId, remark}).then(res => {
+            if (res.code === 0) {
+                onFriendList()
+                setFriendDetails({...friendDetails, remark: remark})
+            }
+        })
     }
 
     const FriendCard = ({info, onClick, onContextMenu}) => {
@@ -506,7 +519,11 @@ export default function Friend() {
                                 <div className="info-item">
                                     <i className={`iconfont icon-beizhu`} style={{fontSize: 14, marginRight: 5}}/>
                                     <div>备注：</div>
-                                    <div>{friendDetails.remark}</div>
+                                    <CustomEditableText
+                                        placeholder="设置好友备注"
+                                        text={friendDetails.remark}
+                                        onSave={(v) => onSetRemark(friendDetails.friendId, v)}
+                                    />
                                 </div>
                                 <div className="info-item">
                                     <i className={`iconfont icon-fenzu`} style={{fontSize: 14, marginRight: 5}}/>
