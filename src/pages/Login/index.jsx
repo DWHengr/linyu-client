@@ -8,17 +8,19 @@ import {useState} from "react";
 import CreateHomeWindow from "../Home/window.jsx";
 import {invoke} from "@tauri-apps/api/core";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {useToast} from "../../componets/CustomToast/index.jsx";
 
 export default function Login() {
     let [account, setAccount] = useState("")
     let [password, setPassword] = useState("")
+    var showToast = useToast();
     const onLogin = () => {
         if (!account) {
-            console.log("用户名不能为空")
+            showToast("用户名不能为空~", true)
             return
         }
         if (!password) {
-            console.log("密码不能为空")
+            showToast("用户名不能为空~", true)
             return
         }
         LoginApi.login({account: account, password: password})
@@ -33,11 +35,11 @@ export default function Login() {
                         CreateHomeWindow()
                     })
                 } else {
-                    console.log(res.msg)
+                    showToast(res.msg, true)
                 }
             })
             .catch((res) => {
-                console.log(res.message)
+                showToast(res.message, true)
             })
     }
 
@@ -68,7 +70,12 @@ export default function Login() {
                 <div className="login-pwd-input">
                     <CustomPwdInput value={password} onChange={(v) => setPassword(v)}/>
                 </div>
-                <div className="login-button" onClick={onLogin}>登 录</div>
+                <div className={`login-button ${password && account ? "" : "disabled"}`} onClick={() => {
+                    if (password && account)
+                        onLogin()
+                }}>
+                    登 录
+                </div>
             </CustomDragDiv>
         </div>
     )
