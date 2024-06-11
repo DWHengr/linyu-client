@@ -1,0 +1,54 @@
+.custom-select {
+  position: relative;
+  user-select: none;
+
+  .selected-box {
+    border-radius: 2px;
+    padding: 0 5px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    background-color: #fff;
+    display: flex;
+
+    .selected-value {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .arrow {
+      font-size: 12px;
+    }
+
+  }
+
+  .options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    background-color: rgba(237, 242, 249, 0.8);
+    backdrop-filter: blur(2px);
+    border-radius: 0 0 5px 5px;
+    z-index: 999;
+  }
+
+  .option {
+    padding: 2px 4px;
+    cursor: pointer;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .option:hover {
+    background-color: rgb(220, 234, 255);
+  }
+
+  .selected {
+    background-color: rgb(220, 234, 255);
+  }
+
+}
