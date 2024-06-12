@@ -15,5 +15,8 @@ export default {
     },
     setRemark(param) {
         return Http.post(`/v1/api/friend/set/remark`, param)
+    },
+    setGroup(param) {
+        return Http.post(`/v1/api/friend/set/group`, param)
     }
 };

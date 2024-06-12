@@ -26,6 +26,7 @@ import GroupApi from "../../../api/group.js";
 import CustomAffirmModal from "../../../componets/CustomAffirmModal/index.jsx";
 import {useToast} from "../../../componets/CustomToast/index.jsx";
 import CustomEditableText from "../../../componets/CustomEditableText/index.jsx";
+import CustomDropdown from "../../../componets/CustomDropdown/index.jsx";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState(null)
@@ -54,9 +55,11 @@ export default function Friend() {
     const [isGroupAdd, setIsGroupAdd] = useState(true)
     const selectedGroupId = useRef(null)
     const [isGroupDelAffirmModalOpen, setIsGroupDelAffirmModalOpen] = useState(false)
+    const [groupList, setGroupList] = useState([])
 
     useEffect(() => {
         onFriendList()
+        onGroupList()
     }, [])
 
     const onFriendList = () => {
@@ -93,6 +96,15 @@ export default function Friend() {
             }
         })
     }
+
+    const onGroupList = () => {
+        GroupApi.list().then(res => {
+            if (res.code === 0) {
+                setGroupList(res.data)
+            }
+        })
+    }
+
 
     const onSendMsgClick = (friendId) => {
         ChatListApi.create({userId: friendId}).then(res => {
@@ -196,6 +208,15 @@ export default function Friend() {
             if (res.code === 0) {
                 onFriendList()
                 setFriendDetails({...friendDetails, remark: remark})
+            }
+        })
+    }
+
+    let onSetGroup = (friendId, option) => {
+        FriendApi.setGroup({friendId, groupId: option.value}).then(res => {
+            if (res.code === 0) {
+                onFriendList()
+                setFriendDetails({...friendDetails, groupName: option.label})
             }
         })
     }
@@ -437,10 +458,14 @@ export default function Friend() {
                                     }}
                                 >
                                     {item?.friends?.map((friend) => {
-                                        return (<FriendCard
-                                            info={friend}
-                                            onClick={() => onFriendDetails(friend.friendId)}
-                                        />)
+                                        return (
+                                            <div key={friend.friendId}>
+                                                <FriendCard
+                                                    info={friend}
+                                                    onClick={() => onFriendDetails(friend.friendId)}
+                                                />
+                                            </div>
+                                        )
                                     })}
                                 </CustomAccordion>
                             )
@@ -528,7 +553,11 @@ export default function Friend() {
                                 <div className="info-item">
                                     <i className={`iconfont icon-fenzu`} style={{fontSize: 14, marginRight: 5}}/>
                                     <div>分组：</div>
-                                    <div>{friendDetails.groupName}</div>
+                                    <CustomDropdown
+                                        options={groupList}
+                                        defaultValue={friendDetails.groupName ? friendDetails.groupName : "未分组"}
+                                        onSelect={(option) => onSetGroup(friendDetails.friendId, option)}
+                                    />
                                 </div>
                                 <div className="info-item">
                                     <i className={`iconfont icon-qianming`} style={{fontSize: 14, marginRight: 5}}/>
