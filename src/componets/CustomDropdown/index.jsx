@@ -7,6 +7,10 @@ const CustomDropdown = ({options, defaultValue, onSelect, width = 80, placeholde
 
     const dropdownRef = useRef(null);
 
+    useEffect(() => {
+        setSelectedValue(defaultValue)
+    }, [defaultValue])
+
     const toggleDropdown = () => {
         setIsOpen(!isOpen);
     };
