@@ -12,6 +12,7 @@ import {emojis} from "../../utils/emoji.js";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import Time from "./ChatContent/Time/index.jsx";
 import {formatTime} from "../../utils/date.js";
+import RichTextEditor from "../RichTextEditor/index.jsx";
 
 function CommonChatFrame({userInfo}) {
 
@@ -166,7 +167,7 @@ function CommonChatFrame({userInfo}) {
     }
 
     useEffect(() => {
-        msgContentRef.current.value = ""
+        msgContentRef.current.innerHTML = ""
         userInfoRef.current = userInfo
         //会话切换，重置
         isQueryComplete.current = false
@@ -194,10 +195,11 @@ function CommonChatFrame({userInfo}) {
     }, [messages])
 
     let onSendMsg = () => {
-        if (!msgContentRef.current.value) return
+        console.log(msgContentRef.current)
+        if (!msgContentRef.current.innerHTML) return
         let msg = {
             toUserId: currentToId.current, msgContent: {
-                type: "text", content: msgContentRef.current.value
+                type: "text", content: msgContentRef.current.innerHTML
             }, isShowTime: true
         }
         MessageApi.sendMsg(msg).then(res => {
@@ -209,7 +211,7 @@ function CommonChatFrame({userInfo}) {
                 }
             }
         })
-        msgContentRef.current.value = ""
+        msgContentRef.current.innerHTML = ""
     }
 
     const onContentKeyDown = (event) => {
@@ -238,7 +240,7 @@ function CommonChatFrame({userInfo}) {
                     {emojis.map((emoji, index) => {
                         return (<div
                             onClick={() => {
-                                msgContentRef.current.value += emoji
+                                msgContentRef.current.innerHTML += emoji
                                 setBiaoQingIsShow(false)
                                 msgContentRef.current.focus()
                             }}
@@ -311,11 +313,12 @@ function CommonChatFrame({userInfo}) {
                 </div>
             </div>
             <div className="chat-content-send-frame-msg">
-                        <textarea
-                            ref={msgContentRef}
-                            onKeyDown={(e) => onContentKeyDown(e)}
-                        >
-                        </textarea>
+                {/*<textarea*/}
+                {/*    ref={msgContentRef}*/}
+                {/*    onKeyDown={(e) => onContentKeyDown(e)}*/}
+                {/*>*/}
+                {/*</textarea>*/}
+                <RichTextEditor ref={msgContentRef} onKeyDown={(e) => onContentKeyDown(e)}/>
             </div>
             <div className="chat-content-send-frame-operation-bottom">
                 <CustomButton width={10}>
