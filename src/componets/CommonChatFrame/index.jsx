@@ -41,9 +41,14 @@ function CommonChatFrame({userInfo}) {
             currentUserId.current = res.user_id
         })
         //监听后端发送的消息
-        const unListen = listen('on-receive-msg', (event) => {
+        const unListen = listen('on-receive-msg', async (event) => {
             let data = event.payload
             if (currentToId.current === data.fromId) {
+                const window = WebviewWindow.getCurrent()
+                let isFocused = await window.isFocused()
+                if (isFocused) {
+                    emit("refresh-chat", {id: currentToId.current})
+                }
                 //判断当前滚动位置
                 const {scrollTop, scrollHeight, clientHeight} = showFrameRef.current;
                 if (scrollTop + clientHeight + 2 >= scrollHeight) {
