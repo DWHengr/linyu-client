@@ -1,0 +1,107 @@
+@ball-size: 5px;
+@mask-border: 2px;
+@ball-position: ~"calc(-@{ball-size} - @{mask-border})";
+@blue: #4C9BFF;
+
+#screenshot {
+  width: 100vw;
+  height: 100vh;
+
+  &::before {
+    content: "";
+    position: absolute;
+    left: var(--left);
+    top: var(--top);
+    width: var(--width);
+    height: var(--height);
+    box-shadow: 0 0 0 999vw rgba(0, 0, 0, 0.5);
+  }
+
+  #rectangle {
+    will-change: left, top, width, height;
+    cursor: move;
+    position: absolute;
+    border: @mask-border solid @blue;
+    box-sizing: border-box;
+
+
+    .toolbar {
+      position: absolute;
+      background-color: white;
+      border: 0.5px solid @blue;
+      border-radius: 3px;
+
+      .tool {
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &:hover {
+          background-color: rgb(230, 230, 230);
+        }
+      }
+    }
+
+    .ball {
+      width: ~"calc(@{ball-size} * 2)";
+      height: ~"calc(@{ball-size} * 2)";
+      border: 1px solid white;
+      border-radius: 50%;
+      background-color: @blue;
+      position: absolute;
+
+      &.top-left {
+        top: @ball-position;
+        left: @ball-position;
+        cursor: nw-resize;
+      }
+
+      &.top-middle {
+        top: @ball-position;
+        left: 50%;
+        transform: translateX(-50%);
+        cursor: n-resize;
+      }
+
+      &.top-right {
+        top: @ball-position;
+        right: @ball-position;
+        cursor: ne-resize;
+      }
+
+      &.middle-left {
+        top: 50%;
+        left: @ball-position;
+        transform: translateY(-50%);
+        cursor: w-resize;
+      }
+
+      &.middle-right {
+        top: 50%;
+        right: @ball-position;
+        transform: translateY(-50%);
+        cursor: e-resize;
+      }
+
+      &.bottom-left {
+        bottom: @ball-position;
+        left: @ball-position;
+        cursor: sw-resize;
+      }
+
+      &.bottom-middle {
+        bottom: @ball-position;
+        left: 50%;
+        transform: translateX(-50%);
+        cursor: s-resize;
+      }
+
+      &.bottom-right {
+        bottom: @ball-position;
+        right: @ball-position;
+        cursor: se-resize;
+      }
+    }
+  }
+}
