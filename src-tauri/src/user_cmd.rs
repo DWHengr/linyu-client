@@ -4,6 +4,8 @@ use std::sync::{Arc, RwLock};
 use tauri::{
     Manager, Runtime,AppHandle,ResourceId,Webview
 };
+use base64::{engine::general_purpose, Engine as _};
+use screenshots::Screen;
 
 // 定义用户信息结构体
 #[derive(Debug, Clone, Serialize)]
@@ -51,4 +53,20 @@ pub fn default_window_icon<R: Runtime>(
     let mut resources_table = webview.resources_table();
     resources_table.add(icon.to_owned())
   })
+}
+
+#[tauri::command]
+pub fn screenshot(x: &str, y: &str, width: &str, height: &str) -> String {
+    let screen = Screen::from_point(1, 1).unwrap();
+    let image = screen
+        .capture_area(
+            x.parse::<i32>().unwrap(),
+            y.parse::<i32>().unwrap(),
+            width.parse::<u32>().unwrap(),
+            height.parse::<u32>().unwrap(),
+        )
+        .unwrap();
+    let buffer = image.buffer();
+    let base64_str = general_purpose::STANDARD_NO_PAD.encode(buffer); //encode(buffer);
+    base64_str
 }

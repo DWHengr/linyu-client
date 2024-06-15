@@ -2,7 +2,7 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 mod tray;
 mod user_cmd;
-use user_cmd::{get_user_info, save_user_info,default_window_icon};
+use user_cmd::{get_user_info, save_user_info,default_window_icon,screenshot};
 
 fn main() {
     tauri::Builder::default()
@@ -10,11 +10,12 @@ fn main() {
         .plugin(tauri_plugin_http::init())
         .plugin(tauri_plugin_websocket::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_clipboard_manager::init())
         .setup(move |app| {
             tray::create_tray(app.handle())?;
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![get_user_info, save_user_info,default_window_icon])
+        .invoke_handler(tauri::generate_handler![get_user_info, save_user_info,default_window_icon,screenshot])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
