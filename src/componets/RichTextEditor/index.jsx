@@ -1,8 +1,24 @@
-import React, {useRef} from 'react';
+import React, {useEffect, useRef} from 'react';
 import "./index.less"
+import {listen} from "@tauri-apps/api/event";
 
 const RichTextEditor = React.forwardRef((props, ref) => {
     const editorRef = useRef(null);
+
+    useEffect(() => {
+        //监听后端发送的消息
+        const unScreenshotListen = listen('screenshot_result', async (event) => {
+            const img = document.createElement('img');
+            img.src = event.payload;
+            img.style.width = '100px'
+            img.style.height = 'auto';
+            editorRef.current.appendChild(img);
+            moveCursorToEnd();
+        })
+        return async () => {
+            (await unScreenshotListen)();
+        }
+    }, [])
 
     const handlePaste = (event) => {
         event.preventDefault();
@@ -60,7 +76,6 @@ const RichTextEditor = React.forwardRef((props, ref) => {
             ref={editorRef}
             contentEditable={true}
             onPaste={handlePaste}
-            onChange={() => console.log(12312421)}
             onKeyDown={handleKeyDown}
             className="rich-text-editor"
         ></div>
