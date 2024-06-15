@@ -42,6 +42,8 @@
     "webview:default",
     "webview:allow-create-webview",
     "webview:allow-create-webview-window",
+    "clipboard-manager:default",
+    "clipboard-manager:allow-write-image",
     {
       "identifier": "http:default",
       "allow": [
@@ -52,6 +54,7 @@
           "url": "http://127.0.0.1:9100"
         }
       ]
-    }
+    },
+    "clipboard-manager:default"
   ]
 }
