@@ -6,6 +6,7 @@ import TrayMenu from "./pages/TrayMenu/index.jsx";
 import ChatWindow from "./pages/ChatWindow/index.jsx";
 import MessageBox from "./pages/MessageBox/index.jsx";
 import {useEffect} from "react";
+import Screenshot from "./pages/screenshot/index.jsx";
 
 function App() {
 
@@ -32,6 +33,7 @@ function App() {
                 <Route path="/tray" component={TrayMenu}></Route>
                 <Route path="/messagebox" component={MessageBox}></Route>
                 <Route path="/chat" component={ChatWindow}></Route>
+                <Route path="/screenshot" component={Screenshot}></Route>
                 <Redirect path="/" to="/login"/>
             </Switch>
         </div>
