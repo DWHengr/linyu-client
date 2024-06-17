@@ -19,6 +19,7 @@ import {emit, listen} from "@tauri-apps/api/event";
 import CrateMessageBox from "../MessageBox/window.jsx";
 import {setCurrentChatId} from "../../store/chat/action.js";
 import ChatListApi from "../../api/chatList.js";
+import CreateVideoChat from "../VideoChat/window.jsx";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData);
@@ -41,7 +42,7 @@ export default function Home() {
             if (token) {
                 ws.connect(token)
                 CreateTrayWindow()
-                CrateMessageBox()
+                // CrateMessageBox()
                 onGetUserUnreadNum()
             }
         })
@@ -77,6 +78,12 @@ export default function Home() {
                 onGetUserUnreadNum()
             }
         });
+        const unVideoListen = listen('on-receive-video', async (event) => {
+            let data = event.payload
+            if (data.type === "invite") {
+                CreateVideoChat(data.fromId, false)
+            }
+        });
         let unChatListJumpListen = listen('chat-list-jump', async (event) => {
             let info = event.payload
             const window = WebviewWindow.getByLabel('home')
@@ -91,6 +98,7 @@ export default function Home() {
             (await unMsgListen)();
             (await unUnreadListen)();
             (await unNotifyListen)();
+            (await unVideoListen)();
             (await unChatListJumpListen)();
         }
     }, [])
