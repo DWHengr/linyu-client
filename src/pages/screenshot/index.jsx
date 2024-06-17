@@ -178,6 +178,7 @@ const screenshot = () => {
             setTop(y);
             setIsMoving(true);
         } else {
+            if (isBallShow) return;
             const leftStage = getStage(x, 'left');
             const topStage = getStage(y, 'top');
             if (leftStage === 1 && topStage === 1) {
@@ -249,7 +250,7 @@ const screenshot = () => {
 
     const right = left + width;
     const bottom = top + height;
-    const isBallShow = width >= 125 || height >= 85;
+    const isBallShow = width >= 1 || height >= 1;
     const draggable = !isMoving && width === 0 && height === 0;
 
     const toolStyle = {
@@ -294,7 +295,7 @@ const screenshot = () => {
                 '--top': `${top}px`,
                 '--width': `${width}px`,
                 '--height': `${height}px`,
-                cursor: width === 0 && height === 0 ? 'crosshair' : 'se-resize',
+                cursor: isBallShow ? '' : 'crosshair',
             }}
             onMouseDownCapture={mouseDown}
             onMouseMoveCapture={mouseMove}
