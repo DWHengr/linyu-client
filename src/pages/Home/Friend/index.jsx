@@ -241,7 +241,7 @@ export default function Friend() {
                         }}
                         className="ellipsis"
                     >
-                        {info.remark ? info.remark + "（" + info.name + ")" : info.name}
+                        {info.remark ? info.remark + "（" + info.name + "）" : info.name}
                     </div>
                 </div>
             </div>
