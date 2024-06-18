@@ -6,5 +6,8 @@ export default {
     },
     unread() {
         return Http.get(`/v1/api/user/unread`)
+    },
+    info() {
+        return Http.get(`/v1/api/user/info`)
     }
 };

@@ -12,6 +12,54 @@
     height: calc(100vh - 10px);
     width: calc(100vw - 10px);
 
+    .edit-info {
+      width: 450px;
+      height: 500px;
+      background-color: #FFFFFF;
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      justify-content: center;
+
+      .edit-info-top {
+        display: flex;
+        position: absolute;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 30px;
+        top: 5px;
+        border-bottom: #f1f1f1 1px solid;
+      }
+
+      .sex-info {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 70px;
+        height: 28px;
+        background-color: #e0e0e0;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+        color: #727272;
+        cursor: pointer;
+      }
+
+      .sex-info.nan {
+        color: #FFFFFF;
+        background-color: #4C9BFF;
+      }
+
+      .sex-info.nv {
+        color: #FFFFFF;
+        background-color: #FFA0CF;
+      }
+    }
+
     .home-nav {
       width: 80px;
       background-color: #EDF2F9;
@@ -71,6 +119,7 @@
       .home-nav-my {
         position: absolute;
         bottom: 20px;
+        cursor: pointer;
       }
     }
 

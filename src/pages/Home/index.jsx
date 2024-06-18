@@ -20,6 +20,11 @@ import CrateMessageBox from "../MessageBox/window.jsx";
 import {setCurrentChatId} from "../../store/chat/action.js";
 import ChatListApi from "../../api/chatList.js";
 import CreateVideoChat from "../VideoChat/window.jsx";
+import CustomModal from "../../componets/CustomModal/index.jsx";
+import IconButton from "../../componets/IconButton/index.jsx";
+import CustomInput from "../../componets/CustomInput/index.jsx";
+import CustomButton from "../../componets/CustomButton/index.jsx";
+import {formatDateString} from "../../utils/date.js";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData);
@@ -30,6 +35,8 @@ export default function Home() {
     const h = useHistory();
     const dispatch = useDispatch();
     const [unreadInfo, setUnreadInfo] = useState({})
+    const [userInfo, setUserInfo] = useState({name: "", signature: "", sex: ""})
+    const [isOpenEditInfo, setIsOpenEditInfo] = useState(false)
 
     useEffect(() => {
         const appWindow = WebviewWindow.getByLabel('home')
@@ -142,6 +149,15 @@ export default function Home() {
         {key: "set", icon: "icon-shezhi", page: "/home/set"},
     ]
 
+    const onEditInfo = () => {
+        UserApi.info().then(res => {
+            if (res.code === 0) {
+                setUserInfo(res.data)
+                setIsOpenEditInfo(true)
+            }
+        })
+    }
+
     return (
         <div
             className="home-container"
@@ -149,6 +165,104 @@ export default function Home() {
             <div className="overlay"></div>
             <div className="home">
                 <CustomDragDiv className="home-nav">
+                    <div>
+                        <CustomModal
+                            isOpen={isOpenEditInfo}
+                            onClose={() => setIsOpenEditInfo(false)}
+                        >
+                            <div className="edit-info">
+                                <div className="edit-info-top">
+                                    <div style={{fontSize: 12}}>
+                                        编辑信息
+                                    </div>
+                                    <div style={{position: "absolute", right: 10}}>
+                                        <IconButton
+                                            danger
+                                            icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 20}}/>}
+                                            onClick={() => setIsOpenEditInfo(false)}
+                                        />
+                                    </div>
+                                </div>
+                                <div style={{
+                                    width: "90%",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                    alignItems: "center"
+                                }}>
+                                    <div style={{marginBottom: 20}}>
+                                        <img style={{width: 80, height: 80, borderRadius: 80}}
+                                             src={homeStoreData.portrait}
+                                             alt={homeStoreData.portrait}/>
+                                    </div>
+                                    <div style={{
+                                        display: "flex",
+                                        marginBottom: 20,
+                                        width: 160,
+                                        justifyContent: "space-between"
+                                    }}>
+                                        <div
+                                            className={`sex-info  ${userInfo.sex === "男" ? "nan" : ""}`}
+                                            onClick={() => setUserInfo({...userInfo, sex: "男"})}
+                                        >
+                                            <i className={`iconfont icon-nan`}
+                                               style={{marginRight: 5}}/>
+                                            <div>男生</div>
+                                        </div>
+                                        <div
+                                            className={`sex-info  ${userInfo.sex === "女" ? "nv" : ""}`}
+                                            onClick={() => setUserInfo({...userInfo, sex: "女"})}
+                                        >
+                                            <i className={`iconfont icon-nv`}
+                                               style={{marginRight: 5}}/>
+                                            <div>女生</div>
+                                        </div>
+                                    </div>
+                                    <div style={{width: "100%"}}>
+                                        <div style={{marginBottom: 20}}>
+                                            <CustomInput
+                                                pre="昵称"
+                                                value={userInfo.name}
+                                                limit={30}
+                                                onChange={(v) => setUserInfo({...userInfo, "name": v})}
+                                            />
+                                        </div>
+                                        <div style={{marginBottom: 20}}>
+                                            <CustomInput
+                                                pre="签名"
+                                                limit={100}
+                                                value={userInfo.signature}
+                                                onChange={(v) => setUserInfo({...userInfo, "signature": v})}
+                                            />
+                                        </div>
+                                        <div style={{marginBottom: 20}}>
+                                            <CustomInput
+                                                value={formatDateString(userInfo.birthday)}
+                                                pre="生日"
+                                                type="date"
+                                                onChange={(v) => setUserInfo({...userInfo, "birthday": v})}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{display: "flex", position: "absolute", right: 10, bottom: 10}}>
+                                    <CustomButton
+                                        width={55}
+                                        onClick={() => console.log(userInfo)}
+                                    >
+                                        保存
+                                    </CustomButton>
+                                    <CustomButton
+                                        width={55}
+                                        type="minor"
+                                        onClick={() => setIsOpenEditInfo(false)}
+                                    >
+                                        取消
+                                    </CustomButton>
+                                </div>
+                            </div>
+                        </CustomModal>
+                    </div>
                     <div className="home-nav-icon">
                         <img style={{height: 60}} src="/logo.png" alt=""/>
                     </div>
@@ -178,11 +292,12 @@ export default function Home() {
                             })
                         }
                     </div>
-                    <div className="home-nav-my">
-                        <div>
-                            <img style={{width: 60, height: 60, borderRadius: 60,}} src={homeStoreData.portrait}
-                                 alt={homeStoreData.portrait}/>
-                        </div>
+                    <div
+                        className="home-nav-my"
+                        onClick={onEditInfo}
+                    >
+                        <img style={{width: 60, height: 60, borderRadius: 60,}} src={homeStoreData.portrait}
+                             alt={homeStoreData.portrait}/>
                     </div>
                 </CustomDragDiv>
                 <div className="home-content">
