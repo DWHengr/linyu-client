@@ -12,6 +12,8 @@ import {emojis} from "../../utils/emoji.js";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import Time from "./ChatContent/Time/index.jsx";
 import {formatTime} from "../../utils/date.js";
+import CreateVideoChat from "../../pages/VideoChat/window.jsx";
+import VideoApi from "../../api/video.js";
 import RichTextEditor from "../RichTextEditor/index.jsx";
 
 function CommonChatFrame({userInfo}) {
@@ -154,9 +156,9 @@ function CommonChatFrame({userInfo}) {
             targetId: userInfoRef.current.fromId, index: currentMsgRecordIndex.current, num: 20
         }).then(res => {
             if (res.code === 0) {
+                messagesRef.current = [...res.data, ...messagesRef.current]
+                setMessages(messagesRef.current)
                 if (res.data.length > 0) {
-                    messagesRef.current = [...res.data, ...messagesRef.current]
-                    setMessages(messagesRef.current)
                     currentMsgRecordIndex.current += 20
                     //调整滚动条
                     requestAnimationFrame(() => {
@@ -225,6 +227,11 @@ function CommonChatFrame({userInfo}) {
             onSendMsg()
         }
     };
+
+    const onVideo = () => {
+        CreateVideoChat(currentToId.current, true)
+        VideoApi.invite({userId: currentToId.current})
+    }
 
     //表情
     const BiaoQingPop = () => {
@@ -314,7 +321,9 @@ function CommonChatFrame({userInfo}) {
                     <IconMinorButton
                         icon={<i className={`iconfont icon icon-dianhua`} style={{fontSize: 24}}/>}/>
                     <IconMinorButton
-                        icon={<i className={`iconfont icon icon-shipin`} style={{fontSize: 26}}/>}/>
+                        icon={<i className={`iconfont icon icon-shipin`} style={{fontSize: 26}}/>}
+                        onClick={onVideo}
+                    />
                 </div>
             </div>
             <div className="chat-content-send-frame-msg">

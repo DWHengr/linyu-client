@@ -112,7 +112,6 @@ export default function VideoChat() {
     }
 
     const onOffer = async () => {
-        console.log(toUserId.current)
         const offer = await pc.current.createOffer();
         await pc.current.setLocalDescription(offer);
         await VideoApi.offer({userId: toUserId.current, desc: pc.current.localDescription})
@@ -190,43 +189,42 @@ export default function VideoChat() {
                         className={`${isSwitch ? "max-window" : "min-window"}`}
                         ref={local} autoPlay
                     />
-                    {toUserIsReady ? <video
-                            onClick={() => {
-                                if (isSwitch && toUserIsReady) {
-                                    setIsSwitch(!isSwitch)
-                                }
-                            }}
-                            className={`${isSwitch ? "min-window" : "max-window"}`}
-                            ref={remote} autoPlay
-                        /> :
+                    <video
+                        onClick={() => {
+                            if (isSwitch && toUserIsReady) {
+                                setIsSwitch(!isSwitch)
+                            }
+                        }}
+                        className={`${isSwitch ? "min-window" : "max-window"}`}
+                        ref={remote} autoPlay
+                        style={{display: toUserIsReady ? "" : "none"}}
+                    />
+                    {!toUserIsReady && <div
+                        style={{
+                            width: "100%",
+                            height: "100%",
+                            backgroundImage: `url(${userInfo?.portrait})`,
+                            backgroundSize: 'cover',
+                        }}
+                    >
                         <div
                             style={{
+                                display: "flex",
+                                flexDirection: "column",
                                 width: "100%",
                                 height: "100%",
-                                backgroundImage: `url(${userInfo?.portrait})`,
-                                backgroundSize: 'cover',
+                                justifyContent: "center",
+                                alignItems: "center",
+                                backdropFilter: "blur(20px)"
                             }}
                         >
-                            <div
-                                style={{
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    width: "100%",
-                                    height: "100%",
-                                    justifyContent: "center",
-                                    alignItems: "center",
-                                    backdropFilter: "blur(20px)"
-                                }}
-                            >
-                                <img style={{width: 100, borderRadius: 10}} src={userInfo?.portrait}/>
-                                {isSender ?
-                                    <div className="dots">正在等待对方接听</div> :
-                                    <div className="dots">对方请求视频通话</div>}
-                            </div>
+                            <img style={{width: 100, borderRadius: 10}} src={userInfo?.portrait}/>
+                            {isSender ?
+                                <div className="dots">正在等待对方接听</div> :
+                                <div className="dots">对方请求视频通话</div>}
                         </div>
+                    </div>}
 
-
-                    }
                     <CustomDragDiv
                         className="operate-bar"
                     >

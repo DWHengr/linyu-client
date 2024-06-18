@@ -7,6 +7,7 @@ import ChatWindow from "./pages/ChatWindow/index.jsx";
 import MessageBox from "./pages/MessageBox/index.jsx";
 import {useEffect} from "react";
 import Screenshot from "./pages/screenshot/index.jsx";
+import VideoChat from "./pages/VideoChat/index.jsx";
 
 function App() {
 
@@ -34,6 +35,7 @@ function App() {
                 <Route path="/messagebox" component={MessageBox}></Route>
                 <Route path="/chat" component={ChatWindow}></Route>
                 <Route path="/screenshot" component={Screenshot}></Route>
+                <Route path="/videochat" component={VideoChat}></Route>
                 <Redirect path="/" to="/login"/>
             </Switch>
         </div>
