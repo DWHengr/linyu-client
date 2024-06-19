@@ -57,4 +57,35 @@ async function post(url, params = {}) {
     return send(configs);
 }
 
-export default {post, get};
+async function upload(url, file, params = {}) {
+    if (file && file.size && file.size > 0) {
+        let token = await invoke("get_user_info", {}).then(res => {
+            return res.token
+        })
+        return new Promise(async (resolve, reject) => {
+            fetch(SERVICE_URL + url, {
+                method: "POST",
+                body: file,
+                headers: {
+                    "x-token": token ? token : "",
+                    "name": file.name,
+                    "type": file.type,
+                    "size": file.size,
+                }
+            })
+                .then(async (response) => {
+                    if (response.ok) {
+                        let result = await response.json()
+                        return resolve(result);
+                    } else {
+                        reject({
+                            message: "Request failed with status code " + response.status,
+                        });
+                    }
+                })
+                .catch((e) => reject({message: `网络错误: ${e}`}));
+        });
+    }
+}
+
+export default {post, get, upload, SERVICE_URL};
