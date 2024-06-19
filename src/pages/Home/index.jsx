@@ -25,6 +25,7 @@ import IconButton from "../../componets/IconButton/index.jsx";
 import CustomInput from "../../componets/CustomInput/index.jsx";
 import CustomButton from "../../componets/CustomButton/index.jsx";
 import {formatDateString} from "../../utils/date.js";
+import Dropzone from "react-dropzone";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData);
@@ -37,6 +38,8 @@ export default function Home() {
     const [unreadInfo, setUnreadInfo] = useState({})
     const [userInfo, setUserInfo] = useState({name: "", signature: "", sex: ""})
     const [isOpenEditInfo, setIsOpenEditInfo] = useState(false)
+    const portraitCacheFile = useRef(null)
+    const userInfoBackCache = useRef(null)
 
     useEffect(() => {
         const appWindow = WebviewWindow.getByLabel('home')
@@ -46,6 +49,7 @@ export default function Home() {
         invoke("get_user_info", {}).then(res => {
             dispatch(setCurrentLoginUserInfo(res.user_id, res.username, res.account, res.portrait))
             let token = res.token
+            userInfoBackCache.current = res
             if (token) {
                 ws.connect(token)
                 CreateTrayWindow()
@@ -149,13 +153,36 @@ export default function Home() {
         {key: "set", icon: "icon-shezhi", page: "/home/set"},
     ]
 
-    const onEditInfo = () => {
+    const onGetUserInfo = () => {
         UserApi.info().then(res => {
             if (res.code === 0) {
                 setUserInfo(res.data)
                 setIsOpenEditInfo(true)
             }
         })
+    }
+
+    const handleAvatarChange = (file) => {
+        UserApi.upload(file).then(res => {
+            if (res.code === 0) {
+                setUserInfo({...userInfo, portrait: res.data})
+            }
+        })
+    }
+
+    const onEditInfo = async () => {
+        UserApi.update(userInfo).then(res => {
+            let info = {
+                userid: userInfoBackCache.current.user_id,
+                username: userInfo.name,
+                token: userInfoBackCache.current.token,
+                portrait: userInfo.portrait,
+            }
+            invoke('save_user_info', info)
+            dispatch(setCurrentLoginUserInfo(userInfoBackCache.current.user_id, userInfo.name, userInfo.account, userInfo.portrait))
+            emit("user-info-reload", info)
+        })
+        setIsOpenEditInfo(false)
     }
 
     return (
@@ -190,11 +217,29 @@ export default function Home() {
                                     justifyContent: "center",
                                     alignItems: "center"
                                 }}>
-                                    <div style={{marginBottom: 20}}>
-                                        <img style={{width: 80, height: 80, borderRadius: 80}}
-                                             src={homeStoreData.portrait}
-                                             alt={homeStoreData.portrait}/>
-                                    </div>
+                                    <Dropzone
+                                        onDrop={(acceptedFiles) => handleAvatarChange(acceptedFiles[0])}
+                                        accept={
+                                            {
+                                                'image/*': ['.png'],
+                                            }
+                                        }
+                                    >
+                                        {({getRootProps, getInputProps}) => (
+                                            <div {...getRootProps()}>
+                                                <input {...getInputProps()} />
+                                                <div className="portrait-info">
+                                                    <img style={{width: 80, height: 80, borderRadius: 80}}
+                                                         src={userInfo.portrait}
+                                                         alt={userInfo.portrait}/>
+                                                    <div className="portrait-info-cover">
+                                                        <i className={`iconfont icon-xiangji`}
+                                                           style={{color: "#fff", fontSize: 40}}/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </Dropzone>
                                     <div style={{
                                         display: "flex",
                                         marginBottom: 20,
@@ -248,7 +293,7 @@ export default function Home() {
                                 <div style={{display: "flex", position: "absolute", right: 10, bottom: 10}}>
                                     <CustomButton
                                         width={55}
-                                        onClick={() => console.log(userInfo)}
+                                        onClick={onEditInfo}
                                     >
                                         保存
                                     </CustomButton>
@@ -294,7 +339,7 @@ export default function Home() {
                     </div>
                     <div
                         className="home-nav-my"
-                        onClick={onEditInfo}
+                        onClick={onGetUserInfo}
                     >
                         <img style={{width: 60, height: 60, borderRadius: 60,}} src={homeStoreData.portrait}
                              alt={homeStoreData.portrait}/>
