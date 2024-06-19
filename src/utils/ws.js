@@ -25,6 +25,10 @@ function response(msg) {
                     emit('on-receive-notify', weContent.content)
                     break
                 }
+                case "video": {
+                    emit('on-receive-video', weContent.content)
+                    break
+                }
             }
         }
     } else {
