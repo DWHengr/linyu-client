@@ -1,0 +1,34 @@
+.image-viewer-container {
+  position: relative;
+
+  .image-viewer {
+    color: #FFFFFF;
+    width: 100vw;
+    height: 100vh;
+    background-color: #1F1F1F;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+
+    .top-bar {
+      width: 100%;
+      height: 40px;
+      z-index: 1100;
+      background-color: #2d2d2d;
+    }
+  }
+}
+
+.react-viewer {
+  .react-viewer-mask {
+    background-color: transparent !important;
+  }
+
+  .react-viewer-footer {
+    height: 60px;
+  }
+
+  .react-viewer-image {
+    margin-top: 40px;
+  }
+}
