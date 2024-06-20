@@ -2,7 +2,7 @@ import "./index.less"
 import IconButton from "../IconButton/index.jsx";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 
-export default function WindowOperation({hide = true, onClose, onMinimize, onHide}) {
+export default function WindowOperation({hide = true, onClose, onMinimize, onHide, height}) {
 
     const handleMinimize = () => {
         if (onMinimize) {
@@ -27,7 +27,7 @@ export default function WindowOperation({hide = true, onClose, onMinimize, onHid
     }
 
     return (
-        <div className="window-operation">
+        <div className="window-operation" style={{height: height}}>
             <IconButton
                 icon={<i className={`iconfont icon-zuixiaohua`} style={{fontSize: 22}}/>}
                 onClick={handleMinimize}
