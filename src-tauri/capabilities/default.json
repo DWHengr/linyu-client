@@ -44,6 +44,8 @@
     "webview:allow-create-webview-window",
     "clipboard-manager:default",
     "clipboard-manager:allow-write-image",
+    "dialog:allow-save",
+    "upload:allow-download",
     {
       "identifier": "http:default",
       "allow": [
