@@ -26,10 +26,11 @@ import CustomInput from "../../componets/CustomInput/index.jsx";
 import CustomButton from "../../componets/CustomButton/index.jsx";
 import {formatDateString} from "../../utils/date.js";
 import Dropzone from "react-dropzone";
+import {useToast} from "../../componets/CustomToast/index.jsx";
 
 export default function Home() {
-    const homeStoreData = useSelector(store => store.homeData);
-    const chatStoreData = useSelector((state) => state.chatData);
+    const homeStoreData = useSelector(store => store.homeData)
+    const chatStoreData = useSelector((state) => state.chatData)
     const currentOption = useRef(homeStoreData.currentOption)
     const currentToId = useRef(chatStoreData.currentChatId)//消息目标用户
     const [selectedOptionIndex, setSelectedOptionIndex] = useState("chat")
@@ -38,8 +39,8 @@ export default function Home() {
     const [unreadInfo, setUnreadInfo] = useState({})
     const [userInfo, setUserInfo] = useState({name: "", signature: "", sex: ""})
     const [isOpenEditInfo, setIsOpenEditInfo] = useState(false)
-    const portraitCacheFile = useRef(null)
     const userInfoBackCache = useRef(null)
+    let showToast = useToast()
 
     useEffect(() => {
         const appWindow = WebviewWindow.getByLabel('home')
@@ -162,25 +163,39 @@ export default function Home() {
         })
     }
 
-    const handleAvatarChange = (file) => {
+    const updateUserInfoCache = (info) => {
+        userInfoBackCache.current = info
+        invoke('save_user_info', info)
+        dispatch(setCurrentLoginUserInfo(info.userid, info.username, userInfo.account, info.portrait))
+        emit("user-info-reload", info)
+    }
+
+    const onAvatarChange = (file) => {
         UserApi.upload(file).then(res => {
             if (res.code === 0) {
                 setUserInfo({...userInfo, portrait: res.data})
+                showToast("头像修改成功~")
+                let info = {
+                    userid: userInfoBackCache.current.user_id,
+                    username: userInfo.name,
+                    token: userInfoBackCache.current.token,
+                    portrait: res.data,
+                }
+                updateUserInfoCache(info)
             }
         })
     }
 
     const onEditInfo = async () => {
         UserApi.update(userInfo).then(res => {
+            showToast("信息修改成功~")
             let info = {
                 userid: userInfoBackCache.current.user_id,
                 username: userInfo.name,
                 token: userInfoBackCache.current.token,
                 portrait: userInfo.portrait,
             }
-            invoke('save_user_info', info)
-            dispatch(setCurrentLoginUserInfo(userInfoBackCache.current.user_id, userInfo.name, userInfo.account, userInfo.portrait))
-            emit("user-info-reload", info)
+            updateUserInfoCache(info)
         })
         setIsOpenEditInfo(false)
     }
@@ -195,7 +210,6 @@ export default function Home() {
                     <div>
                         <CustomModal
                             isOpen={isOpenEditInfo}
-                            onClose={() => setIsOpenEditInfo(false)}
                         >
                             <div className="edit-info">
                                 <div className="edit-info-top">
@@ -218,7 +232,7 @@ export default function Home() {
                                     alignItems: "center"
                                 }}>
                                     <Dropzone
-                                        onDrop={(acceptedFiles) => handleAvatarChange(acceptedFiles[0])}
+                                        onDrop={(acceptedFiles) => onAvatarChange(acceptedFiles[0])}
                                         accept={
                                             {
                                                 'image/*': ['.png'],
@@ -306,7 +320,8 @@ export default function Home() {
                                     </CustomButton>
                                 </div>
                             </div>
-                        </CustomModal>
+                        </CustomModal
+>
                     </div>
                     <div className="home-nav-icon">
                         <img style={{height: 60}} src="/logo.png" alt=""/>
