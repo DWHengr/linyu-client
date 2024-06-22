@@ -1,5 +1,6 @@
 import {fetch} from '@tauri-apps/plugin-http';
 import {invoke} from "@tauri-apps/api/core";
+import {upload as tauriUpload, download as tauriDownload} from "@tauri-apps/plugin-upload";
 
 const SERVICE_URL = "http://" + "127.0.0.1:9200";
 
@@ -10,12 +11,8 @@ async function send(configs) {
     console.log(configs)
     return new Promise(async (resolve, reject) => {
         fetch(configs.url, {
-            method: configs.method,
-            body: JSON.stringify(configs.data),
-            headers: {
-                ...configs.headers,
-                "x-token": token ? token : "",
-                "Content-Type": "application/json",
+            method: configs.method, body: JSON.stringify(configs.data), headers: {
+                ...configs.headers, "x-token": token ? token : "", "Content-Type": "application/json",
             }
         })
             .then(async (response) => {
@@ -64,13 +61,8 @@ async function upload(url, file, params = {}) {
         })
         return new Promise(async (resolve, reject) => {
             fetch(SERVICE_URL + url, {
-                method: "POST",
-                body: file,
-                headers: {
-                    "x-token": token ? token : "",
-                    "name": file.name,
-                    "type": file.type,
-                    "size": file.size,
+                method: "POST", body: file, headers: {
+                    "x-token": token ? token : "", "name": file.name, "type": file.type, "size": file.size,
                 }
             })
                 .then(async (response) => {
@@ -88,4 +80,33 @@ async function upload(url, file, params = {}) {
     }
 }
 
-export default {post, get, upload, SERVICE_URL};
+const uploadFile = async (url, params, progressHandler) => {
+    let userinfo = await invoke("get_user_info", {});
+    return new Promise(async (resolve, reject) => {
+        tauriUpload(SERVICE_URL + url, params.path, progressHandler, {
+            "msgId": params.msgId,
+            "x-token": userinfo.token,
+        }).then(res => {
+            res = JSON.parse(res)
+            return resolve(res)
+        }).catch(res => {
+            return reject(res)
+        })
+    })
+}
+
+const downloadFile = async (url, params, progressHandler) => {
+    console.log(url, params, progressHandler)
+    let userinfo = await invoke("get_user_info", {});
+    return new Promise(async (resolve, reject) => {
+        tauriDownload(SERVICE_URL + url, params.path, progressHandler,
+            {
+                "msgId": params.msgId,
+                "x-token": userinfo.token
+            }).catch(res => {
+            return reject(res)
+        })
+    })
+}
+
+export default {post, get, upload, uploadFile, downloadFile, SERVICE_URL};
