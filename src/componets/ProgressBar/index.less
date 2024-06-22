@@ -1,0 +1,49 @@
+.progress-bar-container {
+  display: flex;
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+  margin-top: 5px;
+  height: 5px;
+}
+
+.progress-bar-bg {
+  width: 100%;
+  background-color: #e0e0e0;
+  border-radius: 25px;
+  overflow: hidden;
+  height: 5px;
+}
+
+.progress-bar {
+  height: 5px;
+  background-color: #A0D9F6;
+  width: 0;
+  border-radius: 25px;
+  position: relative;
+  transition: width 0.5s ease-in-out;
+}
+
+.progress-bar-flash {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 5px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.5);
+  animation: flash 1s infinite linear;
+}
+
+@keyframes flash {
+  0% {
+    left: 0;
+  }
+  50% {
+    left: calc(100% - 5px);
+  }
+  100% {
+    left: 0;
+  }
+}
