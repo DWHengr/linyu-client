@@ -16,3 +16,11 @@ export const setCurrentLoginUserInfo = (userId, username, account, portrait) => 
         portrait
     };
 };
+
+export const setFileFileProgress = (fileName, progress) => {
+    return {
+        type: type.Set_File_Progress,
+        fileName: fileName,
+        progress: progress
+    };
+};

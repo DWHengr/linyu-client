@@ -6,7 +6,8 @@ let defaultState = {
     userId: "",
     username: "",
     account: "",
-    portrait: ""
+    portrait: "",
+    fileProgress: {}
 };
 
 export const homeData = (state = defaultState, action) => {
@@ -20,6 +21,11 @@ export const homeData = (state = defaultState, action) => {
             return {
                 ...state,
                 ...action,
+            };
+        case type.Set_File_Progress:
+            state.fileProgress[action.fileName] = action.progress;
+            return {
+                ...state
             };
         default:
             return state;
