@@ -199,6 +199,19 @@ export default function Chat() {
         dispatch(setCurrentChatId(data.fromId, data))
     }
 
+    const msgContentShow = (msgContent) => {
+        if (!msgContent) return
+        switch (msgContent.type) {
+            case "text": {
+                return <> {msgContent.content}</>
+            }
+            case "file": {
+                let fileInfo = JSON.parse(msgContent.content)
+                return <>[文件] {fileInfo.name}</>
+            }
+        }
+    }
+
     const ChatCard = ({info, onClick, onContextMenu}) => {
         let isSelected = false
         if (info.fromId === selectedChatId) {
@@ -235,7 +248,7 @@ export default function Chat() {
                         style={{fontSize: 12, color: `${isSelected ? "#F6F6F6" : "#646464"}`}}
                         className="ellipsis"
                     >
-                        {info.lastMsgContent?.content}
+                        {msgContentShow(info.lastMsgContent)}
                     </div>
                     {info.unreadNum > 0 && !isSelected ? <div style={{
                         width: 18,
