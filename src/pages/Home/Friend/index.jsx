@@ -27,6 +27,7 @@ import CustomAffirmModal from "../../../componets/CustomAffirmModal/index.jsx";
 import {useToast} from "../../../componets/CustomToast/index.jsx";
 import CustomEditableText from "../../../componets/CustomEditableText/index.jsx";
 import CustomDropdown from "../../../componets/CustomDropdown/index.jsx";
+import CreateImageViewer from "../../ImageViewer/window.jsx";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState(null)
@@ -497,9 +498,12 @@ export default function Friend() {
                         <div className="friend-content-container">
                             <div className="friend-content-container-top">
                                 <div className="friend-content-container-top-info">
-                                    <img className="info-icon"
-                                         src={friendDetails.portrait}
-                                         alt={friendDetails.portrait}/>
+                                    <img
+                                        onClick={() => CreateImageViewer(friendDetails.portrait)}
+                                        className="info-icon"
+                                        src={friendDetails.portrait}
+                                        alt={friendDetails.portrait}
+                                    />
                                     <div className="info-content">
                                         <div style={{display: "flex", justifyContent: "space-between"}}>
                                             <div style={{
