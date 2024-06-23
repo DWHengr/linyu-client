@@ -15,6 +15,12 @@ import {formatTime} from "../../utils/date.js";
 import CreateVideoChat from "../../pages/VideoChat/window.jsx";
 import VideoApi from "../../api/video.js";
 import RichTextEditor from "../RichTextEditor/index.jsx";
+import CreateScreenshot from "../../pages/screenshot/window.jsx";
+import {open} from '@tauri-apps/plugin-dialog';
+import File from "./ChatContent/File/index.jsx";
+import {stat} from "@tauri-apps/plugin-fs";
+import {useDispatch} from "react-redux";
+import {setFileFileProgress} from "../../store/home/action.js";
 
 function CommonChatFrame({userInfo}) {
 
@@ -30,6 +36,8 @@ function CommonChatFrame({userInfo}) {
     const userInfoRef = useRef(userInfo)
     const newMsgUnreadNumRef = useRef(0)
     const [newMsgUnreadNum, setNewMsgUnreadNum] = useState(newMsgUnreadNumRef.current)
+    const dispatch = useDispatch()
+    const isRefresh = useRef(true)
 
     //表情
     const [biaoQingIsShow, setBiaoQingIsShow] = useState(false);
@@ -41,6 +49,9 @@ function CommonChatFrame({userInfo}) {
         //获取当前用户
         invoke("get_user_info", {}).then(res => {
             currentUserId.current = res.user_id
+        })
+        //监听后端发送的消息
+        const unScreenshotListen = listen('screenshot_result', async (event) => {
         })
         //监听后端发送的消息
         const unListen = listen('on-receive-msg', async (event) => {
@@ -75,12 +86,57 @@ function CommonChatFrame({userInfo}) {
                 e.stopPropagation()
             });
         }
+        //窗口聚焦
+        let unDrop = window.listen("tauri://drop", async (e) => {
+            if (!currentToId.current) return
+            onSendFile(e.payload.paths[0])
+        });
         return async () => {
             (await unListen)();
-            if (unFocus)
-                (await unFocus)();
+            (await unScreenshotListen)();
+            (await unDrop)();
+            if (unFocus) (await unFocus)();
         }
     }, [])
+
+    const onSendFile = async (path) => {
+        let fileInfo = await stat(path)
+        let msg = {
+            toUserId: currentToId.current, msgContent: {
+                type: "file", content: JSON.stringify({
+                    name: path.split('\\').pop(), size: fileInfo.size,
+                })
+            }
+        }
+
+        await MessageApi.sendMsg(msg).then(res => {
+            if (res.code === 0) {
+                if (res.data) {
+                    messagesRef.current.push(res.data)
+                    setMessages(() => [...messagesRef.current])
+                    emit("on-send-msg", {})
+                    let sum = 1;
+                    MessageApi.sendFile({
+                        msgId: res.data.id, path: path,
+                    }, (payload) => {
+                        sum += payload.progress
+                        if (isRefresh.current) {
+                            isRefresh.current = false
+                            let p = sum / fileInfo.size * 100
+                            dispatch(setFileFileProgress(res.data.id, p))
+                            setTimeout(function () {
+                                isRefresh.current = true
+                            }, 1000);
+                        }
+                        if (sum >= fileInfo.size) {
+                            dispatch(setFileFileProgress(res.data.id, 100))
+                        }
+                    })
+                }
+            }
+        })
+
+    }
 
     useEffect(() => {
         const handleEscKey = (event) => {
@@ -202,7 +258,6 @@ function CommonChatFrame({userInfo}) {
     }, [messages])
 
     let onSendMsg = () => {
-        console.log(msgContentRef.current)
         if (!msgContentRef.current.innerHTML) return
         let msg = {
             toUserId: currentToId.current, msgContent: {
@@ -231,6 +286,15 @@ function CommonChatFrame({userInfo}) {
     const onVideo = () => {
         CreateVideoChat(currentToId.current, true)
         VideoApi.invite({userId: currentToId.current})
+    }
+
+    const handleOpenFile = async () => {
+        const selected = await open({
+            multiple: true,
+        });
+        if (Array.isArray(selected)) {
+            onSendFile(selected[0].path)
+        }
     }
 
     //表情
@@ -265,6 +329,23 @@ function CommonChatFrame({userInfo}) {
         </div>)
     }
 
+    const handleMsgContent = (msg) => {
+        switch (msg.msgContent?.type) {
+            case "text": {
+                return <Text
+                    value={msg.msgContent?.content}
+                    right={msg.fromId === currentUserId.current}
+                />
+            }
+            case "file": {
+                return <File
+                    value={msg}
+                    right={msg.fromId === currentUserId.current}
+                />
+            }
+        }
+    }
+
     return (<div className="common-chat-content">
         <BiaoQingPop/>
         <CustomDragDiv className="chat-content-title">
@@ -282,22 +363,16 @@ function CommonChatFrame({userInfo}) {
         </CustomDragDiv>
         <div ref={showFrameRef} className="chat-content-show-frame">
             {messages?.map((msg) => {
-                return (
-                    <div key={msg.id}>
-                        {msg.isShowTime && <Time value={formatTime(msg.updateTime)}/>}
-                        <Text
-                            value={msg.msgContent?.content}
-                            right={msg.fromId === currentUserId.current}
-                        />
-                    </div>
-                )
+                return (<div key={msg.id}>
+                    {msg.isShowTime && <Time value={formatTime(msg.updateTime)}/>}
+                    {handleMsgContent(msg)}
+                </div>)
             })}
             {newMsgUnreadNum !== 0 && <div className="hint" onClick={onScrollToBottom}>
                 <i className={`iconfont icon icon-xiala`} style={{fontSize: 12}}/>
                 {newMsgUnreadNum > 0 && <div style={{marginLeft: 5}}>
                     {newMsgUnreadNum}
-                </div>
-                }
+                </div>}
             </div>}
         </div>
         <div className="chat-content-send-frame">
@@ -313,9 +388,15 @@ function CommonChatFrame({userInfo}) {
                         }}
                         icon={<i className={`iconfont icon icon-biaoqing`} style={{fontSize: 24}}/>}/>
                     <IconMinorButton
-                        icon={<i className={`iconfont icon icon-wenjian`} style={{fontSize: 26}}/>}/>
+                        icon={<i className={`iconfont icon icon-wenjian`} style={{fontSize: 26}}/>}
+                        onClick={handleOpenFile}
+                    />
                     <IconMinorButton
                         icon={<i className={`iconfont icon icon-jilu`} style={{fontSize: 22}}/>}/>
+                    <IconMinorButton
+                        icon={<i className={`iconfont icon icon-jietu`} style={{fontSize: 18}}/>}
+                        onClick={CreateScreenshot}
+                    />
                 </div>
                 <div style={{display: "flex"}}>
                     <IconMinorButton
