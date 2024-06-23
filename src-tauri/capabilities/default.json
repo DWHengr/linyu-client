@@ -46,6 +46,9 @@
     "clipboard-manager:allow-write-image",
     "dialog:allow-save",
     "upload:allow-download",
+    "dialog:allow-open",
+    "upload:allow-upload",
+    "fs:default",
     {
       "identifier": "http:default",
       "allow": [
