@@ -4,6 +4,7 @@ import CustomLine from "../../componets/CustomLine/index.jsx";
 import {useEffect, useState} from "react";
 import {invoke} from "@tauri-apps/api/core";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {listen} from "@tauri-apps/api/event";
 
 export default function TrayMenu() {
     const [userInfo, setUserInfo] = useState("");
@@ -13,6 +14,12 @@ export default function TrayMenu() {
             let userInfo = await invoke("get_user_info", {})
             setUserInfo(userInfo)
         })()
+        let unListen = listen('user-info-reload', async (event) => {
+            setUserInfo(event.payload)
+        })
+        return async () => {
+            (await unListen)();
+        }
     }, [])
 
     const onShowHome = async () => {
