@@ -47,3 +47,11 @@ export function formatTime(dateStr) {
         return `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day} ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
     }
 }
+
+export function formatDateString(dateTimeString) {
+    const date = new Date(dateTimeString);
+    const year = date.getFullYear();
+    const month = (`0${date.getMonth() + 1}`).slice(-2); // Add leading zero and take last two characters
+    const day = (`0${date.getDate()}`).slice(-2); // Add leading zero and take last two characters
+    return `${year}-${month}-${day}`;
+}
