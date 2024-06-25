@@ -21,6 +21,8 @@ import File from "./ChatContent/File/index.jsx";
 import {stat} from "@tauri-apps/plugin-fs";
 import {useDispatch} from "react-redux";
 import {setFileFileProgress} from "../../store/home/action.js";
+import {isImageFile} from "../../utils/string.js";
+import Img from "./ChatContent/Img/index.jsx";
 
 function CommonChatFrame({userInfo}) {
 
@@ -101,10 +103,13 @@ function CommonChatFrame({userInfo}) {
 
     const onSendFile = async (path) => {
         let fileInfo = await stat(path)
+        let fileName = path.split('\\').pop();
         let msg = {
             toUserId: currentToId.current, msgContent: {
-                type: "file", content: JSON.stringify({
-                    name: path.split('\\').pop(), size: fileInfo.size,
+                type: isImageFile(fileName) ? "img" : "file",
+                content: JSON.stringify({
+                    name: fileName,
+                    size: fileInfo.size,
                 })
             }
         }
@@ -339,6 +344,12 @@ function CommonChatFrame({userInfo}) {
             }
             case "file": {
                 return <File
+                    value={msg}
+                    right={msg.fromId === currentUserId.current}
+                />
+            }
+            case "img": {
+                return <Img
                     value={msg}
                     right={msg.fromId === currentUserId.current}
                 />
