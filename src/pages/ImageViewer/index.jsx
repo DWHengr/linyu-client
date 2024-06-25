@@ -19,7 +19,7 @@ export default function ImageViewer() {
     }, [])
 
     function saveDialog() {
-        const filenameMatch = url.match(/[^/]+(?=\?)/);
+        const filenameMatch = url.match(/\/([^\/?#]+)(?:\?|#|$)/);
         const filename = filenameMatch ? filenameMatch[0] : null;
         const fileTypeMatch = filename ? filename.match(/(?<=\.)\w+$/) : null;
         const fileType = fileTypeMatch ? fileTypeMatch[0] : null;
