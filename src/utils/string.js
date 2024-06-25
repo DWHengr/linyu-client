@@ -16,3 +16,9 @@ export function getFileNameAndType(url) {
         };
     }
 }
+
+export function isImageFile(filename) {
+    const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'tiff'];
+    const fileExtension = filename.split('.').pop().toLowerCase();
+    return imageExtensions.includes(fileExtension);
+}
