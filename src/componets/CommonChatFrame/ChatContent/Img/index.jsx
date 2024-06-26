@@ -12,14 +12,14 @@ const Img = memo(({value, right = false}) => {
         }).then((value) => {
             setImgInfo(URL.createObjectURL(value))
         })
-    }, [])
+    }, [value])
 
     return (
         <>
             <div className={"chat-content-img"}>
                 <div className={`content  ${right ? "right" : ""}`}>
                     <img
-                        style={{width: 100}}
+                        style={{width: "100%", height: "100%", objectFit: "cover"}}
                         src={imgInfo}
                         alt=""
                         onClick={() => CreateImageViewer(imgInfo)}

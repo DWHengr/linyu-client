@@ -104,9 +104,10 @@ function CommonChatFrame({userInfo}) {
     const onSendFile = async (path) => {
         let fileInfo = await stat(path)
         let fileName = path.split('\\').pop();
+        let fileType = isImageFile(fileName) ? "img" : "file"
         let msg = {
             toUserId: currentToId.current, msgContent: {
-                type: isImageFile(fileName) ? "img" : "file",
+                type: fileType,
                 content: JSON.stringify({
                     name: fileName,
                     size: fileInfo.size,
@@ -117,9 +118,12 @@ function CommonChatFrame({userInfo}) {
         await MessageApi.sendMsg(msg).then(res => {
             if (res.code === 0) {
                 if (res.data) {
-                    messagesRef.current.push(res.data)
-                    setMessages(() => [...messagesRef.current])
-                    emit("on-send-msg", {})
+                    console.log(fileType)
+                    if (fileType === "file") {
+                        messagesRef.current.push(res.data)
+                        setMessages(() => [...messagesRef.current])
+                        emit("on-send-msg", {})
+                    }
                     let sum = 1;
                     MessageApi.sendFile({
                         msgId: res.data.id, path: path,
@@ -135,6 +139,12 @@ function CommonChatFrame({userInfo}) {
                         }
                         if (sum >= fileInfo.size) {
                             dispatch(setFileFileProgress(res.data.id, 100))
+                        }
+                    }).then(v => {
+                        if (fileType === "img") {
+                            messagesRef.current.push(res.data)
+                            setMessages(() => [...messagesRef.current])
+                            emit("on-send-msg", {})
                         }
                     })
                 }
