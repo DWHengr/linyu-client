@@ -25,6 +25,7 @@
     "window:allow-unminimize",
     "window:allow-set-always-on-top",
     "window:allow-set-size",
+    "window:allow-unmaximize",
     "app:default",
     "image:default",
     "resources:default",
