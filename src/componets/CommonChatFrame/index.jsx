@@ -250,7 +250,7 @@ function CommonChatFrame({userInfo}) {
         //会话切换，重置
         isQueryComplete.current = false
         currentMsgRecordIndex.current = 0
-        scrollTriggered.current = true
+        scrollTriggered.current = false
         messagesRef.current = []
         currentToId.current = userInfo.fromId
         const container = showFrameRef.current
