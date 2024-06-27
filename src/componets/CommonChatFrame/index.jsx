@@ -11,7 +11,7 @@ import CustomOverlay from "../CustomOverlay/index.jsx";
 import {emojis} from "../../utils/emoji.js";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import Time from "./ChatContent/Time/index.jsx";
-import {formatTime} from "../../utils/date.js";
+import {formatTime, getYearDayMonth} from "../../utils/date.js";
 import CreateVideoChat from "../../pages/VideoChat/window.jsx";
 import VideoApi from "../../api/video.js";
 import RichTextEditor from "../RichTextEditor/index.jsx";
@@ -23,6 +23,8 @@ import {useDispatch} from "react-redux";
 import {setFileFileProgress} from "../../store/home/action.js";
 import {isImageFile} from "../../utils/string.js";
 import Img from "./ChatContent/Img/index.jsx";
+import RightClickContent from "../RightClickContent/index.jsx";
+import FriendApi from "../../api/friend.js";
 
 function CommonChatFrame({userInfo}) {
 
@@ -40,6 +42,8 @@ function CommonChatFrame({userInfo}) {
     const [newMsgUnreadNum, setNewMsgUnreadNum] = useState(newMsgUnreadNumRef.current)
     const dispatch = useDispatch()
     const isRefresh = useRef(true)
+    const [userInfoPosition, setUserInfoPosition] = useState(null)
+    const [userDetails, setUserDetails] = useState(null)
 
     //表情
     const [biaoQingIsShow, setBiaoQingIsShow] = useState(false);
@@ -312,6 +316,16 @@ function CommonChatFrame({userInfo}) {
         }
     }
 
+    const onUserDetails = (e) => {
+        FriendApi.details(userInfo.fromId).then(res => {
+            if (res.code === 0) {
+                setUserDetails(res.data)
+                console.log(res.data)
+            }
+        })
+        setUserInfoPosition({x: e.clientX, y: e.clientY})
+    }
+
     //表情
     const BiaoQingPop = () => {
         return (<div
@@ -369,13 +383,57 @@ function CommonChatFrame({userInfo}) {
 
     return (<div className="common-chat-content">
         <BiaoQingPop/>
+        <RightClickContent position={userInfoPosition}>
+            <div className="user-details">
+                <div className="user-details-title">
+                    <div style={{display: "flex", alignItems: "center", userSelect: "none"}}>
+                        <img src="/id.png" style={{width: 30, height: 30}}/>
+                        <div style={{marginLeft: 5, fontWeight: 600}}>林语用户证明</div>
+                    </div>
+                    <div style={{display: "flex", alignItems: "center"}}>
+                        <i className={`iconfont ${userDetails?.sex === '女' ? 'icon-nv' : 'icon-nan'}`}
+                           style={{
+                               marginRight: 5,
+                               color: userDetails?.sex === '女' ? "#FFA0CF" : "#4C9BFF"
+                           }}/>
+                        <div>{userDetails?.account}</div>
+                    </div>
+                </div>
+                <div className="user-details-content">
+                    <img src={userDetails?.portrait} style={{width: 80, height: 80, borderRadius: 80}}/>
+                    <div style={{marginLeft: 15}}>
+                        <div className="item">
+                            <div className="item-label">姓名 / Name</div>
+                            <div className="item-value">
+                                {userDetails?.name}
+                            </div>
+                        </div>
+                        <div className="item">
+                            <div className="item-label">备注 / Remark</div>
+                            <div className="item-value">{userDetails?.remark}</div>
+                        </div>
+                        <div className="item">
+                            <div className="item-label">生日 / Birthday</div>
+                            <div className="item-value">{getYearDayMonth(userDetails?.birthday)}</div>
+                        </div>
+                        <div className="item">
+                            <div className="item-label">签名 / Signature</div>
+                            <div className="item-value two-line"
+                            >{userDetails?.signature}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </RightClickContent>
         <CustomDragDiv className="chat-content-title">
             <img
                 style={{
                     width: 40, height: 40, backgroundColor: "#4C9BFF", borderRadius: 50, marginLeft: 10
                 }}
                 src={userInfo.portrait}
-                alt={userInfo.portrait}/>
+                alt={userInfo.portrait}
+                onClick={onUserDetails}
+            />
             <div style={{
                 fontWeight: 600, color: "#1F1F1F", marginLeft: 10,
             }}>
