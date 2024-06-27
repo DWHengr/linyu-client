@@ -1,13 +1,12 @@
 import "./index.less"
 import {memo, useEffect, useRef, useState} from "react";
-import ProgressBar from "../../../ProgressBar/index.jsx";
 import {save} from "@tauri-apps/plugin-dialog";
-import {download} from "@tauri-apps/plugin-upload";
 import {getFileNameAndType} from "../../../../utils/string.js";
 import {invoke} from "@tauri-apps/api/core";
 import {useDispatch, useSelector} from "react-redux";
 import {setFileFileProgress} from "../../../../store/home/action.js";
 import MessageApi from "../../../../api/message.js";
+import CircularProgressBar from "../../../CircularProgressBar/index.jsx";
 
 const File = memo(({value, right = false}) => {
     const homeStoreData = useSelector(store => store.homeData)
@@ -93,20 +92,20 @@ const File = memo(({value, right = false}) => {
                             </div>
                         </div>
                         <div style={{
-                            width: 50,
-                            height: 50,
-                            borderRadius: 50,
+                            width: 60,
+                            height: 60,
                             display: "flex",
                             justifyContent: "center",
                             alignItems: "center"
                         }}>
-                            {right ?
-                                <img style={{height: 50}} src="/file-upload.png" alt=""/> :
-                                <img style={{height: 50}} src="/file-download.png" alt=""/>
-                            }
+                            <CircularProgressBar progress={progress}>
+                                {right ?
+                                    <img style={{height: 50}} src="/file-upload.png" alt=""/> :
+                                    <img style={{height: 50}} src="/file-download.png" alt=""/>
+                                }
+                            </CircularProgressBar>
                         </div>
                     </div>
-                    {progress > 0 && <ProgressBar progress={progress}/>}
                 </div>
             </div>
         </>
