@@ -1,12 +1,14 @@
 import "./index.less"
-import {memo, useEffect, useState} from "react";
+import {memo, useEffect, useRef, useState} from "react";
 import MessageApi from "../../../../api/message.js";
 import CreateImageViewer from "../../../../pages/ImageViewer/window.jsx";
 
 const Img = memo(({value, right = false}) => {
     const [imgInfo, setImgInfo] = useState(null)
+    const fileInfo = useRef()
 
     useEffect(() => {
+        fileInfo.current = JSON.parse(value.msgContent?.content)
         MessageApi.getImg({
             msgId: value.id,
         }).then((value) => {
@@ -22,7 +24,7 @@ const Img = memo(({value, right = false}) => {
                         style={{width: "100%", height: "100%", objectFit: "cover"}}
                         src={imgInfo}
                         alt=""
-                        onClick={() => CreateImageViewer(imgInfo)}
+                        onClick={() => CreateImageViewer(fileInfo.current.name, imgInfo)}
                     />
                 </div>
             </div>
