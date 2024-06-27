@@ -16,6 +16,14 @@ export function getDateDayAndMonth(date) {
     return `${month}月${day}日`;
 }
 
+export function getYearDayMonth(date) {
+    const initDate = new Date(date);
+    const year = initDate.getFullYear();
+    const day = initDate.getDate();
+    const month = initDate.getMonth() + 1;
+    return `${year}-${month}-${day}`;
+}
+
 export function formatTime(dateStr) {
     const date = new Date(dateStr);
     const now = new Date();
