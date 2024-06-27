@@ -28,6 +28,7 @@ import {useToast} from "../../../componets/CustomToast/index.jsx";
 import CustomEditableText from "../../../componets/CustomEditableText/index.jsx";
 import CustomDropdown from "../../../componets/CustomDropdown/index.jsx";
 import CreateImageViewer from "../../ImageViewer/window.jsx";
+import {getFileNameAndType} from "../../../utils/string.js";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState(null)
@@ -499,7 +500,7 @@ export default function Friend() {
                             <div className="friend-content-container-top">
                                 <div className="friend-content-container-top-info">
                                     <img
-                                        onClick={() => CreateImageViewer(friendDetails.portrait)}
+                                        onClick={() => CreateImageViewer(getFileNameAndType(friendDetails.portrait).fileName, friendDetails.portrait)}
                                         className="info-icon"
                                         src={friendDetails.portrait}
                                         alt={friendDetails.portrait}

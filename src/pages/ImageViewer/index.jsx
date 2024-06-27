@@ -6,31 +6,43 @@ import {save} from "@tauri-apps/plugin-dialog";
 import {useEffect, useState} from "react";
 import {download} from "@tauri-apps/plugin-upload";
 import {getItem} from "../../utils/storage.js";
+import {writeFile} from "@tauri-apps/plugin-fs";
 
 
 export default function ImageViewer() {
 
     const [url, setUrl] = useState("")
+    const [fileName, setFileName] = useState("")
 
     useEffect(() => {
-        getItem("image-viewer-url").then(url => {
-            setUrl(url)
+        getItem("image-viewer-url").then(value => {
+            setFileName(value.fileName)
+            setUrl(value.url)
         })
     }, [])
 
     function saveDialog() {
-        const filenameMatch = url.match(/\/([^\/?#]+)(?:\?|#|$)/);
-        const filename = filenameMatch ? filenameMatch[0] : null;
-        const fileTypeMatch = filename ? filename.match(/(?<=\.)\w+$/) : null;
+        const fileTypeMatch = fileName ? fileName.match(/(?<=\.)\w+$/) : null;
         const fileType = fileTypeMatch ? fileTypeMatch[0] : null;
         save({
             title: "林语",
-            defaultPath: filename,
+            defaultPath: fileName,
             filters: [
                 {name: "图片", extensions: [fileType]}
             ]
         }).then((path) => {
-            download(url, path)
+            fetch(url)
+                .then(response => response.blob())
+                .then(blob => {
+                    const reader = new FileReader();
+                    reader.onload = () => {
+                        writeFile(path, reader.result)
+                    };
+                    reader.readAsArrayBuffer(blob);
+                })
+                .catch(error => {
+                    console.error('Error fetching blob content:', error);
+                });
         })
 
     }
