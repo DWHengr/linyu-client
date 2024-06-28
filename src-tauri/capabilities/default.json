@@ -50,6 +50,7 @@
     "dialog:allow-open",
     "upload:allow-upload",
     "fs:default",
+    "fs:write-all",
     {
       "identifier": "http:default",
       "allow": [
