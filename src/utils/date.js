@@ -63,3 +63,10 @@ export function formatDateString(dateTimeString) {
     const day = (`0${date.getDate()}`).slice(-2); // Add leading zero and take last two characters
     return `${year}-${month}-${day}`;
 }
+
+export function formatTimingTime(time) {
+    const hours = Math.floor(time / 3600);
+    const minutes = Math.floor((time % 3600) / 60);
+    const seconds = time % 60;
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
