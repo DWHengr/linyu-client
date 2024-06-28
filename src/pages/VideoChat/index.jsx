@@ -7,6 +7,8 @@ import WindowOperation from "../../componets/WindowOperation/index.jsx";
 import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import ChatListApi from "../../api/chatList.js";
 import {useToast} from "../../componets/CustomToast/index.jsx";
+import {getItem} from "../../utils/storage.js";
+import {formatTimingTime} from "../../utils/date.js";
 
 export default function VideoChat() {
     const toUserId = useRef()
@@ -20,22 +22,38 @@ export default function VideoChat() {
     const [isSender, setIsSender] = useState(false)
     const [isAudioEnabled, setIsAudioEnabled] = useState(true)
     const [isVideoEnabled, setIsVideoEnabled] = useState(true)
+    const isOnlyAudioRef = useRef(false)
+    const [isOnlyAudio, setIsOnlyAudio] = useState(false)
+    const [time, setTime] = useState(0)
+    const timerId = useRef(null)
     const showToast = useToast();
 
 
     useEffect(() => {
         let label = WebviewWindow.getCurrent().label
         let param = label.split('-')
-        toUserId.current = param[1]
-        setIsSender(param[2] === "y")
-        ChatListApi.detail(toUserId.current).then(res => {
-            if (res.code === 0) {
-                setUserInfo(res.data)
-            }
+        getItem("video-chat").then(value => {
+            toUserId.current = value.userId
+            setIsSender(value.isSender)
+            isOnlyAudioRef.current = value.isOnlyAudio
+            setIsOnlyAudio(value.isOnlyAudio)
+            ChatListApi.detail(toUserId.current).then(res => {
+                if (res.code === 0) {
+                    setUserInfo(res.data)
+                }
+            })
+            initRTCPeerConnection()
+            videoCall()
         })
-        initRTCPeerConnection()
-        videoCall()
+        return () => {
+            handlerDestroyTime()
+        };
     }, [])
+
+    const handlerDestroyTime = () => {
+        if (timerId.current)
+            clearInterval(timerId.current)
+    }
 
     useEffect(() => {
         const unVideoMsgListen = listen('on-receive-video', async (event) => {
@@ -54,6 +72,7 @@ export default function VideoChat() {
                     break
                 }
                 case "hangup": {
+                    handlerDestroyTime()
                     showToast("对方已挂断~", true)
                     setTimeout(function () {
                         WebviewWindow.getCurrent().close()
@@ -104,7 +123,7 @@ export default function VideoChat() {
 
     const videoCall = async () => {
         webcamStream.current = await navigator.mediaDevices.getUserMedia({
-            video: true, audio: true,
+            video: !isOnlyAudioRef.current, audio: true,
         });
         local.current.srcObject = webcamStream.current;
         local.current.muted = true;
@@ -118,6 +137,7 @@ export default function VideoChat() {
     }
 
     const onHangup = () => {
+        handlerDestroyTime()
         VideoApi.hangup({userId: toUserId.current}).then(res => {
             WebviewWindow.getCurrent().close()
         })
@@ -131,6 +151,10 @@ export default function VideoChat() {
 
     const handleICEConnectionStateChangeEvent = (event) => {
         setToUserIsReady(true)
+        handlerDestroyTime()
+        timerId.current = setInterval(() => {
+            setTime(prevTime => prevTime + 1);
+        }, 1000);
     }
 
     const initRTCPeerConnection = () => {
@@ -187,6 +211,7 @@ export default function VideoChat() {
                             }
                         }}
                         className={`${isSwitch ? "max-window" : "min-window"}`}
+                        style={{display: isOnlyAudio ? "none" : ""}}
                         ref={local} autoPlay
                     />
                     <video
@@ -197,9 +222,9 @@ export default function VideoChat() {
                         }}
                         className={`${isSwitch ? "min-window" : "max-window"}`}
                         ref={remote} autoPlay
-                        style={{display: toUserIsReady ? "" : "none"}}
+                        style={{display: !toUserIsReady || isOnlyAudio ? "none" : ""}}
                     />
-                    {!toUserIsReady && <div
+                    {(!toUserIsReady || isOnlyAudio) && <div
                         style={{
                             width: "100%",
                             height: "100%",
@@ -219,46 +244,56 @@ export default function VideoChat() {
                             }}
                         >
                             <img style={{width: 100, borderRadius: 10}} src={userInfo?.portrait}/>
-                            {isSender ?
-                                <div className="dots">正在等待对方接听</div> :
-                                <div className="dots">对方请求视频通话</div>}
+                            {toUserIsReady ? <div className="dots">正在语音通话中</div> :
+                                (isSender ?
+                                    <div className="dots">正在等待对方接听</div> :
+                                    <div className="dots">对方请求视频通话</div>)
+                            }
                         </div>
                     </div>}
-
                     <CustomDragDiv
                         className="operate-bar"
                     >
-                        <div
-                            className="operate"
-                            onClick={toggleAudio}
-                        >
-                            <i
-                                className={`iconfont icon ${isAudioEnabled ? "icon-yuyin" : "icon-yuyin-ban"}`}
-                                style={{fontSize: 20}}
-                            />
-                        </div>
-                        <div
-                            className="operate hangup"
-                            onClick={onHangup}
-                        >
-                            <i className={`iconfont icon icon-guaduan`} style={{fontSize: 28}}/>
-                        </div>
-                        {
-                            (!isSender && !toUserIsReady) && <div
-                                className="operate accept"
-                                onClick={onAccept}
+                        <div style={{
+                            backgroundColor: "rgba(182, 182, 182, 0.4)",
+                            width: 100,
+                            borderRadius: 10,
+                            textAlign: "center"
+                        }}>{formatTimingTime(time)}</div>
+                        <div style={{display: "flex", justifyContent: "center", alignItems: "center"}}>
+                            <div
+                                className="operate"
+                                onClick={toggleAudio}
                             >
-                                <i className={`iconfont icon icon-shipin2`} style={{fontSize: 28}}/>
+                                <i
+                                    className={`iconfont icon ${isAudioEnabled ? "icon-yuyin" : "icon-yuyin-ban"}`}
+                                    style={{fontSize: 20}}
+                                />
                             </div>
-                        }
-                        <div
-                            className="operate"
-                            onClick={toggleVideo}
-                        >
-                            <i
-                                className={`iconfont icon ${isVideoEnabled ? "icon-shipin" : "icon-shipin-ban"}`}
-                                style={{fontSize: 24}}
-                            />
+                            <div
+                                className="operate hangup"
+                                onClick={onHangup}
+                            >
+                                <i className={`iconfont icon icon-guaduan`} style={{fontSize: 28}}/>
+                            </div>
+                            {
+                                (!isSender && !toUserIsReady) && <div
+                                    className="operate accept"
+                                    onClick={onAccept}
+                                >
+                                    <i className={`iconfont icon icon-shipin2`} style={{fontSize: 28}}/>
+                                </div>
+                            }
+                            {!isOnlyAudio && <div
+                                className="operate"
+                                onClick={toggleVideo}
+                            >
+                                <i
+                                    className={`iconfont icon ${isVideoEnabled ? "icon-shipin" : "icon-shipin-ban"}`}
+                                    style={{fontSize: 24}}
+                                />
+                            </div>
+                            }
                         </div>
                     </CustomDragDiv>
                 </div>

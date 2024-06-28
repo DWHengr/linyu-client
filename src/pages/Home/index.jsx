@@ -93,7 +93,7 @@ export default function Home() {
         const unVideoListen = listen('on-receive-video', async (event) => {
             let data = event.payload
             if (data.type === "invite") {
-                CreateVideoChat(data.fromId, false)
+                CreateVideoChat(data.fromId, false, data.isOnlyAudio)
             }
         });
         let unChatListJumpListen = listen('chat-list-jump', async (event) => {
@@ -321,7 +321,7 @@ export default function Home() {
                                 </div>
                             </div>
                         </CustomModal
->
+                        >
                     </div>
                     <div className="home-nav-icon">
                         <img style={{height: 60}} src="/logo.png" alt=""/>

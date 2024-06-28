@@ -302,9 +302,9 @@ function CommonChatFrame({userInfo}) {
         }
     };
 
-    const onVideo = () => {
-        CreateVideoChat(currentToId.current, true)
-        VideoApi.invite({userId: currentToId.current})
+    const onVideo = (isOnlyAudio) => {
+        CreateVideoChat(currentToId.current, true, isOnlyAudio)
+        VideoApi.invite({userId: currentToId.current, isOnlyAudio: isOnlyAudio})
     }
 
     const handleOpenFile = async () => {
@@ -479,10 +479,12 @@ function CommonChatFrame({userInfo}) {
                 </div>
                 <div style={{display: "flex"}}>
                     <IconMinorButton
-                        icon={<i className={`iconfont icon icon-dianhua`} style={{fontSize: 24}}/>}/>
+                        icon={<i className={`iconfont icon icon-dianhua`} style={{fontSize: 24}}/>}
+                        onClick={() => onVideo(true)}
+                    />
                     <IconMinorButton
                         icon={<i className={`iconfont icon icon-shipin`} style={{fontSize: 26}}/>}
-                        onClick={onVideo}
+                        onClick={() => onVideo(false)}
                     />
                 </div>
             </div>
