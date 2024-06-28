@@ -18,5 +18,14 @@ export default {
     },
     setGroup(param) {
         return Http.post(`/v1/api/friend/set/group`, param)
+    },
+    delete(param) {
+        return Http.post(`/v1/api/friend/delete`, param)
+    },
+    careFor(param) {
+        return Http.post(`/v1/api/friend/carefor`, param)
+    },
+    unCareFor(param) {
+        return Http.post(`/v1/api/friend/uncarefor`, param)
     }
 };

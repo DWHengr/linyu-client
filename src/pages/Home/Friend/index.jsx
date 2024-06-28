@@ -57,6 +57,7 @@ export default function Friend() {
     const [isGroupAdd, setIsGroupAdd] = useState(true)
     const selectedGroupId = useRef(null)
     const [isGroupDelAffirmModalOpen, setIsGroupDelAffirmModalOpen] = useState(false)
+    const [isFriendDelAffirmModalOpen, setIsFriendDelAffirmModalOpen] = useState(false)
     const [groupList, setGroupList] = useState([])
 
     useEffect(() => {
@@ -83,6 +84,7 @@ export default function Friend() {
         {key: "addFriend", label: "添加好友"},
     ]
 
+    const [moreRightOptionsFilter, setMoreRightOptionsFilter] = useState([])
     const moreRightOptions = [
         {key: "careFor", label: "特别关心"},
         {key: "unCaraFor", label: "取消特别关心"},
@@ -185,6 +187,33 @@ export default function Friend() {
         }
     }
 
+    let onMoreMenuClick = (action) => {
+        switch (action.key) {
+            case "careFor": {
+                FriendApi.careFor({friendId: selectedFriendId}).then(res => {
+                    if (res.code === 0) {
+                        onFriendList()
+                        setFriendDetails({...friendDetails, isConcern: true})
+                    }
+                })
+                break
+            }
+            case "unCaraFor": {
+                FriendApi.unCareFor({friendId: selectedFriendId}).then(res => {
+                    if (res.code === 0) {
+                        onFriendList()
+                        setFriendDetails({...friendDetails, isConcern: false})
+                    }
+                })
+                break
+            }
+            case "delFriend": {
+                setIsFriendDelAffirmModalOpen(true)
+                break
+            }
+        }
+    }
+
     const onDeleteGroup = () => {
         if (selectedGroupId.current) {
             GroupApi.delete({groupId: selectedGroupId.current}).then(res => {
@@ -195,6 +224,20 @@ export default function Friend() {
             })
         }
         setIsGroupDelAffirmModalOpen(false)
+    }
+
+    const onDeleteFriend = () => {
+        if (selectedFriendId) {
+            FriendApi.delete({friendId: selectedFriendId}).then(res => {
+                if (res.code === 0) {
+                    showToast("好友删除成功~")
+                    onFriendList()
+                    setSelectedFriendId(null)
+                    setFriendDetails(null)
+                }
+            })
+        }
+        setIsFriendDelAffirmModalOpen(false)
     }
 
     let onFriendApply = (userId, content) => {
@@ -419,13 +462,24 @@ export default function Friend() {
                 onOk={onDeleteGroup}
                 onCancel={() => setIsGroupDelAffirmModalOpen(false)}
             />
+            <CustomAffirmModal
+                isOpen={isFriendDelAffirmModalOpen}
+                txt="确认删除好友?"
+                onOk={onDeleteFriend}
+                onCancel={() => setIsFriendDelAffirmModalOpen(false)}
+            />
             <RightClickMenu position={addMenuPosition} options={addRightOptions} onMenuItemClick={onAddMenuClick}/>
             <RightClickMenu position={groupMenuPosition}
                             options={groupRightOptions}
                             filter={groupRightOptionsFilter}
                             onMenuItemClick={onGroupMenuClick}
             />
-            <RightClickMenu position={moreMenuPosition} options={moreRightOptions}/>
+            <RightClickMenu
+                position={moreMenuPosition}
+                options={moreRightOptions}
+                filter={moreRightOptionsFilter}
+                onMenuItemClick={onMoreMenuClick}
+            />
             <div className="friend-list">
                 <CustomDragDiv className="friend-list-top">
                     <label className="friend-list-top-title">
@@ -513,10 +567,15 @@ export default function Friend() {
                                                 letterSpacing: 2
                                             }}>{friendDetails.name}</div>
                                             <div style={{display: "flex", alignItems: "center"}}>
-                                                <i className={`iconfont icon-star`}
-                                                   style={{fontSize: 22, color: "#4C9BFF"}}/>
+                                                {friendDetails.isConcern &&
+                                                    <i className={`iconfont icon-star`}
+                                                       style={{fontSize: 22, color: "#4C9BFF"}}/>
+                                                }
                                                 <IconMinorButton
-                                                    onClick={(e) => setMoreMenuPosition({x: e.clientX, y: e.clientY})}
+                                                    onClick={(e) => {
+                                                        setMoreRightOptionsFilter(friendDetails.isConcern ? ["careFor"] : ["unCaraFor"])
+                                                        setMoreMenuPosition({x: e.clientX, y: e.clientY})
+                                                    }}
                                                     icon={<i className={`iconfont icon-gengduo`}
                                                              style={{fontSize: 32}}/>}
                                                 />
@@ -548,7 +607,7 @@ export default function Friend() {
                                 </div>
                                 <div className="info-item">
                                     <i className={`iconfont icon-beizhu`} style={{fontSize: 14, marginRight: 5}}/>
-                                    <div>备注：</div>
+                                    <div className="flex-shrink">备注：</div>
                                     <CustomEditableText
                                         placeholder="设置好友备注"
                                         text={friendDetails.remark}
@@ -557,7 +616,7 @@ export default function Friend() {
                                 </div>
                                 <div className="info-item">
                                     <i className={`iconfont icon-fenzu`} style={{fontSize: 14, marginRight: 5}}/>
-                                    <div>分组：</div>
+                                    <div className="flex-shrink">分组：</div>
                                     <CustomDropdown
                                         options={groupList}
                                         defaultValue={friendDetails.groupName ? friendDetails.groupName : "未分组"}
@@ -566,7 +625,7 @@ export default function Friend() {
                                 </div>
                                 <div className="info-item">
                                     <i className={`iconfont icon-qianming`} style={{fontSize: 14, marginRight: 5}}/>
-                                    <div>签名：</div>
+                                    <div className="flex-shrink">签名：</div>
                                     <div>{friendDetails.signature}</div>
                                 </div>
                                 <div className="info-item">
@@ -574,7 +633,7 @@ export default function Friend() {
                                         <div style={{display: "flex"}}>
                                             <i className={`iconfont icon-pengyouquan`}
                                                style={{fontSize: 14, marginRight: 5}}/>
-                                            <div>朋友圈：</div>
+                                            <div className="flex-shrink">朋友圈：</div>
                                         </div>
                                         <div
                                             onClick={() => {
