@@ -57,7 +57,7 @@ pub fn default_window_icon<R: Runtime>(
 
 #[tauri::command]
 pub fn screenshot(x: &str, y: &str, width: &str, height: &str) -> String {
-    let screen = Screen::from_point(1, 1).unwrap();
+    let screen = Screen::from_point(100, 100).unwrap();
     let image = screen
         .capture_area(
             x.parse::<i32>().unwrap(),
@@ -67,6 +67,6 @@ pub fn screenshot(x: &str, y: &str, width: &str, height: &str) -> String {
         )
         .unwrap();
     let buffer = image.buffer();
-    let base64_str = general_purpose::STANDARD_NO_PAD.encode(buffer); //encode(buffer);
+    let base64_str = general_purpose::STANDARD_NO_PAD.encode(buffer);
     base64_str
 }

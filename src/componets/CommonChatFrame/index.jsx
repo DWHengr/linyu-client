@@ -25,6 +25,9 @@ import {isImageFile} from "../../utils/string.js";
 import Img from "./ChatContent/Img/index.jsx";
 import RightClickContent from "../RightClickContent/index.jsx";
 import FriendApi from "../../api/friend.js";
+import {Image} from "@tauri-apps/api/image";
+import {writeImage} from "@tauri-apps/plugin-clipboard-manager";
+import {base64ToArrayBuffer} from "../../utils/img.js";
 
 function CommonChatFrame({userInfo}) {
 
@@ -58,6 +61,9 @@ function CommonChatFrame({userInfo}) {
         })
         //监听后端发送的消息
         const unScreenshotListen = listen('screenshot_result', async (event) => {
+            Image.fromBytes(base64ToArrayBuffer(event.payload)).then(res => {
+                writeImage(res)
+            })
         })
         //监听后端发送的消息
         const unListen = listen('on-receive-msg', async (event) => {

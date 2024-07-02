@@ -78,7 +78,7 @@ const screenshot = () => {
                 width: captureDetails.width.toString(),
                 height: captureDetails.height.toString(),
             });
-            await emit('screenshot_result', 'data:image/png;base64,' + response);
+            await emit('screenshot_result', response);
         } catch (err) {
             console.error(err);
             await emit('screenshot_result', '');

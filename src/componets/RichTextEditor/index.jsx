@@ -9,7 +9,7 @@ const RichTextEditor = React.forwardRef((props, ref) => {
         //监听后端发送的消息
         const unScreenshotListen = listen('screenshot_result', async (event) => {
             const img = document.createElement('img');
-            img.src = event.payload;
+            img.src = 'data:image/png;base64,' + event.payload;
             img.style.width = '100px'
             img.style.height = 'auto';
             editorRef.current.appendChild(img);
@@ -36,6 +36,8 @@ const RichTextEditor = React.forwardRef((props, ref) => {
                 reader.onload = function (event) {
                     const img = document.createElement('img');
                     img.src = event.target.result;
+                    img.style.width = '100px'
+                    img.style.height = 'auto'
                     editorRef.current.appendChild(img);
                     moveCursorToEnd();
                 };
