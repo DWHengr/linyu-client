@@ -12,17 +12,48 @@
     width: 600px;
 
     .create-talk-media {
+      display: flex;
+      margin-bottom: 10px;
+      flex-wrap: wrap;
+
+      .create-talk-media-item {
+        width: 100px;
+        height: 100px;
+        margin: 2px 2px;
+        border-radius: 5px;
+        position: relative;
+
+        .create-talk-media-item-img-operate {
+          position: absolute;
+          right: 0;
+          top: 3px;
+          width: 20px;
+          height: 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          z-index: 1;
+          background-color: rgba(145, 145, 145, 0.6);
+          color: #FFFFFF;
+          cursor: pointer;
+          border-radius: 5px;
+        }
+
+        .create-talk-media-item-img {
+          object-fit: cover;
+        }
+      }
 
       .create-talk-media-add {
-        width: 120px;
-        height: 120px;
+        margin: 2px 2px;
+        width: 100px;
+        height: 100px;
         background-color: #F9FBFF;
         display: flex;
         justify-content: center;
         align-items: center;
         border-radius: 5px;
         cursor: pointer;
-        margin-bottom: 20px;
       }
 
     }
