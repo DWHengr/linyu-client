@@ -62,6 +62,7 @@ async function upload(url, file, params = {}) {
         return new Promise(async (resolve, reject) => {
             fetch(SERVICE_URL + url, {
                 method: "POST", body: file, headers: {
+                    ...params,
                     "x-token": token ? token : "", "name": file.name, "type": file.type, "size": file.size,
                 }
             })
@@ -80,6 +81,33 @@ async function upload(url, file, params = {}) {
     }
 }
 
+async function download(url, params = {}) {
+    let token = await invoke("get_user_info", {}).then(res => {
+        return res.token
+    })
+    return new Promise(async (resolve, reject) => {
+        fetch(SERVICE_URL + url, {
+            method: "get",
+            headers: {
+                ...params,
+                "x-token": token ? token : "",
+            }
+        })
+            .then(async (response) => {
+                if (response.ok) {
+                    let result = await response.blob()
+                    return resolve(result);
+                } else {
+                    reject({
+                        message: "Request failed with status code " + response.status,
+                    });
+                }
+            })
+            .catch((e) => reject({message: `网络错误: ${e}`}));
+    });
+
+}
+
 const uploadFile = async (url, params, progressHandler) => {
     let userinfo = await invoke("get_user_info", {});
     return new Promise(async (resolve, reject) => {
@@ -96,7 +124,6 @@ const uploadFile = async (url, params, progressHandler) => {
 }
 
 const downloadFile = async (url, params, progressHandler) => {
-    console.log(url, params, progressHandler)
     let userinfo = await invoke("get_user_info", {});
     return new Promise(async (resolve, reject) => {
         tauriDownload(SERVICE_URL + url, params.path, progressHandler,
@@ -109,4 +136,4 @@ const downloadFile = async (url, params, progressHandler) => {
     })
 }
 
-export default {post, get, upload, uploadFile, downloadFile, SERVICE_URL};
+export default {post, get, upload, uploadFile, download, downloadFile, SERVICE_URL};
