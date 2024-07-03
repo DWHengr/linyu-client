@@ -1,123 +1,24 @@
 import "./index.less"
 import CustomButton from "../../../../componets/CustomButton/index.jsx";
-import CustomTextarea from "../../../../componets/CustomTextarea/index.jsx";
 import {useHistory} from "react-router-dom";
 import CustomDragDiv from "../../../../componets/CustomDragDiv/index.jsx";
+import {useEffect, useState} from "react";
+import TalkApi from "../../../../api/talk.js";
+import CustomImg from "../../../../componets/CustomImg/index.jsx";
+import {formatTime} from "../../../../utils/date.js";
+import CustomEmpty from "../../../../componets/CustomEmpty/index.jsx";
 
 export default function AllTalk() {
     let h = useHistory();
+    const [talkListData, setTalkListData] = useState([])
 
-    let talkAllData = [
-        {
-            user: {
-                portrait: "",
-                name: "小红"
-            },
-            content: {
-                describe: "又是疲劳的一天",
-                media: [
-                    {
-                        type: "img",
-                        mediaContent: "https://th.bing.com/th/id/OIP.kt5NiXbTpov01ELs6cs8tQHaEo?rs=1&pid=ImgDetMain"
-                    }
-                ],
-            },
-            time: "20分钟前",
-            like: {
-                num: 10,
-                likeContent: []
-            },
-            comment: {
-                num: 10,
-                commentContent: [
-                    "小蓝：今天怎么了",
-                    "小蓝：今天工作很忙么？"
-                ]
+    useEffect(() => {
+        TalkApi.list({index: 0, num: 10}).then(res => {
+            if (res.code === 0) {
+                setTalkListData(res.data)
             }
-        },
-        {
-            user: {
-                portrait: "",
-                name: "小红"
-            },
-            content: {
-                describe: "又是疲劳的一天",
-                media: [
-                    {
-                        type: "img",
-                        mediaContent: "https://th.bing.com/th/id/OIP.kt5NiXbTpov01ELs6cs8tQHaEo?rs=1&pid=ImgDetMain"
-                    }
-                ],
-            },
-            time: "",
-            like: {
-                num: 10,
-                likeContent: []
-            },
-            comment: {
-                num: 10,
-                commentContent: [
-                    "小蓝：今天怎么了",
-                    "小蓝：今天工作很忙么？"
-                ]
-            }
-        },
-        {
-            user: {
-                portrait: "",
-                name: "小红"
-            },
-            content: {
-                describe: "又是疲劳的一天",
-                media: [
-                    {
-                        type: "img",
-                        mediaContent: "https://th.bing.com/th/id/OIP.kt5NiXbTpov01ELs6cs8tQHaEo?rs=1&pid=ImgDetMain"
-                    }
-                ],
-            },
-            time: "",
-            like: {
-                num: 10,
-                likeContent: []
-            },
-            comment: {
-                num: 10,
-                commentContent: [
-                    "小蓝：今天怎么了",
-                    "小蓝：今天工作很忙么？"
-                ]
-            }
-        },
-        {
-            user: {
-                portrait: "",
-                name: "小红"
-            },
-            content: {
-                describe: "又是疲劳的一天",
-                media: [
-                    {
-                        type: "img",
-                        mediaContent: "https://th.bing.com/th/id/OIP.kt5NiXbTpov01ELs6cs8tQHaEo?rs=1&pid=ImgDetMain"
-                    }
-                ],
-            },
-            time: "",
-            like: {
-                num: 10,
-                likeContent: []
-            },
-            comment: {
-                num: 10,
-                commentContent: [
-                    "小蓝：今天怎么了",
-                    "小蓝：今天工作很忙么？"
-                ]
-            }
-        }
-    ]
-
+        })
+    }, [])
 
     return (
         <CustomDragDiv className="all-talk-container">
@@ -125,50 +26,43 @@ export default function AllTalk() {
                 <CustomButton onClick={() => h.push("/home/talk/create")}>说一说</CustomButton>
             </div>
             <div className="talks">
-                {talkAllData?.map((item) => {
+                {talkListData?.map((item) => {
                     return (
                         <div
+                            key={item.id}
                             className="talk"
                             onClick={() => h.push("/home/talk/detail")}
                         >
                             <div className="talk-title">
-                                <div className="talk-title-portrait"></div>
+                                <img className="talk-title-portrait" src={item.portrait}/>
                                 <div className="talk-title-info">
-                                    <div className="talk-title-info-name">{item.user.name}</div>
-                                    <div className="talk-title-info-time">{item.time}</div>
+                                    <div className="talk-title-info-name">{item.remark ? item.remark : item.name}</div>
+                                    <div className="talk-title-info-time">{formatTime(item.time)}</div>
                                 </div>
                             </div>
                             <div className="talk-content">
-                                <div>{item.content.describe}</div>
-                                {item.content.media?.map((mediaItem) => {
-                                    return (
-                                        <img
-                                            className="talk-content-img"
-                                            src={mediaItem.mediaContent}
-                                        />
-                                    )
-                                })}
+                                <div>{item.content.text}</div>
+                                <div style={{display: "flex"}}>
+                                    {item.content.img?.map((imgItem) => {
+                                        return (
+                                            <CustomImg param={{fileName: imgItem, targetId: item.userId}}/>
+                                        )
+                                    })}
+                                </div>
                             </div>
                             <div className="talk-bottom">
                                 <div className="talk-bottom-operation">
                                     <div className="talk-bottom-operation-item">
-                                        <i className={`iconfont icon-star`}
-                                           style={{fontSize: 14, marginRight: 4, color: "#4C9BFF"}}/>
-                                        <div>已点赞（{item.like.num}）</div>
+                                        <div>已点赞（{item.likeNum}）</div>
                                     </div>
                                     <div className="talk-bottom-operation-item">
-                                        <div>评论（{item.comment.num}）</div>
+                                        <div>评论（{item.commentNum}）</div>
                                     </div>
                                 </div>
-                                <CustomTextarea>
-                                    <div style={{display: "flex", alignItems: "end", justifyContent: "end", margin: 5}}>
-                                        <CustomButton width={60}>发送</CustomButton>
-                                    </div>
-                                </CustomTextarea>
                                 <div>
-                                    {item.comment.commentContent?.map((commentItem) => {
+                                    {item.latestComment?.map((comment) => {
                                         return <div>
-                                            {commentItem}
+                                            {comment.name} : {comment.content}
                                         </div>
                                     })}
                                 </div>
@@ -179,6 +73,18 @@ export default function AllTalk() {
 
                         </div>)
                 })}
+                {talkListData?.length <= 0 &&
+                    // < CustomDragDiv style={{
+                    //     display: "flex",
+                    //     flex: 1,
+                    //     alignItems: "center",
+                    //     justifyContent: "center",
+                    //     height: "100%"
+                    // }}>
+                    //     <img style={{height: 120}} src="/bg.png" alt=""/>
+                    // </CustomDragDiv>
+                    <CustomEmpty placeholder="暂时无人发表说说~"/>
+                }
             </div>
         </CustomDragDiv>
     )
