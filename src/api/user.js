@@ -12,9 +12,11 @@ export default {
     },
     upload(param) {
         return Http.upload(`/v1/api/user/upload/portrait`, param)
-    }
-    ,
+    },
     update(param) {
         return Http.post(`/v1/api/user/update`, param)
+    },
+    getImg(param) {
+        return Http.download("/v1/api/user/get/img", param)
     }
 };
