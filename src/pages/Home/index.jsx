@@ -54,7 +54,7 @@ export default function Home() {
             if (token) {
                 ws.connect(token)
                 CreateTrayWindow()
-                // CrateMessageBox()
+                CrateMessageBox()
                 onGetUserUnreadNum()
             }
         })

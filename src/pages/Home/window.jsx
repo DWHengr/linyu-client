@@ -22,14 +22,6 @@ listen('tray_menu', async (event) => {
     }
 })
 
-listen('tray_enter', async (event) => {
-    console.log("tray_enter")
-})
-
-listen('tray_leave', async (event) => {
-    console.log("tray_leave")
-})
-
 export default function CreateHomeWindow() {
     let webview = new WebviewWindow("home", {
         url: "/home",

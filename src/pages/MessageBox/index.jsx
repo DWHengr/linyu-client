@@ -9,6 +9,7 @@ import {messageBoxWindowHeight, messageBoxWindowWidth} from "./window.jsx";
 import {useDispatch} from "react-redux";
 import {useHistory} from "react-router-dom";
 import {TrayIcon} from '@tauri-apps/api/tray';
+import {PhysicalPosition} from "@tauri-apps/api/window";
 
 function MessageBox() {
     const [chats, setChats] = useState([])
@@ -16,7 +17,45 @@ function MessageBox() {
     const dispatch = useDispatch();
     const h = useHistory();
     let intervalId = useRef(null)
+    let timeoutId = useRef(null)
     let imgRef = useRef(null)
+    const chatsLengthRef = useRef(0)
+
+    useEffect(() => {
+        let trayEnterListen = listen('tray_enter', async (event) => {
+            if (chatsLengthRef.current <= 0) return
+            const homeWindow = WebviewWindow.getByLabel('massage-box')
+            if (!homeWindow) return
+
+            let position = event.payload;
+            let scaleFactor = await homeWindow.scaleFactor();
+            let logicalPosition = new PhysicalPosition(position.x, 100).toLogical(scaleFactor);
+            logicalPosition.x = logicalPosition.x - messageBoxWindowWidth / 2
+            logicalPosition.y = window.screen.availHeight - messageBoxWindowHeight - chatsLengthRef.current * 70
+
+            let trayWindow = WebviewWindow.getByLabel('massage-box')
+            if (trayWindow) {
+                await trayWindow.setAlwaysOnTop(true)
+                await trayWindow.setPosition(logicalPosition)
+                await trayWindow.show()
+                await trayWindow.setFocus()
+            }
+        })
+
+        let trayLeaveListen = listen('tray_leave', async (event) => {
+            // clearTimeout(timeoutId.current)
+            // timeoutId.current = setTimeout(function () {
+            //     const homeWindow = WebviewWindow.getByLabel('massage-box')
+            //     if (homeWindow) {
+            //         homeWindow.hide()
+            //     }
+            // }, 400);
+        })
+        return async () => {
+            (await trayEnterListen)();
+            (await trayLeaveListen)();
+        }
+    }, [])
 
     useEffect(() => {
         (async () => {
@@ -47,6 +86,7 @@ function MessageBox() {
     }
 
     const onClearIntervalId = () => {
+        chatsLengthRef.current = 0
         setTrayDefaultIcon()
         clearInterval(intervalId.current);
     }
@@ -64,6 +104,7 @@ function MessageBox() {
                 TrayIcon.getById("tray").then(res => {
                     let flag = true
                     onClearIntervalId()
+                    chatsLengthRef.current = chats.length
                     intervalId.current = setInterval(function () {
                         if (flag) {
                             res.setIcon(null)
