@@ -1,8 +1,8 @@
 import "./index.less"
 
-export default function CustomSearchInput({value, onChange, placeholder = "搜索"}) {
+export default function CustomSearchInput({value, onChange, placeholder = "搜索", style = {}}) {
     return (
-        <div className="custom-search-input">
+        <div className="custom-search-input" style={style}>
             <input
                 value={value}
                 type="text"
