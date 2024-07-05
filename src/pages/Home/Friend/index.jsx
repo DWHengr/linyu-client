@@ -500,10 +500,10 @@ export default function Friend() {
                 </CustomDragDiv>
                 {!searchInfo ? <div
                         className="friend-list-items">
-                        {allFriendData.map(item => {
+                        {allFriendData.map((item, index) => {
                             return (
                                 <CustomAccordion
-                                    key={item.groupId}
+                                    key={item.name + index}
                                     title={item.name}
                                     titleEnd={`（${item.friends ? item.friends.length : 0}）`}
                                     onContextMenu={(e) => {
@@ -515,7 +515,7 @@ export default function Friend() {
                                 >
                                     {item?.friends?.map((friend) => {
                                         return (
-                                            <div key={friend.friendId}>
+                                            <div key={item.groupId + "" + friend.friendId}>
                                                 <FriendCard
                                                     info={friend}
                                                     onClick={() => onFriendDetails(friend.friendId)}

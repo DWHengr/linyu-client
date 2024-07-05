@@ -27,5 +27,8 @@ export default {
     },
     unCareFor(param) {
         return Http.post(`/v1/api/friend/uncarefor`, param)
-    }
+    },
+    listFlat(param) {
+        return Http.get("/v1/api/friend/list/flat", param);
+    },
 };
