@@ -5,15 +5,24 @@ import {useHistory} from "react-router-dom";
 import CustomLine from "../../../../componets/CustomLine/index.jsx";
 import CustomButton from "../../../../componets/CustomButton/index.jsx";
 import Dropzone from "react-dropzone";
-import {useState} from "react";
+import {useRef, useState} from "react";
 import CreateImageViewer from "../../../ImageViewer/window.jsx";
 import TalkApi from "../../../../api/talk.js";
 import {useToast} from "../../../../componets/CustomToast/index.jsx";
+import FriendApi from "../../../../api/friend.js";
+import CustomSearchInput from "../../../../componets/CustomSearchInput/index.jsx";
 
 export default function CreateTalk() {
     let h = useHistory()
     const [text, setText] = useState("")
     const [imgs, setImgs] = useState([])
+    const [isShowSelectUser, setIsShowSelectUser] = useState(false)
+    const [allFriend, setAllFriend] = useState([])
+    const [allGroupFriend, setAllGroupFriend] = useState([])
+    const [contentFriend, setContentFriend] = useState([])
+    const [currentSelectFriendId, setCurrentSelectFriendId] = useState([])
+    const [currentSelectFriend, setCurrentSelectFriend] = useState([])
+    const [searchUsersInfo, setSearchUsersInfo] = useState("")
     const showToast = useToast()
 
     const handlerUploadImg = (acceptedFiles) => {
@@ -41,7 +50,7 @@ export default function CreateTalk() {
 
     const onCreateTalk = () => {
         let uploadNum = 0
-        TalkApi.create({text: text}).then(res => {
+        TalkApi.create({text: text, permission: currentSelectFriendId}).then(res => {
             if (res.code === 0) {
                 let talkId = res.data.id
                 imgs.map(img => {
@@ -49,13 +58,54 @@ export default function CreateTalk() {
                         if (res.code === 0) {
                             uploadNum++
                         }
-                        if (uploadNum === imgs.length) {
-                            showToast("发表成功~")
-                            setText("")
-                            setImgs([])
-                        }
                     })
                 })
+                if (uploadNum === imgs.length) {
+                    showToast("发表成功~")
+                    setText("")
+                    setImgs([])
+                    setCurrentSelectFriend([])
+                    setCurrentSelectFriendId([])
+                }
+            }
+        })
+    }
+
+    const handlerOpenSelectUser = (e) => {
+        FriendApi.list().then(res => {
+            if (res.code === 0) {
+                setAllGroupFriend(res.data)
+            }
+        })
+        FriendApi.listFlat().then(res => {
+            if (res.code === 0) {
+                setAllFriend(res.data)
+                setContentFriend(res.data)
+            }
+        })
+        setIsShowSelectUser(!isShowSelectUser)
+    }
+
+    const handlerSelectUser = (friend) => {
+        if (!currentSelectFriendId.includes(friend.friendId)) {
+            let newCurrentSelectFriendId = [...currentSelectFriendId, friend.friendId]
+            setCurrentSelectFriendId(newCurrentSelectFriendId)
+            let newCurrentSelectFriend = [...currentSelectFriend, friend]
+            setCurrentSelectFriend(newCurrentSelectFriend)
+        } else {
+            let newCurrentSelectFriendId = currentSelectFriendId.filter(id => id !== friend.friendId)
+            setCurrentSelectFriendId(newCurrentSelectFriendId)
+            let newCurrentSelectFriend = currentSelectFriend.filter(item => item.friendId !== friend.friendId)
+            setCurrentSelectFriend(newCurrentSelectFriend)
+        }
+    }
+
+    const onSearchUsersInfo = (v) => {
+        setSearchUsersInfo(v)
+        FriendApi.listFlat({friendInfo: v}).then(res => {
+            console.log("res:", res)
+            if (res.code === 0) {
+                setContentFriend(res.data)
             }
         })
     }
@@ -120,12 +170,100 @@ export default function CreateTalk() {
                             <i className={"iconfont icon-haoyou"} style={{fontSize: 14, marginRight: 5}}/>
                             <div>可以给谁看</div>
                         </div>
-                        <div>
-                            <div style={{display: "flex", alignItems: "center"}}>
-                                <div>所有</div>
+                        <div style={{position: 'relative', display: 'inline-block'}}>
+                            {isShowSelectUser &&
+                                <div
+                                    className="select-user"
+                                >
+                                    <div className="search">
+                                        <CustomSearchInput
+                                            style={{marginTop: 0, marginBottom: 0, height: 30}}
+                                            value={searchUsersInfo}
+                                            onChange={(v) => onSearchUsersInfo(v)}
+                                            placeholder="搜索好友"
+                                        />
+                                        <div className="group">
+                                            <div
+                                                className="group-item ellipsis"
+                                                onClick={() => setContentFriend(allFriend)}
+                                            >
+                                                全部好友
+                                            </div>
+                                            {allGroupFriend?.map(group => {
+                                                return (
+                                                    <div
+                                                        className="group-item ellipsis"
+                                                        key={group.id}
+                                                        onClick={() => setContentFriend(group.friends)}
+                                                    >
+                                                        {group.name}
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                    <div style={{display: "flex", flexDirection: "column", flex: 1}}>
+                                        <div className="operate">
+                                            <div className="operate-item" onClick={() => setIsShowSelectUser(false)}>
+                                                <i className={`iconfont icon-guanbi`} style={{fontSize: 18}}/>
+                                            </div>
+                                        </div>
+                                        <div className="user">
+                                            {contentFriend?.map(friend => {
+                                                return (
+                                                    <div
+                                                        className={`user-item ${currentSelectFriendId.includes(friend.friendId) ? "selected" : ""}`}
+                                                        key={friend.friendId}
+                                                        onClick={() => handlerSelectUser(friend)}
+                                                    >
+                                                        <img style={{
+                                                            width: 40,
+                                                            height: 40,
+                                                            borderRadius: 40,
+                                                            marginRight: 5
+                                                        }}
+                                                             src={friend.portrait}/>
+                                                        <div
+                                                            className="ellipsis"
+                                                        >
+                                                            {friend.remark ? friend.remark : friend.name}
+                                                        </div>
+
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            <div style={{display: "flex", alignItems: "center", cursor: "pointer"}}
+                                 onClick={handlerOpenSelectUser}>
+                                <div>{currentSelectFriend.length <= 0 ? "所有" : "部分"}</div>
                                 <i className={"iconfont icon-weixiala"} style={{fontSize: 14}}/>
                             </div>
                         </div>
+                    </div>
+                    <div className="selected-content">
+                        {currentSelectFriend?.map(friend => {
+                            return (
+                                <div
+                                    key={friend.friendId}
+                                    className="selected-content-item"
+                                >
+                                    <img style={{width: 16, height: 16, borderRadius: 2, marginRight: 2}}
+                                         src={friend.portrait} alt=""/>
+                                    <div
+                                        className="ellipsis"
+                                        style={{flex: 1}}>{friend.remark ? friend.remark : friend.name}
+                                    </div>
+                                    <i
+                                        className={`iconfont icon-guanbi`}
+                                        style={{fontSize: 16, cursor: "pointer", color: "#4C9BFF"}}
+                                        onClick={() => handlerSelectUser(friend)}
+                                    />
+                                </div>
+                            )
+                        })}
                     </div>
                 </div>
             </div>
