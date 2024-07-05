@@ -10,4 +10,7 @@ export default {
     uploadImg(file, param) {
         return Http.upload(`/v1/api/talk/upload/img`, file, param)
     },
+    delete(param) {
+        return Http.post(`/v1/api/talk/delete`, param)
+    },
 };
