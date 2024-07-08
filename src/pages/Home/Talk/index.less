@@ -1,9 +1,31 @@
 .talk-container {
   height: 100%;
 
+  .float-container {
+    position: absolute;
+    width: 600px;
+    height: 80%;
+
+    .operate {
+      bottom: 0;
+      right: -70px;
+      height: 40px;
+      width: 40px;
+      border-radius: 40px;
+      background-color: #fff;
+      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #646464;
+    }
+  }
+
   .talks {
     height: 80%;
     overflow-y: scroll;
+    z-index: 1;
 
     .talk {
       width: 600px;

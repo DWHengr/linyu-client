@@ -13,4 +13,7 @@ export default {
     delete(param) {
         return Http.post(`/v1/api/talk/delete`, param)
     },
+    details(param) {
+        return Http.post(`/v1/api/talk/details`, param)
+    },
 };

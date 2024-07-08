@@ -1,6 +1,6 @@
 import "./index.less"
 import CustomButton from "../../../../componets/CustomButton/index.jsx";
-import {useHistory} from "react-router-dom";
+import {useHistory, useLocation} from "react-router-dom";
 import CustomDragDiv from "../../../../componets/CustomDragDiv/index.jsx";
 import {useEffect, useRef, useState} from "react";
 import TalkApi from "../../../../api/talk.js";
@@ -23,13 +23,27 @@ export default function AllTalk() {
     const [isTalkDelAffirmModalOpen, setIsTalkDelAffirmModalOpen] = useState(false)
     const currentDelTalkId = useRef(0)
     const showToast = useToast()
+    const location = useLocation()
+    const cache = location.state
 
     useEffect(() => {
         invoke("get_user_info", {}).then(res => {
             currentUserId.current = res.user_id
-            onGetTalkList()
+            if (cache) {
+                setTalkListData(cache?.allTalk)
+            } else {
+                onGetTalkList()
+            }
         })
     }, [])
+
+    useEffect(() => {
+        if (talksRef.current && cache) {
+            setTalkListData(cache?.allTalk)
+            const container = talksRef.current
+            container.scrollTop = cache.scrollTop
+        }
+    }, [talkListData])
 
     const onGetTalkList = () => {
         loading.current = true
@@ -90,15 +104,26 @@ export default function AllTalk() {
                 onCancel={() => setIsTalkDelAffirmModalOpen(false)}
             />
             <div style={{position: "absolute", top: 20, left: 10}}>
-                <CustomButton onClick={() => h.push("/home/talk/create")}>说一说</CustomButton>
+                <CustomButton onClick={() => h.push("/home/talk/create", {
+                    allTalk: talkListData,
+                    scrollTop: talksRef.current.scrollTop
+                })}>说一说</CustomButton>
             </div>
+            {talkListData?.length > 0 && <div className="float-container">
+                <div className="operate" onClick={() => talksRef.current.scrollTop = 0}>
+                    <i className={`iconfont icon icon-zhiding`} style={{fontSize: 30}}/>
+                </div>
+            </div>}
             <div ref={talksRef} className="talks">
                 {talkListData?.map((item) => {
                     return (
                         <div
                             key={item.talkId}
                             className="talk"
-                            onClick={() => h.push("/home/talk/detail")}
+                            onClick={() => h.push({
+                                pathname: "/home/talk/detail",
+                                state: {talk: item, allTalk: talkListData, scrollTop: talksRef.current.scrollTop}
+                            })}
                         >
                             <div className="talk-title">
                                 <img className="talk-title-portrait" src={item.portrait}/>
@@ -122,10 +147,10 @@ export default function AllTalk() {
                                 <div className="talk-bottom-operation">
                                     <div style={{display: "flex"}}>
                                         <div className="talk-bottom-operation-item">
-                                            <div>已点赞（{item.likeNum}）</div>
+                                            <div>点赞数（{item.likeNum}）</div>
                                         </div>
                                         <div className="talk-bottom-operation-item">
-                                            <div>评论（{item.commentNum}）</div>
+                                            <div>评论数（{item.commentNum}）</div>
                                         </div>
                                     </div>
                                     {currentUserId.current === item.userId ?
