@@ -1,7 +1,7 @@
 import "./index.less"
 import CustomDragDiv from "../../../../componets/CustomDragDiv/index.jsx";
 import IconMinorButton from "../../../../componets/IconMinorButton/index.jsx";
-import {useHistory} from "react-router-dom";
+import {useHistory, useLocation} from "react-router-dom";
 import CustomLine from "../../../../componets/CustomLine/index.jsx";
 import CustomButton from "../../../../componets/CustomButton/index.jsx";
 import Dropzone from "react-dropzone";
@@ -24,6 +24,7 @@ export default function CreateTalk() {
     const [currentSelectFriend, setCurrentSelectFriend] = useState([])
     const [searchUsersInfo, setSearchUsersInfo] = useState("")
     const showToast = useToast()
+    const location = useLocation()
 
     const handlerUploadImg = (acceptedFiles) => {
         let newImgs = [...imgs]
@@ -114,7 +115,7 @@ export default function CreateTalk() {
         <CustomDragDiv className="create-talk-container">
             <div
                 style={{position: "absolute", top: 15, left: 10}}
-                onClick={() => h.push("/home/talk/all")}
+                onClick={() => h.push("/home/talk/all", location.state)}
             >
                 <IconMinorButton icon={<i className={"iconfont icon-fanhui"} style={{fontSize: 24}}/>}/>
             </div>
