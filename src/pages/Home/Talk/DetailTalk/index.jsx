@@ -145,6 +145,11 @@ export default function DetailTalk() {
             >
                 <IconMinorButton icon={<i className={"iconfont icon-fanhui"} style={{fontSize: 24}}/>}/>
             </div>
+            <div className="float-container">
+                <div className="operate" onClick={() => setIsComment(true)}>
+                    <i className={`iconfont icon icon-pinglun1`} style={{fontSize: 30}}/>
+                </div>
+            </div>
             <div className="talks" ref={talksRef}>
                 <div className="talk">
                     <div className="talk-title">
