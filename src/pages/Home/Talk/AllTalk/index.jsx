@@ -30,6 +30,8 @@ export default function AllTalk() {
         invoke("get_user_info", {}).then(res => {
             currentUserId.current = res.user_id
             if (cache) {
+                currentNum.current = cache?.allTalk.length
+                talkListDataRef.current = cache?.allTalk
                 setTalkListData(cache?.allTalk)
             } else {
                 onGetTalkList()
@@ -38,10 +40,10 @@ export default function AllTalk() {
     }, [])
 
     useEffect(() => {
-        if (talksRef.current && cache) {
-            setTalkListData(cache?.allTalk)
+        if (talkListData.length > 0 && talksRef.current && cache && !cache.isLoadComplete) {
             const container = talksRef.current
             container.scrollTop = cache.scrollTop
+            cache.isLoadComplete = true
         }
     }, [talkListData])
 
@@ -51,7 +53,6 @@ export default function AllTalk() {
             if (res.code === 0) {
                 if (res.data?.length > 0) {
                     talkListDataRef.current = [...talkListDataRef.current, ...res.data]
-                    console.log(talkListDataRef.current)
                     setTalkListData(talkListDataRef.current)
                     currentNum.current += res.data?.length
                 } else {
