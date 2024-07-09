@@ -8,8 +8,8 @@ const CustomImg = memo(({param}) => {
 
     useEffect(() => {
         UserAPi.getImg(param)
-            .then((value) => {
-                setImgInfo(URL.createObjectURL(value));
+            .then((res) => {
+                setImgInfo(res.data);
             });
     }, [param]);
 

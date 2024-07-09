@@ -11,8 +11,9 @@ const Img = memo(({value, right = false}) => {
         fileInfo.current = JSON.parse(value.msgContent?.content)
         MessageApi.getImg({
             msgId: value.id,
-        }).then((value) => {
-            setImgInfo(URL.createObjectURL(value))
+        }).then((res) => {
+            console.log(res)
+            setImgInfo(res?.data)
         })
     }, [value])
 

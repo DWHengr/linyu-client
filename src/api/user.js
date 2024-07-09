@@ -17,6 +17,6 @@ export default {
         return Http.post(`/v1/api/user/update`, param)
     },
     getImg(param) {
-        return Http.download("/v1/api/user/get/img", param)
+        return Http.get("/v1/api/user/get/img", param)
     }
 };

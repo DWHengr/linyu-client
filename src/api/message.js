@@ -14,6 +14,6 @@ export default {
         return Http.downloadFile("/v1/api/message/get/file", param, progressHandler)
     },
     getImg(param) {
-        return Http.download("/v1/api/message/get/file", param)
+        return Http.get("/v1/api/message/get/img", param)
     }
 };
