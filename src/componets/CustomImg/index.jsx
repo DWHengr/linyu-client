@@ -3,15 +3,15 @@ import {memo, useEffect, useState} from "react";
 import UserAPi from "../../api/user.js";
 import CreateImageViewer from "../../pages/ImageViewer/window.jsx";
 
-const CustomImg = memo(({param}) => {
+const CustomImg = memo(({fileName, targetId}) => {
     const [imgInfo, setImgInfo] = useState(null);
 
     useEffect(() => {
-        UserAPi.getImg(param)
+        UserAPi.getImg({fileName, targetId})
             .then((res) => {
                 setImgInfo(res.data);
             });
-    }, [param]);
+    }, [fileName, targetId]);
 
     return (
         <div className="custom-img" onClick={(e) => e.stopPropagation()}>
