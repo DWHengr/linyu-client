@@ -27,6 +27,8 @@ import CustomButton from "../../componets/CustomButton/index.jsx";
 import {formatDateString} from "../../utils/date.js";
 import Dropzone from "react-dropzone";
 import {useToast} from "../../componets/CustomToast/index.jsx";
+import RightClickContent from "../../componets/RightClickContent/index.jsx";
+import CustomLine from "../../componets/CustomLine/index.jsx";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData)
@@ -41,6 +43,8 @@ export default function Home() {
     const [isOpenEditInfo, setIsOpenEditInfo] = useState(false)
     const userInfoBackCache = useRef(null)
     let showToast = useToast()
+    const [userInfoPosition, setUserInfoPosition] = useState(null)
+    const [userInfoVisible, setUserInfoVisible] = useState(false)
 
     useEffect(() => {
         const appWindow = WebviewWindow.getByLabel('home')
@@ -154,11 +158,11 @@ export default function Home() {
         {key: "set", icon: "icon-shezhi", page: "/home/set"},
     ]
 
-    const onGetUserInfo = () => {
+    const onGetUserInfo = (e) => {
         UserApi.info().then(res => {
             if (res.code === 0) {
                 setUserInfo(res.data)
-                setIsOpenEditInfo(true)
+                setUserInfoPosition({x: e.clientX, y: e.clientY})
             }
         })
     }
@@ -206,6 +210,53 @@ export default function Home() {
         >
             <div className="overlay"></div>
             <div className="home">
+                <RightClickContent position={userInfoPosition} visible={userInfoVisible}>
+                    <div className="user-info">
+                        <div style={{display: "flex", height: 60, alignItems: "center", marginBottom: 10}}>
+                            <img className="user-info-portrait"
+                                 alt=""
+                                 src={userInfo.portrait}/>
+                            <div style={{flex: 1, overflow: "hidden"}}>
+                                <div className="ellipsis">{userInfo.name}</div>
+                                <div className="ellipsis"
+                                     style={{fontSize: 14, color: "#989898"}}>{userInfo.account}</div>
+                            </div>
+                        </div>
+                        <CustomLine width={1}/>
+                        <div style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                        }}>
+                            <CustomButton
+                                width={160}
+                                style={{marginTop: 10}} o
+                                onClick={() => {
+                                    setUserInfoVisible({value: false})
+                                    setIsOpenEditInfo(true)
+                                }}
+                            >
+                                编辑信息
+                            </CustomButton>
+                            <CustomButton
+                                width={160}
+                                type="line"
+                                style={{marginTop: 5}}
+                                onClick={() => {
+                                    setUserInfoVisible({value: false})
+                                    h.replace('/home/talk/reload');
+                                    setTimeout(() => {
+                                        h.replace("/home/talk/all", {targetId: userInfo.id})
+                                    });
+                                    dispatch(setCurrentOption("talk"))
+                                }}
+                            >
+                                我的说说
+                            </CustomButton>
+                        </div>
+                    </div>
+                </RightClickContent>
                 <CustomDragDiv className="home-nav">
                     <div>
                         <CustomModal
