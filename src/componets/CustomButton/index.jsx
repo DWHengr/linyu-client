@@ -1,6 +1,6 @@
 import "./index.css"
 
-export default function CustomButton({children, onClick, width, type, style, disabled = false}) {
+export default function CustomButton({children, onClick, width, type = "", style, disabled = false}) {
     return (
         <>
             <div

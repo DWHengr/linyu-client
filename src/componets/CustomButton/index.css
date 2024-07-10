@@ -33,3 +33,13 @@
         background-color: rgba(76, 155, 255, 0.5);
     }
 }
+
+.custom-button.line {
+    color: #1F1F1F;
+    background-color: transparent;
+    border: #C4C4C4 1px solid;
+
+    &:hover {
+        background-color: #E3ECFF;
+    }
+}
