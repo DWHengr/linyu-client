@@ -29,6 +29,7 @@ import CustomEditableText from "../../../componets/CustomEditableText/index.jsx"
 import CustomDropdown from "../../../componets/CustomDropdown/index.jsx";
 import CreateImageViewer from "../../ImageViewer/window.jsx";
 import {getFileNameAndType} from "../../../utils/string.js";
+import CustomImg from "../../../componets/CustomImg/index.jsx";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState(null)
@@ -633,24 +634,22 @@ export default function Friend() {
                                         <div style={{display: "flex"}}>
                                             <i className={`iconfont icon-pengyouquan`}
                                                style={{fontSize: 14, marginRight: 5}}/>
-                                            <div className="flex-shrink">朋友圈：</div>
+                                            <div className="flex-shrink">说一说：</div>
                                         </div>
-                                        <div
-                                            onClick={() => {
-                                                h.push("/home/talk")
-                                            }}
-                                        >
-                                            <div>今天天气不错！</div>
-                                            <div style={{width: 100, height: 100}}>
-                                                <img
-                                                    style={{
-                                                        width: "100%",
-                                                        height: "100%",
-                                                        objectFit: "cover",
-                                                        borderRadius: 5
-                                                    }}
-                                                    src="https://th.bing.com/th/id/OIP.kt5NiXbTpov01ELs6cs8tQHaEo?rs=1&pid=ImgDetMain"
-                                                />
+                                        <div>
+                                            <div>{friendDetails.talkContent?.text}</div>
+                                            <div>
+                                                {
+                                                    friendDetails.talkContent?.img?.map((item, index) => {
+                                                        return (
+                                                            <CustomImg
+                                                                key={index}
+                                                                fileName={item}
+                                                                targetId={friendDetails.friendId}
+                                                            />
+                                                        )
+                                                    })
+                                                }
                                             </div>
                                         </div>
                                     </div>
@@ -667,6 +666,15 @@ export default function Friend() {
                                         发消息
                                     </CustomButton>
                                     <CustomButton type="minor" width={100}>视频聊天</CustomButton>
+                                    <CustomButton
+                                        onClick={() => {
+                                            h.push("/home/talk/all", {targetId: friendDetails.friendId})
+                                            dispatch(setCurrentOption("talk"))
+                                        }}
+                                        type="minor" width={100}
+                                    >
+                                        ta的说说
+                                    </CustomButton>
                                 </div>
                             </div>
                         </div>
