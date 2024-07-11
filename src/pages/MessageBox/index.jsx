@@ -89,6 +89,7 @@ function MessageBox() {
         chatsLengthRef.current = 0
         setTrayDefaultIcon()
         clearInterval(intervalId.current);
+        clearTimeout(timeoutId.current)
     }
 
     useEffect(() => {
@@ -105,6 +106,9 @@ function MessageBox() {
                     let flag = true
                     onClearIntervalId()
                     chatsLengthRef.current = chats.length
+                    timeoutId.current = setTimeout(() => {
+                        invoke("audio", {})
+                    }, 500)
                     intervalId.current = setInterval(function () {
                         if (flag) {
                             res.setIcon(null)
