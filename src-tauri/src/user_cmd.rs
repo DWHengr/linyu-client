@@ -6,6 +6,8 @@ use tauri::{
 };
 use base64::{engine::general_purpose, Engine as _};
 use screenshots::Screen;
+use std::time::Duration;
+use std::thread::{sleep, spawn};
 
 // 定义用户信息结构体
 #[derive(Debug, Clone, Serialize)]
@@ -69,4 +71,19 @@ pub fn screenshot(x: &str, y: &str, width: &str, height: &str) -> String {
     let buffer = image.buffer();
     let base64_str = general_purpose::STANDARD_NO_PAD.encode(buffer);
     base64_str
+}
+
+#[tauri::command]
+pub fn audio() {
+    use rodio::{Decoder, Source};
+    use std::fs::File;
+    use std::io::BufReader;
+    spawn(|| {
+        let audio = File::open("audio/remind-short.wav").unwrap();
+        let file = BufReader::new(audio);
+        let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
+        let source = Decoder::new(file).unwrap();
+        stream_handle.play_raw(source.convert_samples()).unwrap();
+        sleep(Duration::from_millis(3000));
+    });
 }

@@ -26,4 +26,5 @@ lazy_static = "1.4"
 screenshots = {git="https://github.com/nashaofu/screenshots-rs", branch="master"}
 base64 = {git="https://github.com/marshallpierce/rust-base64", branch="master"}
 tauri-plugin-clipboard-manager = "2.1.0-beta.4"
+rodio = "0.17.3"
 
