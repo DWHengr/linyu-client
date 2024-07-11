@@ -84,6 +84,7 @@ export default function DetailTalk() {
         TalkApi.delete({talkId: talk.talkId}).then(res => {
             if (res.code === 0) {
                 showToast("删除成功~")
+                location.state.allTalk = location.state?.allTalk.filter(item => item.talkId !== currentDelTalkId.current)
                 h.push("/home/talk/all", location.state)
             }
         })
@@ -165,7 +166,9 @@ export default function DetailTalk() {
                             {talk.content.img?.map((imgItem, index) => {
                                 return (
                                     <CustomImg key={talk.talkId + "" + index}
-                                               param={{fileName: imgItem, targetId: talk.userId}}/>
+                                               fileName={imgItem}
+                                               targetId={talk.userId}
+                                    />
                                 )
                             })}
                         </div>

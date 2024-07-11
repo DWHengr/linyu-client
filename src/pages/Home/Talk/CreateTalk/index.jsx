@@ -50,24 +50,21 @@ export default function CreateTalk() {
     }
 
     const onCreateTalk = () => {
-        let uploadNum = 0
         TalkApi.create({text: text, permission: currentSelectFriendId}).then(res => {
             if (res.code === 0) {
                 let talkId = res.data.id
                 imgs.map(img => {
                     TalkApi.uploadImg(img.file, {talkId}).then(res => {
                         if (res.code === 0) {
-                            uploadNum++
                         }
                     })
                 })
-                if (uploadNum === imgs.length) {
-                    showToast("发表成功~")
-                    setText("")
-                    setImgs([])
-                    setCurrentSelectFriend([])
-                    setCurrentSelectFriendId([])
-                }
+                location.state = null
+                showToast("发表成功~")
+                setText("")
+                setImgs([])
+                setCurrentSelectFriend([])
+                setCurrentSelectFriendId([])
             }
         })
     }
@@ -251,7 +248,7 @@ export default function CreateTalk() {
                                     key={friend.friendId}
                                     className="selected-content-item"
                                 >
-                                    <img style={{width: 16, height: 16, borderRadius: 2, marginRight: 2}}
+                                    <img style={{width: 16, height: 16, borderRadius: 16, marginRight: 2}}
                                          src={friend.portrait} alt=""/>
                                     <div
                                         className="ellipsis"

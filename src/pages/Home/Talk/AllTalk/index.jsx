@@ -25,11 +25,12 @@ export default function AllTalk() {
     const showToast = useToast()
     const location = useLocation()
     const cache = location.state
+    const targetId = location.state?.targetId
 
     useEffect(() => {
         invoke("get_user_info", {}).then(res => {
             currentUserId.current = res.user_id
-            if (cache) {
+            if (cache?.allTalk) {
                 currentNum.current = cache?.allTalk.length
                 talkListDataRef.current = cache?.allTalk
                 setTalkListData(cache?.allTalk)
@@ -40,7 +41,7 @@ export default function AllTalk() {
     }, [])
 
     useEffect(() => {
-        if (talkListData.length > 0 && talksRef.current && cache && !cache.isLoadComplete) {
+        if (talkListData.length > 0 && talksRef.current && cache?.allTalk && !cache.isLoadComplete) {
             const container = talksRef.current
             container.scrollTop = cache.scrollTop
             cache.isLoadComplete = true
@@ -49,7 +50,7 @@ export default function AllTalk() {
 
     const onGetTalkList = () => {
         loading.current = true
-        TalkApi.list({index: currentNum.current, num: 10}).then(res => {
+        TalkApi.list({index: currentNum.current, num: 10, targetId: targetId}).then(res => {
             if (res.code === 0) {
                 if (res.data?.length > 0) {
                     talkListDataRef.current = [...talkListDataRef.current, ...res.data]
@@ -107,7 +108,8 @@ export default function AllTalk() {
             <div style={{position: "absolute", top: 20, left: 10}}>
                 <CustomButton onClick={() => h.push("/home/talk/create", {
                     allTalk: talkListData,
-                    scrollTop: talksRef.current.scrollTop
+                    scrollTop: talksRef.current.scrollTop,
+                    targetId: targetId,
                 })}>说一说</CustomButton>
             </div>
             {talkListData?.length > 0 && <div className="float-container">
@@ -121,10 +123,15 @@ export default function AllTalk() {
                         <div
                             key={item.talkId}
                             className="talk"
-                            onClick={() => h.push({
-                                pathname: "/home/talk/detail",
-                                state: {talk: item, allTalk: talkListData, scrollTop: talksRef.current.scrollTop}
-                            })}
+                            onClick={() => h.push(
+                                "/home/talk/detail",
+                                {
+                                    talk: item,
+                                    allTalk: talkListData,
+                                    scrollTop: talksRef.current.scrollTop,
+                                    targetId: targetId
+                                }
+                            )}
                         >
                             <div className="talk-title">
                                 <img className="talk-title-portrait" src={item.portrait}/>
@@ -138,8 +145,11 @@ export default function AllTalk() {
                                 <div style={{display: "flex"}}>
                                     {item.content.img?.map((imgItem, index) => {
                                         return (
-                                            <CustomImg key={item.talkId + "" + index}
-                                                       param={{fileName: imgItem, targetId: item.userId}}/>
+                                            <CustomImg
+                                                key={item.talkId + "" + index}
+                                                fileName={imgItem}
+                                                targetId={item.userId}
+                                            />
                                         )
                                     })}
                                 </div>
