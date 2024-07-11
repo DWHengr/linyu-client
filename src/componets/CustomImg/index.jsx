@@ -5,6 +5,7 @@ import CreateImageViewer from "../../pages/ImageViewer/window.jsx";
 
 const CustomImg = memo(({fileName, targetId}) => {
     const [imgInfo, setImgInfo] = useState(null);
+    const [isLoaded, setIsLoaded] = useState(false);
 
     useEffect(() => {
         UserAPi.getImg({fileName, targetId})
@@ -13,20 +14,27 @@ const CustomImg = memo(({fileName, targetId}) => {
             });
     }, [fileName, targetId]);
 
+    const handleImageLoad = () => {
+        setIsLoaded(true);
+    };
+
     return (
         <div className="custom-img" onClick={(e) => e.stopPropagation()}>
+            {imgInfo && !isLoaded ? (
+                <div className="loading-spinner"></div>
+            ) : null}
             {imgInfo ? (
                 <img
                     className="img"
                     src={imgInfo}
                     alt=""
+                    onLoad={handleImageLoad}
+                    style={{ display: isLoaded ? 'block' : 'none' }}
                     onClick={(e) => {
-                        CreateImageViewer(param.fileName, imgInfo)
+                        CreateImageViewer(fileName, imgInfo);
                     }}
                 />
-            ) : (
-                <div className="loading-spinner"></div>
-            )}
+            ) : null}
         </div>
     )
 });
