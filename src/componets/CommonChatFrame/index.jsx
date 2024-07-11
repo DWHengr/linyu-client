@@ -71,7 +71,8 @@ function CommonChatFrame({userInfo}) {
             if (currentToId.current === data.fromId) {
                 const window = WebviewWindow.getCurrent()
                 let isFocused = await window.isFocused()
-                if (isFocused) {
+                let isMinimized = await window.isMinimized();
+                if (isFocused && !isMinimized) {
                     emit("refresh-chat", {id: currentToId.current})
                 }
                 //判断当前滚动位置
