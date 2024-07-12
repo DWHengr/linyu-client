@@ -15,5 +15,8 @@ export default {
     },
     getImg(param) {
         return Http.get("/v1/api/message/get/img", param)
-    }
+    },
+    sendImg(file, param, progressHandler) {
+        return Http.upload("/v1/api/message/send/file", file, param)
+    },
 };

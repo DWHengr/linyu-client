@@ -14,10 +14,9 @@ import Time from "./ChatContent/Time/index.jsx";
 import {formatTime, getYearDayMonth} from "../../utils/date.js";
 import CreateVideoChat from "../../pages/VideoChat/window.jsx";
 import VideoApi from "../../api/video.js";
-import RichTextEditor from "../RichTextEditor/index.jsx";
 import CreateScreenshot from "../../pages/screenshot/window.jsx";
 import {open} from '@tauri-apps/plugin-dialog';
-import File from "./ChatContent/File/index.jsx";
+import FileContent from "./ChatContent/File/index.jsx";
 import {stat} from "@tauri-apps/plugin-fs";
 import {useDispatch} from "react-redux";
 import {setFileFileProgress} from "../../store/home/action.js";
@@ -28,6 +27,7 @@ import FriendApi from "../../api/friend.js";
 import {Image} from "@tauri-apps/api/image";
 import {writeImage} from "@tauri-apps/plugin-clipboard-manager";
 import {base64ToArrayBuffer} from "../../utils/img.js";
+import QuillRichTextEditor from "../QuillRichTextEditor/index.jsx";
 
 function CommonChatFrame({userInfo}) {
 
@@ -47,6 +47,7 @@ function CommonChatFrame({userInfo}) {
     const isRefresh = useRef(true)
     const [userInfoPosition, setUserInfoPosition] = useState(null)
     const [userDetails, setUserDetails] = useState(null)
+    const [editorHtml, setEditorHtml] = useState('');
 
     //表情
     const [biaoQingIsShow, setBiaoQingIsShow] = useState(false);
@@ -64,6 +65,7 @@ function CommonChatFrame({userInfo}) {
             Image.fromBytes(base64ToArrayBuffer(event.payload)).then(res => {
                 writeImage(res)
             })
+            msgContentRef.current.insertImage('data:image/png;base64,' + event.payload)
         })
         //监听后端发送的消息
         const unListen = listen('on-receive-msg', async (event) => {
@@ -129,7 +131,6 @@ function CommonChatFrame({userInfo}) {
         await MessageApi.sendMsg(msg).then(res => {
             if (res.code === 0) {
                 if (res.data) {
-                    console.log(fileType)
                     if (fileType === "file") {
                         messagesRef.current.push(res.data)
                         setMessages(() => [...messagesRef.current])
@@ -256,7 +257,7 @@ function CommonChatFrame({userInfo}) {
     }
 
     useEffect(() => {
-        msgContentRef.current.innerHTML = ""
+        setEditorHtml("")
         userInfoRef.current = userInfo
         //会话切换，重置
         isQueryComplete.current = false
@@ -283,23 +284,66 @@ function CommonChatFrame({userInfo}) {
         }
     }, [messages])
 
-    let onSendMsg = () => {
-        if (!msgContentRef.current.innerHTML) return
-        let msg = {
-            toUserId: currentToId.current, msgContent: {
-                type: "text", content: msgContentRef.current.innerHTML
-            }, isShowTime: true
+    const onUploadImg = (img) => {
+        const base64Data = img.split(',')[1];
+        const contentType = img.split(',')[0].split(':')[1].split(';')[0];
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
         }
-        MessageApi.sendMsg(msg).then(res => {
-            if (res.code === 0) {
-                if (res.data) {
-                    messagesRef.current.push(res.data)
-                    setMessages(() => [...messagesRef.current])
-                    emit("on-send-msg", {})
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], {type: contentType});
+        return new File([blob], 'img.png', {type: contentType});
+    }
+
+    let onSendMsg = () => {
+        const {isNull, data} = msgContentRef.current?.getContent()
+        if (isNull || (data.length <= 0)) return
+        data?.map(item => {
+            if (item.type === 'text') {
+                let msg = {
+                    toUserId: currentToId.current, msgContent: {
+                        type: "text", content: item.text
+                    }, isShowTime: true
                 }
+                MessageApi.sendMsg(msg).then(res => {
+                    if (res.code === 0) {
+                        if (res.data) {
+                            messagesRef.current.push(res.data)
+                            setMessages(() => [...messagesRef.current])
+                            emit("on-send-msg", {})
+                        }
+                    }
+                })
+            }
+            if (item.type === 'img') {
+                let file = onUploadImg(item.url)
+                let msg = {
+                    toUserId: currentToId.current, msgContent: {
+                        type: "img",
+                        content: JSON.stringify({
+                            name: file.name,
+                            size: file.size,
+                        })
+                    }
+                }
+                MessageApi.sendMsg(msg).then(res => {
+                    if (res.code === 0) {
+                        if (res.data) {
+                            MessageApi.sendImg(file, {
+                                msgId: res.data.id
+                            }).then(v => {
+                                messagesRef.current.push(res.data)
+                                setMessages(() => [...messagesRef.current])
+                                emit("on-send-msg", {})
+                            })
+                        }
+                    }
+                })
             }
         })
-        msgContentRef.current.innerHTML = ""
+        setEditorHtml("")
     }
 
     const onContentKeyDown = (event) => {
@@ -308,7 +352,6 @@ function CommonChatFrame({userInfo}) {
             onSendMsg()
         }
     };
-
     const onVideo = (isOnlyAudio) => {
         CreateVideoChat(currentToId.current, true, isOnlyAudio)
         VideoApi.invite({userId: currentToId.current, isOnlyAudio: isOnlyAudio})
@@ -352,9 +395,8 @@ function CommonChatFrame({userInfo}) {
                     {emojis.map((emoji, index) => {
                         return (<div
                             onClick={() => {
-                                msgContentRef.current.innerHTML += emoji
+                                msgContentRef.current.insertEmoji(emoji);
                                 setBiaoQingIsShow(false)
-                                msgContentRef.current.focus()
                             }}
                             className="biao-qing" key={index}>
                             {emoji}
@@ -374,7 +416,7 @@ function CommonChatFrame({userInfo}) {
                 />
             }
             case "file": {
-                return <File
+                return <FileContent
                     value={msg}
                     right={msg.fromId === currentUserId.current}
                 />
@@ -496,12 +538,18 @@ function CommonChatFrame({userInfo}) {
                 </div>
             </div>
             <div className="chat-content-send-frame-msg">
+                <QuillRichTextEditor
+                    ref={msgContentRef}
+                    value={editorHtml}
+                    onChange={(v) => setEditorHtml(v)}
+                    onKeyDown={(e) => onContentKeyDown(e)}
+                />
                 {/*<textarea*/}
                 {/*    ref={msgContentRef}*/}
                 {/*    onKeyDown={(e) => onContentKeyDown(e)}*/}
                 {/*>*/}
                 {/*</textarea>*/}
-                <RichTextEditor ref={msgContentRef} onKeyDown={(e) => onContentKeyDown(e)}/>
+                {/*<RichTextEditor ref={msgContentRef} onKeyDown={(e) => onContentKeyDown(e)}/>*/}
             </div>
             <div className="chat-content-send-frame-operation-bottom">
                 <CustomButton width={10}>
