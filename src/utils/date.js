@@ -31,13 +31,19 @@ export function formatTime(dateStr) {
     const oneDay = 24 * 60 * 60 * 1000;
     const oneWeek = 7 * oneDay;
 
-    if (diffMs < oneDay) {
+    // 检查是否是昨天
+    const isYesterday = now.getDate() - date.getDate() === 1 && now.getMonth() === date.getMonth() && now.getFullYear() === date.getFullYear();
+
+    if (diffMs < oneDay && !isYesterday) {
         // 当天消息
         const hours = date.getHours();
         const minutes = date.getMinutes();
-        const period = hours < 12 ? '上午' : '下午';
-        const formattedHours = hours % 12 || 12; // 把24小时制转换为12小时制
-        return `${period} ${formattedHours}:${minutes < 10 ? '0' + minutes : minutes}`;
+        return `${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
+    } else if (isYesterday) {
+        // 昨天的消息
+        const hours = date.getHours();
+        const minutes = date.getMinutes();
+        return `昨天 ${hours}:${minutes < 10 ? '0' + minutes : minutes}`;
     } else if (diffMs < oneWeek) {
         // 超过1天，小于1周
         const daysOfWeek = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
