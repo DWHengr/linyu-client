@@ -1,0 +1,16 @@
+.editor-container {
+    height: 100%;
+}
+
+.editor-container .ql-container {
+    border: none;
+}
+
+.editor-container .ql-editor {
+    padding: 0;
+    border: none;
+}
+
+.editor-container .ql-editor:focus {
+    outline: none;
+}
