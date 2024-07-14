@@ -4,9 +4,9 @@ import WindowOperation from "../../componets/WindowOperation/index.jsx";
 import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import {save} from "@tauri-apps/plugin-dialog";
 import {useEffect, useState} from "react";
-import {download} from "@tauri-apps/plugin-upload";
 import {getItem} from "../../utils/storage.js";
 import {writeFile} from "@tauri-apps/plugin-fs";
+import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 
 
 export default function ImageViewer() {
@@ -48,13 +48,14 @@ export default function ImageViewer() {
     }
 
     return (
-        <div className="image-viewer-container">
+        <div className="image-viewer-container" onKeyDown={(e) => console.log(e)}>
             <div className="image-viewer">
                 <CustomDragDiv className="top-bar">
                     <WindowOperation height={40} hide={false}/>
                 </CustomDragDiv>
                 <div style={{width: 300}}>
                     <Viewer
+                        onClose={() => WebviewWindow.getCurrent().close()}
                         noClose={true}
                         noNavbar={true}
                         showTotal={false}
