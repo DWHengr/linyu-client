@@ -28,6 +28,8 @@ import {Image} from "@tauri-apps/api/image";
 import {writeImage} from "@tauri-apps/plugin-clipboard-manager";
 import {base64ToArrayBuffer} from "../../utils/img.js";
 import QuillRichTextEditor from "../QuillRichTextEditor/index.jsx";
+import RightClickMenu from "../RightClickMenu/index.jsx";
+import Retraction from "./ChatContent/Retraction/index.jsx";
 
 function CommonChatFrame({userInfo}) {
 
@@ -70,6 +72,10 @@ function CommonChatFrame({userInfo}) {
         //监听后端发送的消息
         const unListen = listen('on-receive-msg', async (event) => {
             let data = event.payload
+            if (data?.msgContent?.type === "retraction") {
+                handlerUpdateRetractionMsg(data.id)
+                return;
+            }
             if (currentToId.current === data.fromId) {
                 const window = WebviewWindow.getCurrent()
                 let isFocused = await window.isFocused()
@@ -395,7 +401,7 @@ function CommonChatFrame({userInfo}) {
                     {emojis.map((emoji, index) => {
                         return (<div
                             onClick={() => {
-                                msgContentRef.current.insertEmoji(emoji);
+                                msgContentRef.current.insertEmojiOrText(emoji);
                                 setBiaoQingIsShow(false)
                             }}
                             className="biao-qing" key={index}>
@@ -427,11 +433,82 @@ function CommonChatFrame({userInfo}) {
                     right={msg.fromId === currentUserId.current}
                 />
             }
+            case "retraction": {
+                return <Retraction
+                    value={msg}
+                    onReedit={onReedit}
+                    right={msg.fromId === currentUserId.current}
+                />
+            }
+        }
+    }
+
+    const msgContentRightOptions = [
+        {key: "copy", label: "复制"},
+        {key: "retraction", label: "撤回"}
+    ]
+    const [msgContentRightFilterOptions, setMsgContentRightFilterOptions] = useState([])
+    const [msgContentMenuPosition, setMsgContentMenuPosition] = useState(null)
+    const currentRightSelectMsgRef = useRef()
+
+    const onReedit = (msg) => {
+        MessageApi.reedit({msgId: msg.id}).then(res => {
+            if (res.code === 0) {
+                msgContentRef.current.insertEmojiOrText(res.data?.msgContent?.content)
+            }
+        })
+    }
+
+    const handlerRightSelectMsgContent = (e, msg) => {
+        if (msg.msgContent.type === "retraction") return
+        currentRightSelectMsgRef.current = msg
+        let filter = [""]
+        if (msg.msgContent.type !== 'text') filter.push("copy")
+        if (msg.fromId !== currentUserId.current) filter.push("retraction")
+        setMsgContentRightFilterOptions(filter)
+        setMsgContentMenuPosition({x: e.clientX, y: e.clientY})
+    }
+
+    const handlerUpdateRetractionMsg = (msgId) => {
+        for (let i = messagesRef.current.length - 1; i >= 0; i--) {
+            let msg = messagesRef.current[i]
+            if (msg.id === msgId) {
+                messagesRef.current[i].type = msg.msgContent.type
+                messagesRef.current[i].msgContent.type = "retraction"
+                messagesRef.current[i].msgContent.content = ""
+                break
+            }
+        }
+        setMessages(() => [...messagesRef.current])
+        emit("on-send-msg", {})
+    }
+
+    const onMsgContentClick = (action) => {
+        console.log(action)
+        switch (action.key) {
+            case "copy": {
+                break
+            }
+            case "retraction": {
+                MessageApi.retraction({msgId: currentRightSelectMsgRef.current.id}).then(res => {
+                    if (res.code === 0) {
+                        handlerUpdateRetractionMsg(currentRightSelectMsgRef.current.id)
+                    }
+                })
+                break
+            }
         }
     }
 
     return (<div className="common-chat-content">
         <BiaoQingPop/>
+        <RightClickMenu
+            position={msgContentMenuPosition}
+            options={msgContentRightOptions}
+            width={70}
+            filter={msgContentRightFilterOptions}
+            onMenuItemClick={onMsgContentClick}
+        />
         <RightClickContent position={userInfoPosition}>
             <div className="user-details">
                 <div className="user-details-title">
@@ -493,7 +570,9 @@ function CommonChatFrame({userInfo}) {
             {messages?.map((msg) => {
                 return (<div key={msg.id}>
                     {msg.isShowTime && <Time value={formatTime(msg.updateTime)}/>}
-                    {handleMsgContent(msg)}
+                    <div onContextMenu={(e) => handlerRightSelectMsgContent(e, msg)}>
+                        {handleMsgContent(msg)}
+                    </div>
                 </div>)
             })}
             {newMsgUnreadNum !== 0 && <div className="hint" onClick={onScrollToBottom}>

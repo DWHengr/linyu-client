@@ -19,4 +19,10 @@ export default {
     sendImg(file, param, progressHandler) {
         return Http.upload("/v1/api/message/send/file", file, param)
     },
+    retraction(param) {
+        return Http.post("/v1/api/message/retraction", param);
+    },
+    reedit(param) {
+        return Http.post("/v1/api/message/reedit", param);
+    }
 };
