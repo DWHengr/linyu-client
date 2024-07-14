@@ -3,7 +3,7 @@ import {useEffect, useRef, useState} from "react";
 import {listen} from "@tauri-apps/api/event";
 import RightClickContent from "../RightClickContent/index.jsx";
 
-export default function RightClickMenu({position, options, visible = false, onMenuItemClick, filter = []}) {
+export default function RightClickMenu({position, options, visible = false, onMenuItemClick, filter = [], width}) {
     const [menuVisible, setMenuVisible] = useState();
     const [menuPosition, setMenuPosition] = useState({x: 0, y: 0});
     const menuRef = useRef(null);
@@ -25,7 +25,7 @@ export default function RightClickMenu({position, options, visible = false, onMe
     return (
         <>
             <RightClickContent visible={menuVisible} position={position}>
-                <div className="options">
+                <div className="options" style={{width: width}}>
                     {menuOptions.map((item, index) => {
                         if (filter.includes(index.key)) {
                             return <></>
