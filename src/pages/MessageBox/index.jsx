@@ -10,6 +10,7 @@ import {useDispatch} from "react-redux";
 import {useHistory} from "react-router-dom";
 import {TrayIcon} from '@tauri-apps/api/tray';
 import {PhysicalPosition} from "@tauri-apps/api/window";
+import MsgContentShow from "../../componets/MsgContentShow/index.jsx";
 
 function MessageBox() {
     const [chats, setChats] = useState([])
@@ -158,7 +159,7 @@ function MessageBox() {
                                                 style={{fontSize: 12}}
                                                 className="ellipsis"
                                             >
-                                                {info.lastMsgContent?.content}
+                                                <MsgContentShow msgContent={info.lastMsgContent}/>
                                             </div>
                                             <div style={{
                                                 width: 18,
