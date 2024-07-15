@@ -1,0 +1,29 @@
+.shortcut-input-container {
+  display: flex;
+  cursor: pointer;
+  border: 1px solid rgba(204, 204, 204, 0.5);
+  align-items: center;
+  justify-content: space-between;
+  width: 160px;
+  height: 24px;
+  font-size: 12px;
+  padding: 0 4px;
+  border-radius: 3px;
+
+  &.edit {
+    border: 1px solid #4C9BFF;
+  }
+
+  input {
+    border: none;
+    outline: none;
+    width: 100%;
+    color: #4C9BFF;
+    padding: 0;
+    font-size: 12px;
+  }
+
+  input::placeholder {
+    color: #4C9BFF;
+  }
+}
