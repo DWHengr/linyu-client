@@ -1,8 +1,18 @@
 import "./index.less"
 import CustomDragDiv from "../../../../componets/CustomDragDiv/index.jsx";
 import CustomLine from "../../../../componets/CustomLine/index.jsx";
+import CustomDropdown from "../../../../componets/CustomDropdown/index.jsx";
+import CustomSwitch from "../../../../componets/CustomSwitch/index.jsx";
+import {useState} from "react";
 
 export default function General() {
+    const sendMsgOptions =
+        [
+            {label: "Enter", value: "enter"},
+            {label: "Alt + Enter", value: "altEnter"}
+        ]
+    const [isBootstrap, setIsBootstrap] = useState(false)
+
     return (
         <div className="general">
             <CustomDragDiv className="general-title">
@@ -14,7 +24,12 @@ export default function General() {
                     <div className="set-item-options">
                         <div className="set-item-option">
                             <div>发送消息</div>
-                            <div>Enter</div>
+                            <CustomDropdown
+                                options={sendMsgOptions}
+                                defaultValue="Enter"
+                                onSelect={() => {
+                                }}
+                            />
                         </div>
                         <CustomLine width={1}/>
                         <div className="set-item-option">
@@ -28,7 +43,7 @@ export default function General() {
                     <div className="set-item-options">
                         <div className="set-item-option">
                             <div>开机自启</div>
-                            <div>是</div>
+                            <CustomSwitch isOn={isBootstrap} handleToggle={(v) => setIsBootstrap(v.target.checked)}/>
                         </div>
                     </div>
                 </div>
