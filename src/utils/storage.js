@@ -13,3 +13,11 @@ export async function getItem(key) {
     let data = JSON.parse(localStorage.getItem(userKey))
     return data[key]
 }
+
+export function getLocalItem(key) {
+    return JSON.parse(localStorage.getItem(key))
+}
+
+export function setLocalItem(key, value) {
+    localStorage.setItem(key, JSON.stringify(value))
+}
