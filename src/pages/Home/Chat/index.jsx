@@ -15,6 +15,7 @@ import {useHistory} from "react-router-dom";
 import FriendSearchCard from "../../../componets/FriendSearchCard/index.jsx";
 import CustomEmpty from "../../../componets/CustomEmpty/index.jsx";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import MsgContentShow from "../../../componets/MsgContentShow/index.jsx";
 
 export default function Chat() {
     const chatStoreData = useSelector((state) => state.chatData);
@@ -199,19 +200,6 @@ export default function Chat() {
         dispatch(setCurrentChatId(data.fromId, data))
     }
 
-    const msgContentShow = (msgContent) => {
-        if (!msgContent) return
-        switch (msgContent.type) {
-            case "text": {
-                return <> {msgContent.content}</>
-            }
-            case "file": {
-                let fileInfo = JSON.parse(msgContent.content)
-                return <>[文件] {fileInfo.name}</>
-            }
-        }
-    }
-
     const ChatCard = ({info, onClick, onContextMenu}) => {
         let isSelected = false
         if (info.fromId === selectedChatId) {
@@ -248,7 +236,7 @@ export default function Chat() {
                         style={{fontSize: 12, color: `${isSelected ? "#F6F6F6" : "#646464"}`}}
                         className="ellipsis"
                     >
-                        {msgContentShow(info.lastMsgContent)}
+                        <MsgContentShow msgContent={info.lastMsgContent}/>
                     </div>
                     {info.unreadNum > 0 && !isSelected ? <div style={{
                         width: 18,

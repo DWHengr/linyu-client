@@ -30,6 +30,8 @@ import {base64ToArrayBuffer} from "../../utils/img.js";
 import QuillRichTextEditor from "../QuillRichTextEditor/index.jsx";
 import RightClickMenu from "../RightClickMenu/index.jsx";
 import Retraction from "./ChatContent/Retraction/index.jsx";
+import VoiceRecorder from "../VoiceRecorder/index.jsx";
+import Voice from "./ChatContent/Voice/index.jsx";
 
 function CommonChatFrame({userInfo}) {
 
@@ -108,7 +110,7 @@ function CommonChatFrame({userInfo}) {
             });
         }
         //窗口聚焦
-        let unDrop = window.listen("tauri://drop", async (e) => {
+        let unDrop = window.listen("tauri://drag-drop", (e) => {
             if (!currentToId.current) return
             onSendFile(e.payload.paths[0])
         });
@@ -337,7 +339,7 @@ function CommonChatFrame({userInfo}) {
                 MessageApi.sendMsg(msg).then(res => {
                     if (res.code === 0) {
                         if (res.data) {
-                            MessageApi.sendImg(file, {
+                            MessageApi.sendMedia(file, {
                                 msgId: res.data.id
                             }).then(v => {
                                 messagesRef.current.push(res.data)
@@ -350,6 +352,34 @@ function CommonChatFrame({userInfo}) {
             }
         })
         setEditorHtml("")
+    }
+
+    const onSendVoice = (audioBlob, time) => {
+        console.log(audioBlob)
+        const audioFile = new File([audioBlob], 'voice.wav', {type: 'audio/wav'});
+        let msg = {
+            toUserId: currentToId.current, msgContent: {
+                type: "voice",
+                content: JSON.stringify({
+                    name: audioFile.name,
+                    size: audioFile.size,
+                    time: time,
+                })
+            }
+        }
+        MessageApi.sendMsg(msg).then(res => {
+            if (res.code === 0) {
+                if (res.data) {
+                    MessageApi.sendMedia(audioFile, {
+                        msgId: res.data.id
+                    }).then(v => {
+                        messagesRef.current.push(res.data)
+                        setMessages(() => [...messagesRef.current])
+                        emit("on-send-msg", {})
+                    })
+                }
+            }
+        })
     }
 
     const onContentKeyDown = (event) => {
@@ -376,7 +406,6 @@ function CommonChatFrame({userInfo}) {
         FriendApi.details(userInfo.fromId).then(res => {
             if (res.code === 0) {
                 setUserDetails(res.data)
-                console.log(res.data)
             }
         })
         setUserInfoPosition({x: e.clientX, y: e.clientY})
@@ -440,6 +469,12 @@ function CommonChatFrame({userInfo}) {
                     right={msg.fromId === currentUserId.current}
                 />
             }
+            case "voice": {
+                return <Voice
+                    value={msg}
+                    right={msg.fromId === currentUserId.current}
+                />
+            }
         }
     }
 
@@ -479,6 +514,7 @@ function CommonChatFrame({userInfo}) {
                 break
             }
         }
+        scrollTriggered.current = true
         setMessages(() => [...messagesRef.current])
         emit("on-send-msg", {})
     }
@@ -631,9 +667,7 @@ function CommonChatFrame({userInfo}) {
                 {/*<RichTextEditor ref={msgContentRef} onKeyDown={(e) => onContentKeyDown(e)}/>*/}
             </div>
             <div className="chat-content-send-frame-operation-bottom">
-                <CustomButton width={10}>
-                    <i className={`iconfont icon icon-yuyin`} style={{fontSize: 14}}/>
-                </CustomButton>
+                <VoiceRecorder onComplete={onSendVoice}/>
                 <CustomButton
                     width={40}
                     onClick={onSendMsg}
