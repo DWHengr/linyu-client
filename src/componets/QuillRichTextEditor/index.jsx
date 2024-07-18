@@ -61,13 +61,13 @@ const QuillRichTextEditor = React.forwardRef(({value, onChange, onKeyDown}, ref)
                 quillRef.current.focus();
             }
         },
-        insertEmoji: (emoji) => {
+        insertEmojiOrText: (value) => {
             if (quillRef.current) {
                 const quill = quillRef.current.getEditor();
                 let range = quill.getSelection(true);
                 if (range) {
-                    quill.insertText(range.index, emoji);
-                    quill.setSelection(range.index + emoji.length);
+                    quill.insertText(range.index, value);
+                    quill.setSelection(range.index + value.length);
                 }
             }
         },
