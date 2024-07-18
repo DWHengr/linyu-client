@@ -27,7 +27,9 @@ export default function CustomOverlay({visible, position, width, children, onClo
     }, [])
 
     return (
-        <div>
+        <div onMouseDown={(e) => {
+            e.stopPropagation()
+        }}>
             <div className="custom-overlay">
                 {inVisible &&
                     <div
