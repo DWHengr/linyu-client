@@ -1,6 +1,5 @@
 use tauri::{
-    tray::{MouseButton, TrayIconBuilder, TrayIconEvent},
-    Manager, Runtime,
+    tray::{MouseButton, TrayIconBuilder, TrayIconEvent}, Emitter, Manager, Runtime
 };
 
 pub fn create_tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {

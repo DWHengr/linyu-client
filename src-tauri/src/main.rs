@@ -15,6 +15,7 @@ fn main() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
         .setup(move |app| {
+            app.handle().plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
             tray::create_tray(app.handle())?;
             Ok(())
         })
