@@ -14,7 +14,7 @@ const Img = memo(({value, right = false}) => {
 
     useEffect(() => {
         fileInfo.current = JSON.parse(value.msgContent?.content)
-        MessageApi.getImg({
+        MessageApi.getMedia({
             msgId: value.id,
         }).then((res) => {
             imgInfoRef.current = res?.data
