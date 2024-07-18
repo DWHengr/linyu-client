@@ -1,0 +1,41 @@
+.chat-content-voice {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 10px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  word-wrap: break-word;
+  height: 34px;
+
+  .content.right {
+    color: #fff;
+    margin-left: auto;
+  }
+
+  .loading-spinner {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 100px;
+  }
+
+  .loading-spinner::after {
+    content: " ";
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #4C9BFF;
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
+}
