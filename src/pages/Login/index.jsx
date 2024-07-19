@@ -4,16 +4,29 @@ import CustomPwdInput from "../../componets/CustomPwdInput/index.jsx";
 import IconButton from "../../componets/IconButton/index.jsx";
 import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import LoginApi from "../../api/login.js";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import CreateHomeWindow from "../Home/window.jsx";
 import {invoke} from "@tauri-apps/api/core";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import {useToast} from "../../componets/CustomToast/index.jsx";
+import {getLocalItem, setLocalItem} from "../../utils/storage.js";
 
 export default function Login() {
     let [account, setAccount] = useState("")
     let [password, setPassword] = useState("")
-    var showToast = useToast();
+    const showToast = useToast();
+    const [reagents, setReagents] = useState([])
+
+    useEffect(() => {
+        try {
+            let data = getLocalItem("reagents")
+            if (data) {
+                setReagents(data)
+            }
+        } catch (e) {
+        }
+    }, [])
+
     const onLogin = () => {
         if (!account) {
             showToast("用户名不能为空~", true)
@@ -34,6 +47,10 @@ export default function Login() {
                     }).then(() => {
                         CreateHomeWindow()
                     })
+                    let data = getLocalItem("reagents")
+                    data = new Set(data)
+                    data.add(account)
+                    setLocalItem("reagents", [...data])
                 } else {
                     showToast(res.msg, true)
                 }
@@ -41,6 +58,14 @@ export default function Login() {
             .catch((res) => {
                 showToast(res.message, true)
             })
+    }
+
+    const handlerDeleteItem = (item) => {
+        let newReagents = reagents.filter((v) => {
+            return v !== item
+        });
+        setLocalItem("reagents", newReagents)
+        setReagents(newReagents)
     }
 
     return (
@@ -65,7 +90,9 @@ export default function Login() {
                     <CustomUserNameInput
                         value={account}
                         onChange={(v) => setAccount(v)}
-                        reagents={["admin", "xiaohong", "xiaohong", "xiaohong", "xiaohong", "xiaohong", "xiaohong", "xiaohong"]}/>
+                        reagents={reagents}
+                        onDeleteItem={handlerDeleteItem}
+                    />
                 </div>
                 <div className="login-pwd-input">
                     <CustomPwdInput value={password} onChange={(v) => setPassword(v)}/>
