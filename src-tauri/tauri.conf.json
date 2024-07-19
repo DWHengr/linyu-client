@@ -41,6 +41,9 @@
       "wix": {
         "language": "zh-CN"
       }
+    },
+    "resources": {
+      "audio/*": "audio/"
     }
   }
 }

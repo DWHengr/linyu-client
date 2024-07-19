@@ -51,6 +51,12 @@
     "upload:allow-upload",
     "fs:default",
     "fs:write-all",
+    "fs:allow-stat",
+    "fs:write-all",
+    "global-shortcut:default",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-is-registered",
+    "fs:default",
     {
       "identifier": "http:default",
       "allow": [
@@ -61,7 +67,6 @@
           "url": "http://127.0.0.1:9100"
         }
       ]
-    },
-    "clipboard-manager:default"
+    }
   ]
 }
