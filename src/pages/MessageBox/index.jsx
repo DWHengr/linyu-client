@@ -21,6 +21,7 @@ function MessageBox() {
     let timeoutId = useRef(null)
     let imgRef = useRef(null)
     const chatsLengthRef = useRef(0)
+    const chatsRef = useRef([])
 
     useEffect(() => {
         let trayEnterListen = listen('tray_enter', async (event) => {
@@ -52,9 +53,17 @@ function MessageBox() {
             //     }
             // }, 400);
         })
+
+        let unOpenUnreadMsg = listen('openUnreadMsg', async (event) => {
+            console.log(chatsRef.current)
+            if (chatsRef.current?.length >= 0) {
+                onChatJump(chatsRef.current[0])
+            }
+        })
         return async () => {
             (await trayEnterListen)();
             (await trayLeaveListen)();
+            (await unOpenUnreadMsg)();
         }
     }, [])
 
@@ -72,6 +81,7 @@ function MessageBox() {
                     unreadChats.push(chats[i])
                 }
             }
+            chatsRef.current = unreadChats
             setChats(unreadChats)
         });
         return async () => {
