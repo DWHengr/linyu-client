@@ -1,6 +1,8 @@
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
+import {setItem} from "../../utils/storage.js";
 
-export default async function CreateScreenshot() {
+export default async function CreateScreenshot(toUserWindowLabel) {
+    await setItem("screenshot", {toUserWindowLabel})
     const window = WebviewWindow.getByLabel("screenshot")
     if (window) {
         await window.show()

@@ -1,8 +1,9 @@
 import React, {useEffect, useState} from 'react';
-import {emit} from '@tauri-apps/api/event';
+import {emitTo} from '@tauri-apps/api/event';
 import {invoke} from "@tauri-apps/api/core";
 import './index.less';
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {getItem} from "../../utils/storage.js";
 
 const screenshot = () => {
     const [listeners, setListeners] = useState([]);
@@ -71,6 +72,7 @@ const screenshot = () => {
             width: Math.floor(width * scaleFactor),
             height: Math.floor(height * scaleFactor)
         };
+        let screenshot = await getItem("screenshot")
         try {
             const response = await invoke('screenshot', {
                 x: captureDetails.left.toString(),
@@ -78,10 +80,9 @@ const screenshot = () => {
                 width: captureDetails.width.toString(),
                 height: captureDetails.height.toString(),
             });
-            await emit('screenshot_result', response);
+            await emitTo(screenshot.toUserWindowLabel, 'screenshot_result', response);
         } catch (err) {
-            console.error(err);
-            await emit('screenshot_result', '');
+            await emitTo(screenshot.toUserWindowLabel, 'screenshot_result', '');
         }
     };
 
