@@ -1,13 +1,12 @@
+use base64::{engine::general_purpose, Engine as _};
 use lazy_static::lazy_static;
+use screenshots::Screen;
 use serde::Serialize;
 use std::sync::{Arc, RwLock};
-use tauri::{
-    Manager, Runtime,AppHandle,ResourceId,Webview
-};
-use base64::{engine::general_purpose, Engine as _};
-use screenshots::Screen;
-use std::time::Duration;
 use std::thread::{sleep, spawn};
+use std::time::Duration;
+use tauri::{AppHandle, Manager, ResourceId, Runtime, Webview};
+use tauri::path::BaseDirectory;
 
 // 定义用户信息结构体
 #[derive(Debug, Clone, Serialize)]
@@ -48,13 +47,13 @@ pub fn get_user_info() -> UserInfo {
 
 #[tauri::command]
 pub fn default_window_icon<R: Runtime>(
-  webview: Webview<R>,
-  app: AppHandle<R>,
+    webview: Webview<R>,
+    app: AppHandle<R>,
 ) -> Option<ResourceId> {
-  app.default_window_icon().cloned().map(|icon| {
-    let mut resources_table = webview.resources_table();
-    resources_table.add(icon.to_owned())
-  })
+    app.default_window_icon().cloned().map(|icon| {
+        let mut resources_table = webview.resources_table();
+        resources_table.add(icon.to_owned())
+    })
 }
 
 #[tauri::command]
@@ -74,12 +73,16 @@ pub fn screenshot(x: &str, y: &str, width: &str, height: &str) -> String {
 }
 
 #[tauri::command]
-pub fn audio() {
+pub fn audio(handle: tauri::AppHandle) {
     use rodio::{Decoder, Source};
     use std::fs::File;
     use std::io::BufReader;
-    spawn(|| {
-        let audio = File::open("audio/remind-short.wav").unwrap();
+    spawn(move || {
+        let audio_path = handle
+            .path()
+            .resolve("audio/remind-short.wav", BaseDirectory::Resource)
+            .unwrap();
+        let audio = File::open(audio_path).unwrap();
         let file = BufReader::new(audio);
         let (_stream, stream_handle) = rodio::OutputStream::try_default().unwrap();
         let source = Decoder::new(file).unwrap();
