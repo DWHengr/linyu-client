@@ -60,16 +60,21 @@ function CommonChatFrame({userInfo}) {
     const [scrollDirection, setScrollDirection] = useState('up');
 
     useEffect(() => {
+        const window = WebviewWindow.getCurrent()
         //获取当前用户
         invoke("get_user_info", {}).then(res => {
             currentUserId.current = res.user_id
         })
         //监听后端发送的消息
-        const unScreenshotListen = listen('screenshot_result', async (event) => {
+        const unScreenshotListen = window.listen('screenshot_result', async (event) => {
             Image.fromBytes(base64ToArrayBuffer(event.payload)).then(res => {
                 writeImage(res)
             })
             msgContentRef.current.insertImage('data:image/png;base64,' + event.payload)
+        })
+        //监听截图快捷键事件
+        const unScreenshot = listen('screenshot', async (event) => {
+            handlerCreateScreenshot()
         })
         //监听后端发送的消息
         const unListen = listen('on-receive-msg', async (event) => {
@@ -100,7 +105,6 @@ function CommonChatFrame({userInfo}) {
             }
         });
         //窗口聚焦
-        const window = WebviewWindow.getCurrent()
         let unFocus = null;
         if (window.label !== "home") {
             let unFocus = window.listen("tauri://focus", (e) => {
@@ -117,10 +121,16 @@ function CommonChatFrame({userInfo}) {
         return async () => {
             (await unListen)();
             (await unScreenshotListen)();
+            (await unScreenshot)();
             (await unDrop)();
             if (unFocus) (await unFocus)();
         }
     }, [])
+
+
+    const handlerCreateScreenshot = () => {
+        CreateScreenshot(WebviewWindow.getCurrent().label);
+    }
 
     const onSendFile = async (path) => {
         let fileInfo = await stat(path)
@@ -638,7 +648,7 @@ function CommonChatFrame({userInfo}) {
                         icon={<i className={`iconfont icon icon-jilu`} style={{fontSize: 22}}/>}/>
                     <IconMinorButton
                         icon={<i className={`iconfont icon icon-jietu`} style={{fontSize: 18}}/>}
-                        onClick={CreateScreenshot}
+                        onClick={handlerCreateScreenshot}
                     />
                 </div>
                 <div style={{display: "flex"}}>
