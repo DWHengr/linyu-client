@@ -2,7 +2,7 @@ import "./index.less"
 import {useEffect, useRef, useState} from "react";
 import CustomOverlay from "../CustomOverlay/index.jsx";
 
-export default function CustomUserNameInput({value, onChange, reagents}) {
+export default function CustomUserNameInput({value, onChange, reagents, onDeleteItem}) {
     const [inputValue, setInputValue] = useState(value)
     const [showRecentInput, setShowRecentInput] = useState(false)
     const recentRef = useRef(null)
@@ -20,6 +20,14 @@ export default function CustomUserNameInput({value, onChange, reagents}) {
         onChange("")
     }
 
+    const handlerChangeValue = (value) => {
+        setInputValue(value)
+        if (onChange) onChange(value)
+    }
+
+    const handlerDeleteItem = (item) => {
+        if (onDeleteItem) onDeleteItem(item)
+    }
 
     return (
         <div
@@ -33,8 +41,7 @@ export default function CustomUserNameInput({value, onChange, reagents}) {
                     placeholder={"请输入用户名"}
                     value={inputValue}
                     onChange={(e) => {
-                        setInputValue(e.target.value)
-                        if (onChange) onChange(e.target.value)
+                        handlerChangeValue(e.target.value)
                     }}
 
                 />
@@ -48,7 +55,9 @@ export default function CustomUserNameInput({value, onChange, reagents}) {
                     }
                     <i
                         className={`iconfont icon-xiala operation-icon`}
-                        onClick={() => setShowRecentInput(!showRecentInput)}
+                        onClick={() => {
+                            setShowRecentInput(!showRecentInput)
+                        }}
                     />
                 </div>
             </div>
@@ -61,19 +70,43 @@ export default function CustomUserNameInput({value, onChange, reagents}) {
                 }
                 visible={showRecentInput}
                 width={usernameDivInfo.width}
+                onClose={() => {
+                    setShowRecentInput(false)
+                }}
             >
-                <div
-                    className="custom-user-input-down"
-                    ref={recentRef}
-                >
-                    {
-                        reagents?.map((item, index) => {
-                            return (
-                                <div key={index} className="custom-user-input-down-item">{item}</div>
-                            )
-                        })
-                    }
-                </div>
+                {reagents?.length > 0 &&
+                    <div
+                        className="custom-user-input-down"
+                        ref={recentRef}
+                    >
+                        {
+                            reagents?.map((item, index) => {
+                                return (
+                                    <div
+                                        key={index}
+                                        className="custom-user-input-down-item"
+                                        onClick={() => {
+                                            handlerChangeValue(item)
+                                            setShowRecentInput(false)
+                                        }}
+                                    >
+                                        <div>
+                                            {item}
+                                        </div>
+                                        <div style={{color: "#969696"}} onClick={(e) => {
+                                            e.stopPropagation()
+                                            handlerDeleteItem(item)
+                                        }}>
+                                            <i
+                                                className={`iconfont icon-guanbi operation-icon`}
+                                            />
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                }
             </CustomOverlay>
         </div>
     )
