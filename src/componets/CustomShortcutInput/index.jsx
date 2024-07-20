@@ -1,13 +1,16 @@
 import React, {useState, useRef, useEffect} from 'react';
 import "./index.less"
+import {isValidShortcut} from "../../utils/shortcut.js";
 
-const CustomShortcutInput = () => {
+const CustomShortcutInput = ({value, onChange}) => {
     const [shortcut, setShortcut] = useState('');
     const [isEditing, setIsEditing] = useState(false);
     const [currentKeys, setCurrentKeys] = useState(new Set());
     const inputRef = useRef(null);
 
-    const functionKeys = new Set(['Control', 'Alt', 'Shift', 'Meta']);
+    useEffect(() => {
+        setShortcut(value)
+    }, [value])
 
     useEffect(() => {
         if (isEditing) {
@@ -48,19 +51,17 @@ const CustomShortcutInput = () => {
         return specialKeys[key] || key.charAt(0).toUpperCase() + key.slice(1);
     };
 
-    const isValidShortcut = (keys) => {
-        return Array.from(keys).some(key => !functionKeys.has(key));
-    };
-
     const formatShortcut = (keys) => {
         return Array.from(keys).map(normalizeKey).join(' + ');
     };
 
     const handleInputBlur = () => {
-        if (currentKeys.size > 0 && isValidShortcut(currentKeys)) {
-            setShortcut(formatShortcut(currentKeys));
+        let shortcutStr = formatShortcut(currentKeys);
+        if (currentKeys.size > 0 && isValidShortcut(shortcutStr)) {
+            setShortcut(shortcutStr);
+            if (onChange) onChange(shortcutStr)
         } else {
-            setShortcut('');
+            setShortcut(value);
         }
         setIsEditing(false);
         setCurrentKeys(new Set());
@@ -79,6 +80,10 @@ const CustomShortcutInput = () => {
         setCurrentKeys(new Set());
     };
 
+    const onClear = () => {
+        if (onChange) onChange('')
+    }
+
     return (
         <div
             onClick={handleClick}
@@ -86,22 +91,34 @@ const CustomShortcutInput = () => {
             className={`shortcut-input-container ${isEditing ? "edit" : ""}`}
         >
             {isEditing ? (
-                <input
-                    ref={inputRef}
-                    type="text"
-                    value={currentKeys.size > 0 ? formatShortcut(currentKeys) : '请按下快捷键'}
-                    readOnly
-                    style={{border: 'none', outline: 'none', width: '100%'}}
-                />
+                <div style={{display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center"}}>
+                    <input
+                        ref={inputRef}
+                        type="text"
+                        value={currentKeys.size > 0 ? formatShortcut(currentKeys) : '请按下快捷键'}
+                        readOnly
+                        style={{border: 'none', outline: 'none', width: '100%'}}
+                    />
+                    <div onClick={handleClear}
+                         style={{background: 'none', border: 'none', cursor: 'pointer', color: "#969696"}}>
+                        <i
+                            className={`iconfont icon-guanbi operation-icon`}
+                        />
+                    </div>
+                </div>
             ) : shortcut ? (
-                <div>{shortcut}</div>
+                <div style={{display: "flex", width: "100%", justifyContent: "space-between", alignItems: "center"}}>
+                    <div>{shortcut}</div>
+                    <div onClick={onClear}
+                         style={{background: 'none', border: 'none', cursor: 'pointer', color: "#969696"}}>
+                        <i
+                            className={`iconfont icon-guanbi operation-icon`}
+                        />
+                    </div>
+                </div>
             ) : (
                 <div style={{color: "#969696"}}>点击设置快捷键</div>
             )}
-            <button onClick={handleClear}
-                    style={{background: 'none', border: 'none', cursor: 'pointer', color: "#969696"}}>
-                ✖
-            </button>
         </div>
     );
 };
