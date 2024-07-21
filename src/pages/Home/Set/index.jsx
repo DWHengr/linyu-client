@@ -1,17 +1,20 @@
 import "./index.less"
 import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
 import {useState} from "react";
-import {Redirect, Route, Switch} from "react-router-dom";
+import {Redirect, Route, Switch, useHistory} from "react-router-dom";
 import General from "./General/index.jsx";
+import Shortcut from "./Shortcut/index.jsx";
+import MessageNotify from "./MessageNotify/index.jsx";
 
 export default function Set() {
 
     const [selectedSetIndex, setSelectedSetIndex] = useState(0)
+    const h = useHistory();
 
     const sets = [
-        {label: "通用", page: "", icon: "icon-tongyongshezhi"},
-        {label: "快捷键", page: "", icon: "icon-kuaijiejian"},
-        {label: "消息通知", page: "", icon: "icon-tongzhi"}
+        {label: "通用", page: "/home/set/general", icon: "icon-tongyongshezhi"},
+        {label: "快捷键", page: "/home/set/shortcut", icon: "icon-kuaijiejian"},
+        {label: "消息通知", page: "/home/set/message-notify", icon: "icon-tongzhi"}
     ]
 
     return (
@@ -27,7 +30,10 @@ export default function Set() {
                             return (
                                 <div
                                     key={index} className={`set-list-item ${isSelected ? "selected" : ""}`}
-                                    onClick={() => setSelectedSetIndex(index)}
+                                    onClick={() => {
+                                        setSelectedSetIndex(index)
+                                        h.push(set.page)
+                                    }}
                                 >
                                     <div style={{
                                         width: 20,
@@ -50,6 +56,8 @@ export default function Set() {
             <div className="set-content">
                 <Switch>
                     <Route path="/home/set/general" component={General}></Route>
+                    <Route path="/home/set/shortcut" component={Shortcut}></Route>
+                    <Route path="/home/set/message-notify" component={MessageNotify}></Route>
                     <Redirect path="/home/set" to="/home/set/general"/>
                 </Switch>
             </div>
