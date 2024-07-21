@@ -3,9 +3,8 @@ import CustomDragDiv from "../../../componets/CustomDragDiv/index.jsx";
 import {useEffect, useRef, useState} from "react";
 import {Redirect, Route, Switch} from "react-router-dom";
 import FriendNotify from "./FriendNotify/index.jsx";
-import {emit, listen} from "@tauri-apps/api/event";
+import {emit} from "@tauri-apps/api/event";
 import NotifyApi from "../../../api/notify.js";
-import CustomEmpty from "../../../componets/CustomEmpty/index.jsx";
 
 export default function Notify() {
 
@@ -26,7 +25,6 @@ export default function Notify() {
     }
 
     useEffect(() => {
-        console.log(3243524563)
         onReadNotify(selectedNotifyIndex)
     }, [selectedNotifyIndex])
 
