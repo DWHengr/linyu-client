@@ -3,15 +3,31 @@ import CustomDragDiv from "../../../../componets/CustomDragDiv/index.jsx";
 import CustomLine from "../../../../componets/CustomLine/index.jsx";
 import CustomDropdown from "../../../../componets/CustomDropdown/index.jsx";
 import CustomSwitch from "../../../../componets/CustomSwitch/index.jsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
+import {getItem, setItem} from "../../../../utils/storage.js";
 
 export default function General() {
+    const [userSets, SetUserSets] = useState({})
+
+    useEffect(() => {
+        getItem("user-sets").then(value => {
+            SetUserSets(value)
+        })
+    }, [])
+
+    const handleOnChange = (key, value) => {
+        SetUserSets(pre => {
+            let newPre = {...pre, [key]: value}
+            setItem("user-sets", newPre)
+            return newPre;
+        })
+    }
+
     const sendMsgOptions =
         [
             {label: "Enter", value: "enter"},
             {label: "Alt + Enter", value: "altEnter"}
         ]
-    const [isBootstrap, setIsBootstrap] = useState(false)
 
     return (
         <div className="general">
@@ -26,7 +42,7 @@ export default function General() {
                             <div>发送消息</div>
                             <CustomDropdown
                                 options={sendMsgOptions}
-                                defaultValue="Enter"
+                                defaultValue={userSets.sendMsgShortcut}
                                 onSelect={() => {
                                 }}
                             />
@@ -43,7 +59,8 @@ export default function General() {
                     <div className="set-item-options">
                         <div className="set-item-option">
                             <div>开机自启</div>
-                            <CustomSwitch isOn={isBootstrap} handleToggle={(v) => setIsBootstrap(v.target.checked)}/>
+                            <CustomSwitch isOn={userSets.bootstrap}
+                                          handleToggle={() => handleOnChange("bootstrap", !userSets.bootstrap)}/>
                         </div>
                     </div>
                 </div>
