@@ -29,6 +29,9 @@ import Dropzone from "react-dropzone";
 import {useToast} from "../../componets/CustomToast/index.jsx";
 import RightClickContent from "../../componets/RightClickContent/index.jsx";
 import CustomLine from "../../componets/CustomLine/index.jsx";
+import UserSetApi from "../../api/userSet.js";
+import {shortcutRegisterAndEmit} from "../../utils/shortcut.js";
+import {setItem} from "../../utils/storage.js";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData)
@@ -51,6 +54,16 @@ export default function Home() {
         appWindow.listen("tauri://close-requested", function (e) {
             appWindow.hide()
         });
+        let unHideOrShowHome = listen("hideOrShowHome", async function (e) {
+            let isVisible = await appWindow.isVisible();
+            if (isVisible) {
+                await appWindow.hide()
+            } else {
+                await appWindow.setFocus()
+                await appWindow.unminimize()
+                await appWindow.show()
+            }
+        });
         invoke("get_user_info", {}).then(res => {
             dispatch(setCurrentLoginUserInfo(res.user_id, res.username, res.account, res.portrait))
             let token = res.token
@@ -60,8 +73,12 @@ export default function Home() {
                 CreateTrayWindow()
                 CrateMessageBox()
                 onGetUserUnreadNum()
+                onGetUserSet()
             }
         })
+        return async () => {
+            (await unHideOrShowHome)();
+        }
     }, [])
 
     const onGetChatList = () => {
@@ -70,6 +87,28 @@ export default function Home() {
                 emit("chat-list", [...res.data.tops, ...res.data.others])
             }
         })
+    }
+
+    const registerAllShortcut = async (value) => {
+        //screenshot
+        shortcutRegisterAndEmit(value.screenshot, "screenshot")
+        //hideOrShowHome
+        shortcutRegisterAndEmit(value.hideOrShowHome, "hideOrShowHome")
+        //openUnreadMsg
+        shortcutRegisterAndEmit(value.openUnreadMsg, "openUnreadMsg")
+        //closeMsgWindow
+        shortcutRegisterAndEmit(value.closeMsgWindow, "closeMsgWindow")
+    }
+
+    const onGetUserSet = () => {
+        UserSetApi.getUserSet().then(res => {
+            if (res.code === 0) {
+                console.log(res.data.sets)
+                registerAllShortcut(res.data.sets)
+                setItem("user-sets", res.data.sets)
+            }
+        })
+
     }
 
     useEffect(() => {
