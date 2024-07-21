@@ -122,12 +122,16 @@ export default function VideoChat() {
     };
 
     const videoCall = async () => {
-        webcamStream.current = await navigator.mediaDevices.getUserMedia({
-            video: !isOnlyAudioRef.current, audio: true,
-        });
-        local.current.srcObject = webcamStream.current;
-        local.current.muted = true;
-        webcamStream.current.getTracks().forEach((track) => pc.current.addTrack(track, webcamStream.current));
+        try {
+            webcamStream.current = await navigator.mediaDevices.getUserMedia({
+                video: !isOnlyAudioRef.current, audio: true,
+            });
+            local.current.srcObject = webcamStream.current;
+            local.current.muted = true;
+            webcamStream.current.getTracks().forEach((track) => pc.current.addTrack(track, webcamStream.current));
+        } catch (e) {
+            showToast("相机/麦克风权限未允许~", true)
+        }
     }
 
     const onOffer = async () => {
