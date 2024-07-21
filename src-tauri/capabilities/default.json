@@ -56,6 +56,7 @@
     "global-shortcut:default",
     "global-shortcut:allow-register",
     "global-shortcut:allow-is-registered",
+    "global-shortcut:allow-unregister",
     "fs:default",
     {
       "identifier": "http:default",
