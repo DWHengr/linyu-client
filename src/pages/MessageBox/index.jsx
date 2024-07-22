@@ -11,6 +11,7 @@ import {useHistory} from "react-router-dom";
 import {TrayIcon} from '@tauri-apps/api/tray';
 import {PhysicalPosition} from "@tauri-apps/api/window";
 import MsgContentShow from "../../componets/MsgContentShow/index.jsx";
+import {getItem} from "../../utils/storage.js";
 
 function MessageBox() {
     const [chats, setChats] = useState([])
@@ -25,6 +26,8 @@ function MessageBox() {
 
     useEffect(() => {
         let trayEnterListen = listen('tray_enter', async (event) => {
+            let userSets = await getItem("user-sets");
+            if (!userSets.friendMsgNotify) return
             if (chatsLengthRef.current <= 0) return
             const homeWindow = WebviewWindow.getByLabel('massage-box')
             if (!homeWindow) return
@@ -55,7 +58,6 @@ function MessageBox() {
         })
 
         let unOpenUnreadMsg = listen('openUnreadMsg', async (event) => {
-            console.log(chatsRef.current)
             if (chatsRef.current?.length >= 0) {
                 onChatJump(chatsRef.current[0])
             }
@@ -104,12 +106,14 @@ function MessageBox() {
     }
 
     useEffect(() => {
-        const boxWindow = WebviewWindow.getByLabel('massage-box')
-        if (chats.length <= 0) {
-            onClearIntervalId()
-        } else {
-            boxWindow.setSize(new LogicalSize(messageBoxWindowWidth, messageBoxWindowHeight + chats.length * 70));
-            (async () => {
+        (async () => {
+            let userSets = await getItem("user-sets");
+            if (!userSets.friendMsgNotify) return
+            const boxWindow = WebviewWindow.getByLabel('massage-box')
+            if (chats.length <= 0) {
+                onClearIntervalId()
+            } else {
+                boxWindow.setSize(new LogicalSize(messageBoxWindowWidth, messageBoxWindowHeight + chats.length * 70));
                 if (!imgRef.current) {
                     imgRef.current = await invoke("default_window_icon")
                 }
@@ -117,9 +121,13 @@ function MessageBox() {
                     let flag = true
                     onClearIntervalId()
                     chatsLengthRef.current = chats.length
-                    timeoutId.current = setTimeout(() => {
-                        invoke("audio", {})
-                    }, 500)
+                    getItem("user-sets").then(value => {
+                        if (value.msgTone) {
+                            timeoutId.current = setTimeout(() => {
+                                invoke("audio", {filename: "remind-short.wav"})
+                            }, 500)
+                        }
+                    })
                     intervalId.current = setInterval(function () {
                         if (flag) {
                             res.setIcon(null)
@@ -128,9 +136,9 @@ function MessageBox() {
                         }
                         flag = !flag
                     }, 400);
-                })
-            })();
-        }
+                });
+            }
+        })();
     }, [chats])
 
     const onChatJump = (info) => {

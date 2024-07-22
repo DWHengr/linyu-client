@@ -32,6 +32,7 @@ import RightClickMenu from "../RightClickMenu/index.jsx";
 import Retraction from "./ChatContent/Retraction/index.jsx";
 import VoiceRecorder from "../VoiceRecorder/index.jsx";
 import Voice from "./ChatContent/Voice/index.jsx";
+import {getItem} from "../../utils/storage.js";
 
 function CommonChatFrame({userInfo}) {
 
@@ -393,11 +394,18 @@ function CommonChatFrame({userInfo}) {
     }
 
     const onContentKeyDown = (event) => {
-        if (event.key === 'Enter') {
-            event.preventDefault()
-            onSendMsg()
-        }
+        getItem("user-sets").then(value => {
+            if (event.key === 'Enter' && event.altKey && value.sendMsgShortcut === "altEnter") {
+                event.preventDefault()
+                onSendMsg()
+            }
+            if (event.key === 'Enter' && value.sendMsgShortcut === "enter") {
+                event.preventDefault()
+                onSendMsg()
+            }
+        })
     };
+
     const onVideo = (isOnlyAudio) => {
         CreateVideoChat(currentToId.current, true, isOnlyAudio)
         VideoApi.invite({userId: currentToId.current, isOnlyAudio: isOnlyAudio})

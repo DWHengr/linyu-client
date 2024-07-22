@@ -9,6 +9,7 @@ import ChatListApi from "../../api/chatList.js";
 import {useToast} from "../../componets/CustomToast/index.jsx";
 import {getItem} from "../../utils/storage.js";
 import {formatTimingTime} from "../../utils/date.js";
+import {invoke} from "@tauri-apps/api/core";
 
 export default function VideoChat() {
     const toUserId = useRef()
@@ -26,7 +27,8 @@ export default function VideoChat() {
     const [isOnlyAudio, setIsOnlyAudio] = useState(false)
     const [time, setTime] = useState(0)
     const timerId = useRef(null)
-    const showToast = useToast();
+    const showToast = useToast()
+    const audioTimerId = useRef(null)
 
 
     useEffect(() => {
@@ -49,6 +51,20 @@ export default function VideoChat() {
             handlerDestroyTime()
         };
     }, [])
+
+    useEffect(() => {
+        getItem("user-sets").then(value => {
+            if (!value.audioVideoTone) return
+            if (!toUserIsReady) {
+                audioTimerId.current = setInterval(() => {
+                    invoke("audio", {filename: "remind.wav"})
+                }, 3000)
+            } else {
+                if (audioTimerId.current)
+                    clearInterval(audioTimerId.current)
+            }
+        })
+    }, [toUserIsReady])
 
     const handlerDestroyTime = () => {
         if (timerId.current)
