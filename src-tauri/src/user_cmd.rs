@@ -5,8 +5,8 @@ use serde::Serialize;
 use std::sync::{Arc, RwLock};
 use std::thread::{sleep, spawn};
 use std::time::Duration;
-use tauri::{AppHandle, Manager, ResourceId, Runtime, Webview};
 use tauri::path::BaseDirectory;
+use tauri::{AppHandle, Manager, ResourceId, Runtime, Webview};
 
 // 定义用户信息结构体
 #[derive(Debug, Clone, Serialize)]
@@ -73,14 +73,15 @@ pub fn screenshot(x: &str, y: &str, width: &str, height: &str) -> String {
 }
 
 #[tauri::command]
-pub fn audio(handle: tauri::AppHandle) {
+pub fn audio(filename: &str, handle: tauri::AppHandle) {
     use rodio::{Decoder, Source};
     use std::fs::File;
     use std::io::BufReader;
+    let path = "audio/".to_string() + filename;
     spawn(move || {
         let audio_path = handle
             .path()
-            .resolve("audio/remind-short.wav", BaseDirectory::Resource)
+            .resolve(path, BaseDirectory::Resource)
             .unwrap();
         let audio = File::open(audio_path).unwrap();
         let file = BufReader::new(audio);
