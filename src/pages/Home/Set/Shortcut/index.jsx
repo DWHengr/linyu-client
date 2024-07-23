@@ -5,6 +5,7 @@ import CustomShortcutInput from "../../../../componets/CustomShortcutInput/index
 import {useEffect, useState} from "react";
 import {getItem, setItem} from "../../../../utils/storage.js";
 import {UpdateShortcutRegister} from "../../../../utils/shortcut.js";
+import UserSetApi from "../../../../api/userSet.js";
 
 export default function Shortcut() {
     const [userSets, SetUserSets] = useState({})
@@ -19,6 +20,7 @@ export default function Shortcut() {
         SetUserSets(pre => {
             let newPre = {...pre, [key]: value}
             UpdateShortcutRegister(pre[key], value, key)
+            UserSetApi.update({key, value})
             setItem("user-sets", newPre)
             return newPre;
         })

@@ -5,6 +5,7 @@ import CustomDropdown from "../../../../componets/CustomDropdown/index.jsx";
 import CustomSwitch from "../../../../componets/CustomSwitch/index.jsx";
 import {useEffect, useState} from "react";
 import {getItem, setItem} from "../../../../utils/storage.js";
+import UserSetApi from "../../../../api/userSet.js";
 
 export default function General() {
     const [userSets, SetUserSets] = useState({})
@@ -18,6 +19,7 @@ export default function General() {
     const handleOnChange = (key, value) => {
         SetUserSets(pre => {
             let newPre = {...pre, [key]: value}
+            UserSetApi.update({key, value})
             setItem("user-sets", newPre)
             return newPre;
         })
@@ -25,8 +27,8 @@ export default function General() {
 
     const sendMsgOptions =
         [
-            {label: "Enter", value: "enter"},
-            {label: "Alt + Enter", value: "altEnter"}
+            {label: "Enter", value: "Enter"},
+            {label: "Alt + Enter", value: "Alt + Enter"}
         ]
 
     return (
@@ -43,7 +45,8 @@ export default function General() {
                             <CustomDropdown
                                 options={sendMsgOptions}
                                 defaultValue={userSets.sendMsgShortcut}
-                                onSelect={() => {
+                                onSelect={(o) => {
+                                    handleOnChange("sendMsgShortcut", o.value)
                                 }}
                             />
                         </div>

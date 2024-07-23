@@ -4,6 +4,7 @@ import CustomLine from "../../../../componets/CustomLine/index.jsx";
 import CustomSwitch from "../../../../componets/CustomSwitch/index.jsx";
 import {useEffect, useState} from "react";
 import {getItem, setItem} from "../../../../utils/storage.js";
+import UserSetApi from "../../../../api/userSet.js";
 
 export default function MessageNotify() {
     const [userSets, SetUserSets] = useState({})
@@ -17,6 +18,7 @@ export default function MessageNotify() {
     const handleOnChange = (key, value) => {
         SetUserSets(pre => {
             let newPre = {...pre, [key]: value}
+            UserSetApi.update({key, value})
             setItem("user-sets", newPre)
             return newPre;
         })
