@@ -6,6 +6,7 @@ import CustomSwitch from "../../../../componets/CustomSwitch/index.jsx";
 import {useEffect, useState} from "react";
 import {getItem, setItem} from "../../../../utils/storage.js";
 import UserSetApi from "../../../../api/userSet.js";
+import {disable, enable} from "@tauri-apps/plugin-autostart";
 
 export default function General() {
     const [userSets, SetUserSets] = useState({})
@@ -62,8 +63,17 @@ export default function General() {
                     <div className="set-item-options">
                         <div className="set-item-option">
                             <div>开机自启</div>
-                            <CustomSwitch isOn={userSets.bootstrap}
-                                          handleToggle={() => handleOnChange("bootstrap", !userSets.bootstrap)}/>
+                            <CustomSwitch
+                                isOn={userSets.bootstrap}
+                                handleToggle={() => {
+                                    if (!userSets.bootstrap) {
+                                        enable()
+                                    } else {
+                                        disable()
+                                    }
+                                    handleOnChange("bootstrap", !userSets.bootstrap)
+                                }}
+                            />
                         </div>
                     </div>
                 </div>
