@@ -9,5 +9,8 @@ export default {
     },
     read(param) {
         return Http.post(`/v1/api/notify/read`, param)
+    },
+    systemList() {
+        return Http.get(`/v1/api/notify/system/list`)
     }
 };
