@@ -58,6 +58,9 @@
     "global-shortcut:allow-is-registered",
     "global-shortcut:allow-unregister",
     "fs:default",
+    "autostart:allow-enable",
+    "autostart:allow-disable",
+    "autostart:default",
     {
       "identifier": "http:default",
       "allow": [

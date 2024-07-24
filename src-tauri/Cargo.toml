@@ -23,6 +23,7 @@ tauri-plugin-fs = "2.0.0-beta"
 tauri-plugin-dialog = "2.0.0-beta"
 tauri-plugin-upload = "2.0.0-beta"
 tauri-plugin-global-shortcut = "2.0.0-beta"
+tauri-plugin-autostart = "2.0.0-beta"
 lazy_static = "1.4"
 screenshots = {git="https://github.com/nashaofu/screenshots-rs", branch="master"}
 base64 = {git="https://github.com/marshallpierce/rust-base64", branch="master"}

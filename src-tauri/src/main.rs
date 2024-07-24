@@ -3,6 +3,7 @@
 mod tray;
 mod user_cmd;
 use user_cmd::{get_user_info, save_user_info,default_window_icon,screenshot,audio};
+use tauri_plugin_autostart::MacosLauncher;
 
 fn main() {
     tauri::Builder::default()
@@ -14,6 +15,7 @@ fn main() {
         .plugin(tauri_plugin_upload::init())
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_clipboard_manager::init())
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, Some(vec!["--flag1"])))
         .setup(move |app| {
             app.handle().plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
             tray::create_tray(app.handle())?;
