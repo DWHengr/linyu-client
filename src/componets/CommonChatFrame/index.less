@@ -41,12 +41,25 @@
     }
   }
 
+  .resize-handle {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 10px;
+    cursor: ns-resize;
+    background-color: transparent;
+  }
+
   .chat-content-send-frame {
     width: 100%;
     height: 250px;
+    min-height: 150px;
+    max-height: 450px;
     background-color: #F9FBFF;
     display: flex;
     flex-direction: column;
+    position: relative;
 
     .chat-content-send-frame-operation {
       height: 30px;

@@ -3,7 +3,7 @@ import IconMinorButton from "../IconMinorButton/index.jsx";
 import CustomButton from "../CustomButton/index.jsx";
 import Text from "./ChatContent/Text/index.jsx";
 import CustomDragDiv from "../CustomDragDiv/index.jsx";
-import {memo, useEffect, useRef, useState} from "react";
+import {memo, useCallback, useEffect, useRef, useState} from "react";
 import {emit, listen} from "@tauri-apps/api/event";
 import MessageApi from "../../api/message.js";
 import {invoke} from "@tauri-apps/api/core";
@@ -32,7 +32,8 @@ import RightClickMenu from "../RightClickMenu/index.jsx";
 import Retraction from "./ChatContent/Retraction/index.jsx";
 import VoiceRecorder from "../VoiceRecorder/index.jsx";
 import Voice from "./ChatContent/Voice/index.jsx";
-import {getItem} from "../../utils/storage.js";
+import {getItem, setItem} from "../../utils/storage.js";
+import CustomTooltip from "../CustomTooltip/index.jsx";
 
 function CommonChatFrame({userInfo}) {
 
@@ -52,13 +53,21 @@ function CommonChatFrame({userInfo}) {
     const isRefresh = useRef(true)
     const [userInfoPosition, setUserInfoPosition] = useState(null)
     const [userDetails, setUserDetails] = useState(null)
-    const [editorHtml, setEditorHtml] = useState('');
+    const [editorHtml, setEditorHtml] = useState('')
 
     //表情
     const [biaoQingIsShow, setBiaoQingIsShow] = useState(false);
     const [biaoQingIsPosition, setBiaoQingIsPosition] = useState({});
     const biaoQingPopSize = useRef({width: 290, height: 140})
     const [scrollDirection, setScrollDirection] = useState('up');
+    //用户设置
+    const [userSets, SetUserSets] = useState({})
+    const [userLocalSets, SetUserLocalSets] = useState({})
+    //div可改变resize
+    const [height, setHeight] = useState(500);
+    const [isResizing, setIsResizing] = useState(false);
+    const [startY, setStartY] = useState(0);
+    const [startHeight, setStartHeight] = useState(0);
 
     useEffect(() => {
         const window = WebviewWindow.getCurrent()
@@ -66,11 +75,23 @@ function CommonChatFrame({userInfo}) {
         invoke("get_user_info", {}).then(res => {
             currentUserId.current = res.user_id
         })
+        //用户设置
+        getItem("user-sets").then(value => {
+            SetUserSets(value)
+        })
+        //用户本地相关设置
+        getItem("user-local-sets").then(value => {
+            SetUserLocalSets(value)
+        })
+        //监听关闭窗口快捷键
+        const unCloseMsgWindow = window.listen('closeMsgWindow', async (event) => {
+            const window = WebviewWindow.getCurrent();
+            if (window.label !== "home") {
+                window.close()
+            }
+        })
         //监听后端发送的消息
         const unScreenshotListen = window.listen('screenshot_result', async (event) => {
-            Image.fromBytes(base64ToArrayBuffer(event.payload)).then(res => {
-                writeImage(res)
-            })
             msgContentRef.current.insertImage('data:image/png;base64,' + event.payload)
         })
         //监听截图快捷键事件
@@ -124,10 +145,51 @@ function CommonChatFrame({userInfo}) {
             (await unScreenshotListen)();
             (await unScreenshot)();
             (await unDrop)();
+            (await unCloseMsgWindow)();
             if (unFocus) (await unFocus)();
         }
     }, [])
 
+
+    useEffect(() => {
+        if (userLocalSets?.sendMsgDivHeight) {
+            setHeight(userLocalSets.sendMsgDivHeight)
+        } else {
+            setHeight(250)
+        }
+    }, [userLocalSets])
+
+    const handleMouseDown = (e) => {
+        setIsResizing(true);
+        setStartY(e.clientY);
+        setStartHeight(height);
+    };
+
+    const handleMouseMove = useCallback((e) => {
+        if (!isResizing) return;
+        const newHeight = startHeight - (e.clientY - startY);
+        setHeight(newHeight);
+        setItem("user-local-sets", {...userLocalSets, sendMsgDivHeight: newHeight})
+    }, [isResizing, startY, startHeight]);
+
+    const handleMouseUp = () => {
+        setIsResizing(false);
+    };
+
+    useEffect(() => {
+        if (isResizing) {
+            window.addEventListener('mousemove', handleMouseMove);
+            window.addEventListener('mouseup', handleMouseUp);
+        } else {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        }
+
+        return () => {
+            window.removeEventListener('mousemove', handleMouseMove);
+            window.removeEventListener('mouseup', handleMouseUp);
+        };
+    }, [isResizing, handleMouseMove]);
 
     const handlerCreateScreenshot = () => {
         CreateScreenshot(WebviewWindow.getCurrent().label);
@@ -366,7 +428,6 @@ function CommonChatFrame({userInfo}) {
     }
 
     const onSendVoice = (audioBlob, time) => {
-        console.log(audioBlob)
         const audioFile = new File([audioBlob], 'voice.wav', {type: 'audio/wav'});
         let msg = {
             toUserId: currentToId.current, msgContent: {
@@ -395,11 +456,11 @@ function CommonChatFrame({userInfo}) {
 
     const onContentKeyDown = (event) => {
         getItem("user-sets").then(value => {
-            if (event.key === 'Enter' && event.altKey && value.sendMsgShortcut === "altEnter") {
+            if (event.key === 'Enter' && event.altKey && value.sendMsgShortcut === "Alt + Enter") {
                 event.preventDefault()
                 onSendMsg()
             }
-            if (event.key === 'Enter' && value.sendMsgShortcut === "enter") {
+            if (event.key === 'Enter' && value.sendMsgShortcut === "Enter") {
                 event.preventDefault()
                 onSendMsg()
             }
@@ -538,7 +599,6 @@ function CommonChatFrame({userInfo}) {
     }
 
     const onMsgContentClick = (action) => {
-        console.log(action)
         switch (action.key) {
             case "copy": {
                 break
@@ -629,14 +689,25 @@ function CommonChatFrame({userInfo}) {
                     </div>
                 </div>)
             })}
-            {newMsgUnreadNum !== 0 && <div className="hint" onClick={onScrollToBottom}>
-                <i className={`iconfont icon icon-xiala`} style={{fontSize: 12}}/>
-                {newMsgUnreadNum > 0 && <div style={{marginLeft: 5}}>
-                    {newMsgUnreadNum}
+            {newMsgUnreadNum !== 0 &&
+                <div className="hint"
+                     onClick={onScrollToBottom}
+                     style={{bottom: height + 15}}
+                >
+                    <i className={`iconfont icon icon-xiala`} style={{fontSize: 12}}/>
+                    {newMsgUnreadNum > 0 && <div style={{marginLeft: 5}}>
+                        {newMsgUnreadNum}
+                    </div>}
                 </div>}
-            </div>}
         </div>
-        <div className="chat-content-send-frame">
+        <div
+            className="chat-content-send-frame"
+            style={{height: height}}
+        >
+            <div
+                className="resize-handle"
+                onMouseDown={handleMouseDown}
+            />
             <div className="chat-content-send-frame-operation">
                 <div style={{display: "flex"}}>
                     <IconMinorButton
@@ -647,26 +718,34 @@ function CommonChatFrame({userInfo}) {
                             })
                             setBiaoQingIsShow(true)
                         }}
-                        icon={<i className={`iconfont icon icon-biaoqing`} style={{fontSize: 24}}/>}/>
+                        icon={<i className={`iconfont icon icon-biaoqing`} style={{fontSize: 24}}/>}
+                        title="表情"
+                    />
                     <IconMinorButton
                         icon={<i className={`iconfont icon icon-wenjian`} style={{fontSize: 26}}/>}
                         onClick={handleOpenFile}
+                        title="文件"
                     />
-                    <IconMinorButton
-                        icon={<i className={`iconfont icon icon-jilu`} style={{fontSize: 22}}/>}/>
+                    {/*<IconMinorButton*/}
+                    {/*    icon={<i className={`iconfont icon icon-jilu`} style={{fontSize: 22}}/>}*/}
+                    {/*    title="聊天记录"*/}
+                    {/*/>*/}
                     <IconMinorButton
                         icon={<i className={`iconfont icon icon-jietu`} style={{fontSize: 18}}/>}
                         onClick={handlerCreateScreenshot}
+                        title={`截图 ${userSets.screenshot}`}
                     />
                 </div>
                 <div style={{display: "flex"}}>
                     <IconMinorButton
                         icon={<i className={`iconfont icon icon-dianhua`} style={{fontSize: 24}}/>}
                         onClick={() => onVideo(true)}
+                        title="电话"
                     />
                     <IconMinorButton
                         icon={<i className={`iconfont icon icon-shipin`} style={{fontSize: 26}}/>}
                         onClick={() => onVideo(false)}
+                        title="视频"
                     />
                 </div>
             </div>
@@ -685,13 +764,14 @@ function CommonChatFrame({userInfo}) {
                 {/*<RichTextEditor ref={msgContentRef} onKeyDown={(e) => onContentKeyDown(e)}/>*/}
             </div>
             <div className="chat-content-send-frame-operation-bottom">
-                <VoiceRecorder onComplete={onSendVoice}/>
-                <CustomButton
-                    width={40}
-                    onClick={onSendMsg}
-                >
-                    发送
-                </CustomButton>
+                <CustomTooltip placement="top" title="语音消息">
+                    <VoiceRecorder onComplete={onSendVoice}/>
+                </CustomTooltip>
+                <CustomTooltip placement="top" title={userSets.sendMsgShortcut}>
+                    <CustomButton width={40} onClick={onSendMsg}>
+                        发送
+                    </CustomButton>
+                </CustomTooltip>
             </div>
         </div>
     </div>)
