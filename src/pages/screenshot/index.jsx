@@ -4,6 +4,9 @@ import {invoke} from "@tauri-apps/api/core";
 import './index.less';
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import {getItem} from "../../utils/storage.js";
+import {Image} from "@tauri-apps/api/image";
+import {base64ToArrayBuffer} from "../../utils/img.js";
+import {writeImage} from "@tauri-apps/plugin-clipboard-manager";
 
 const screenshot = () => {
     const [listeners, setListeners] = useState([]);
@@ -80,7 +83,11 @@ const screenshot = () => {
                 width: captureDetails.width.toString(),
                 height: captureDetails.height.toString(),
             });
-            await emitTo(screenshot.toUserWindowLabel, 'screenshot_result', response);
+            Image.fromBytes(base64ToArrayBuffer(response)).then(res => {
+                writeImage(res)
+            })
+            if (screenshot.toUserWindowLabel)
+                await emitTo(screenshot.toUserWindowLabel, 'screenshot_result', response);
         } catch (err) {
             await emitTo(screenshot.toUserWindowLabel, 'screenshot_result', '');
         }
