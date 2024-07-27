@@ -30,6 +30,8 @@ import CustomDropdown from "../../../componets/CustomDropdown/index.jsx";
 import CreateImageViewer from "../../ImageViewer/window.jsx";
 import {getFileNameAndType} from "../../../utils/string.js";
 import CustomImg from "../../../componets/CustomImg/index.jsx";
+import CreateVideoChat from "../../VideoChat/window.jsx";
+import VideoApi from "../../../api/video.js";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState(null)
@@ -665,7 +667,16 @@ export default function Friend() {
                                     >
                                         发消息
                                     </CustomButton>
-                                    <CustomButton type="minor" width={100}>视频聊天</CustomButton>
+                                    <CustomButton
+                                        type="minor"
+                                        width={100}
+                                        onClick={() => {
+                                            CreateVideoChat(friendDetails.friendId, true, false)
+                                            VideoApi.invite({userId: friendDetails.friendId, isOnlyAudio: false})
+                                        }}
+                                    >
+                                        视频聊天
+                                    </CustomButton>
                                     <CustomButton
                                         onClick={() => {
                                             h.push("/home/talk/all", {targetId: friendDetails.friendId})
