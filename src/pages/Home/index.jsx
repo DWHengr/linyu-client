@@ -32,6 +32,8 @@ import CustomLine from "../../componets/CustomLine/index.jsx";
 import UserSetApi from "../../api/userSet.js";
 import {shortcutRegisterAndEmit} from "../../utils/shortcut.js";
 import {setItem} from "../../utils/storage.js";
+import CreateScreenshot from "../screenshot/window.jsx";
+import CreateAboutWindow from "../AboutWindow/window.jsx";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData)
@@ -64,6 +66,13 @@ export default function Home() {
                 await appWindow.show()
             }
         });
+        //监听截图快捷键事件
+        const unScreenshot = listen('screenshot', async (event) => {
+            if (currentOption.current !== 'chat' || !currentToId.current) {
+                console.log(currentOption, currentToId)
+                CreateScreenshot("");
+            }
+        })
         invoke("get_user_info", {}).then(res => {
             dispatch(setCurrentLoginUserInfo(res.user_id, res.username, res.account, res.portrait))
             let token = res.token
@@ -78,6 +87,7 @@ export default function Home() {
         })
         return async () => {
             (await unHideOrShowHome)();
+            (await unScreenshot)();
         }
     }, [])
 
@@ -413,7 +423,7 @@ export default function Home() {
                         </CustomModal
                         >
                     </div>
-                    <div className="home-nav-icon">
+                    <div className="home-nav-icon" onClick={CreateAboutWindow}>
                         <img style={{height: 60}} src="/logo.png" alt=""/>
                     </div>
                     <div className="home-nav-options">
