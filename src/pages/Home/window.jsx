@@ -2,6 +2,8 @@ import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
 import {listen} from "@tauri-apps/api/event";
 import {PhysicalPosition} from "@tauri-apps/api/window";
 import {trayWindowHeight} from "../TrayMenu/window.jsx";
+import {invoke} from "@tauri-apps/api/core";
+import {TrayIcon} from "@tauri-apps/api/tray";
 
 listen('tray_menu', async (event) => {
 
@@ -23,6 +25,10 @@ listen('tray_menu', async (event) => {
 })
 
 export default function CreateHomeWindow() {
+    TrayIcon.getById("tray").then(async (res) => {
+        let userInfo = await invoke("get_user_info", {})
+        res.setTooltip(userInfo.username ? userInfo.username : "linyu")
+    })
     let webview = new WebviewWindow("home", {
         url: "/home",
         title: "linyu",
