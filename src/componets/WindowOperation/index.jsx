@@ -3,7 +3,7 @@ import IconButton from "../IconButton/index.jsx";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import {useEffect, useState} from "react";
 
-export default function WindowOperation({hide = true, onClose, onMinimize, onHide, height}) {
+export default function WindowOperation({hide = true, onClose, onMinimize, onHide, height, isMaximize = true}) {
 
     const [isMax, setIsMax] = useState(false)
 
@@ -59,11 +59,13 @@ export default function WindowOperation({hide = true, onClose, onMinimize, onHid
                 icon={<i className={`iconfont icon-zuixiaohua`} style={{fontSize: 22}}/>}
                 onClick={handleMinimize}
             />
-            <IconButton
-                icon={<i className={`iconfont ${isMax ? "icon-chuangkouhua" : "icon-zuidahua"}`}
-                         style={{fontSize: 18}}/>}
-                onClick={isMax ? handleUnMaximize : handleMaximize}
-            />
+            {
+                isMaximize && <IconButton
+                    icon={<i className={`iconfont ${isMax ? "icon-chuangkouhua" : "icon-zuidahua"}`}
+                             style={{fontSize: 18}}/>}
+                    onClick={isMax ? handleUnMaximize : handleMaximize}
+                />
+            }
             <IconButton
                 danger
                 icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 22}}/>}
