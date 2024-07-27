@@ -12,6 +12,7 @@ import {TrayIcon} from '@tauri-apps/api/tray';
 import {PhysicalPosition} from "@tauri-apps/api/window";
 import MsgContentShow from "../../componets/MsgContentShow/index.jsx";
 import {getItem} from "../../utils/storage.js";
+import ChatListAPI from "../../api/chatList.js";
 
 function MessageBox() {
     const [chats, setChats] = useState([])
@@ -145,6 +146,16 @@ function MessageBox() {
         emit("chat-list-jump", info)
     }
 
+    const onReadAll = () => {
+        ChatListAPI.readAll().then(res => {
+            setChats([])
+            onClearIntervalId()
+            emit("on-unread-info")
+            const window = WebviewWindow.getByLabel('massage-box')
+            window.hide();
+        })
+    }
+
     return (
         <div className="message-box-container">
             <CustomDragDiv className="message-box">
@@ -200,7 +211,9 @@ function MessageBox() {
                         })
                     }
                 </div>
-                <div className="message-box-bottom">忽略全部</div>
+                <div className="message-box-bottom">
+                    <div style={{cursor: "pointer"}} onClick={() => onReadAll()}>忽略全部</div>
+                </div>
             </CustomDragDiv>
         </div>
     )
