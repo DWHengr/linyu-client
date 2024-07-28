@@ -1,5 +1,5 @@
 import "./index.less"
-import {useState} from "react";
+import {useEffect, useState} from "react";
 
 export default function CustomInput({value, onChange, placeholder, pre = "", pos = "", limit = -1, type = "input"}) {
     const [inputValue, setInputValue] = useState(value)
@@ -9,6 +9,10 @@ export default function CustomInput({value, onChange, placeholder, pre = "", pos
         if (onChange)
             onChange("")
     }
+
+    useEffect(() => {
+        setInputValue(value)
+    }, [value])
 
     return (
         <div className="custom-input">
