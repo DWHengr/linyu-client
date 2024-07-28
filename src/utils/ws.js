@@ -1,5 +1,6 @@
 import WebSocket from '@tauri-apps/plugin-websocket';
 import {emit} from "@tauri-apps/api/event";
+import {getLocalItem} from "./storage.js";
 
 let ws = null
 let heartTimer = null
@@ -11,6 +12,11 @@ let reconnectCount = 0
 let isConnect = false
 
 function response(msg) {
+    if (typeof msg === 'string') {
+        console.log(msg)
+        onCloseHandler()
+        return
+    }
     if (msg.type) {
         if (msg.data.code === -1) {
             onCloseHandler()
@@ -41,7 +47,9 @@ function connect(tokenStr) {
     isConnect = true
     token = tokenStr
     try {
-        WebSocket.connect("ws://127.0.0.1:9100/ws?x-token=" + token).then((r) => {
+        let wsIp = getLocalItem("serverWs")
+        wsIp = wsIp ? wsIp : "ws://127.0.0.1:9100"
+        WebSocket.connect(wsIp + "/ws?x-token=" + token).then((r) => {
             console.log("连接服务器")
             ws = r
             ws.addListener(response);

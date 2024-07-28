@@ -65,10 +65,16 @@
       "identifier": "http:default",
       "allow": [
         {
-          "url": "http://127.0.0.1:9200"
+          "url": "http://**"
         },
         {
-          "url": "http://127.0.0.1:9100"
+          "url": "https://**"
+        },
+        {
+          "url": "http://*:*"
+        },
+        {
+          "url": "https://*:*"
         }
       ]
     }

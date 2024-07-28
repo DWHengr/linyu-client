@@ -1,8 +1,14 @@
 import {fetch} from '@tauri-apps/plugin-http';
 import {invoke} from "@tauri-apps/api/core";
 import {upload as tauriUpload, download as tauriDownload} from "@tauri-apps/plugin-upload";
+import {getLocalItem} from "./storage.js";
 
-const SERVICE_URL = "http://" + "127.0.0.1:9200";
+let SERVICE_URL = "http://" + "127.0.0.1:9200";
+
+function onServerIp() {
+    let ip = getLocalItem("serverIp")
+    SERVICE_URL = ip ? ip : "http://127.0.0.1:9200"
+}
 
 async function send(configs) {
     let token = await invoke("get_user_info", {}).then(res => {
@@ -30,6 +36,7 @@ async function send(configs) {
 }
 
 function get(url, params = {}) {
+    onServerIp()
     let urlParams = [];
     Object.keys(params).forEach((key) => {
         urlParams.push(`${key}=${encodeURIComponent(params[key])}`);
@@ -48,6 +55,7 @@ function get(url, params = {}) {
 }
 
 async function post(url, params = {}) {
+    onServerIp()
     const configs = {
         method: "POST", url: SERVICE_URL + url, data: params,
     };
@@ -55,6 +63,7 @@ async function post(url, params = {}) {
 }
 
 async function upload(url, file, params = {}) {
+    onServerIp()
     if (file && file.size && file.size > 0) {
         let token = await invoke("get_user_info", {}).then(res => {
             return res.token
@@ -82,6 +91,7 @@ async function upload(url, file, params = {}) {
 }
 
 async function download(url, params = {}) {
+    onServerIp()
     let token = await invoke("get_user_info", {}).then(res => {
         return res.token
     })
@@ -109,6 +119,7 @@ async function download(url, params = {}) {
 }
 
 const uploadFile = async (url, params, progressHandler) => {
+    onServerIp()
     let userinfo = await invoke("get_user_info", {});
     return new Promise(async (resolve, reject) => {
         tauriUpload(SERVICE_URL + url, params.path, progressHandler, {
@@ -124,6 +135,7 @@ const uploadFile = async (url, params, progressHandler) => {
 }
 
 const downloadFile = async (url, params, progressHandler) => {
+    onServerIp()
     let userinfo = await invoke("get_user_info", {});
     return new Promise(async (resolve, reject) => {
         tauriDownload(SERVICE_URL + url, params.path, progressHandler,
