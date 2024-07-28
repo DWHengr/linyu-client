@@ -51,11 +51,11 @@ export default function General() {
                                 }}
                             />
                         </div>
-                        <CustomLine width={1}/>
-                        <div className="set-item-option">
-                            <div>输入"/"时唤起</div>
-                            <div>表情</div>
-                        </div>
+                        {/*<CustomLine width={1}/>*/}
+                        {/*<div className="set-item-option">*/}
+                        {/*    <div>输入"/"时唤起</div>*/}
+                        {/*    <div>表情</div>*/}
+                        {/*</div>*/}
                     </div>
                 </div>
                 <div className="set-item">
