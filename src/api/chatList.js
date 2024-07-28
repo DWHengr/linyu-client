@@ -18,5 +18,8 @@ export default {
     },
     top(param) {
         return Http.post("/v1/api/chat-list/top", param);
+    },
+    readAll() {
+        return Http.get(`/v1/api/chat-list/read/all`)
     }
 };
