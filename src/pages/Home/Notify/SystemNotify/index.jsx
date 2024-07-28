@@ -45,6 +45,14 @@ export default function SystemNotify() {
                         )
                     })
                 }
+                {
+                    notices.length <= 0 &&
+                    <CustomDragDiv
+                        style={{display: "flex", height: "100%", alignItems: "center", justifyContent: "center"}}
+                    >
+                        <img style={{height: 120}} src="/bg.png" alt=""/>
+                    </CustomDragDiv>
+                }
             </div>
         </div>
     )
