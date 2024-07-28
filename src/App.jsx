@@ -9,6 +9,7 @@ import {useEffect} from "react";
 import Screenshot from "./pages/screenshot/index.jsx";
 import VideoChat from "./pages/VideoChat/index.jsx";
 import ImageViewer from "./pages/ImageViewer/index.jsx";
+import AboutWindow from "./pages/AboutWindow/index.jsx";
 
 function App() {
 
@@ -38,6 +39,7 @@ function App() {
                 <Route path="/screenshot" component={Screenshot}></Route>
                 <Route path="/videochat" component={VideoChat}></Route>
                 <Route path="/imageviewer" component={ImageViewer}></Route>
+                <Route path="/about" component={AboutWindow}></Route>
                 <Redirect path="/" to="/login"/>
             </Switch>
         </div>
