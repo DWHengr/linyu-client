@@ -10,6 +10,7 @@ import Screenshot from "./pages/screenshot/index.jsx";
 import VideoChat from "./pages/VideoChat/index.jsx";
 import ImageViewer from "./pages/ImageViewer/index.jsx";
 import AboutWindow from "./pages/AboutWindow/index.jsx";
+import Register from "./pages/Register/index.jsx";
 
 function App() {
 
@@ -40,6 +41,7 @@ function App() {
                 <Route path="/videochat" component={VideoChat}></Route>
                 <Route path="/imageviewer" component={ImageViewer}></Route>
                 <Route path="/about" component={AboutWindow}></Route>
+                <Route path="/register" component={Register}></Route>
                 <Redirect path="/" to="/login"/>
             </Switch>
         </div>

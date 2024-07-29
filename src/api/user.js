@@ -18,5 +18,8 @@ export default {
     },
     getImg(param) {
         return Http.get("/v1/api/user/get/img", param)
+    },
+    register(param) {
+        return Http.post("/v1/api/user/register", param)
     }
 };
