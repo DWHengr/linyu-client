@@ -11,7 +11,6 @@ export default function CustomUserNameInput({value, onChange, reagents, onDelete
 
     useEffect(() => {
         if (usernameInputRef) {
-            console.log(usernameInputRef.current.getBoundingClientRect())
             setUsernameDivInfo(usernameInputRef.current.getBoundingClientRect())
         }
     }, [usernameInputRef])

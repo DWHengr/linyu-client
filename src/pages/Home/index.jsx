@@ -34,6 +34,8 @@ import {shortcutRegisterAndEmit} from "../../utils/shortcut.js";
 import {setItem} from "../../utils/storage.js";
 import CreateScreenshot from "../screenshot/window.jsx";
 import CreateAboutWindow from "../AboutWindow/window.jsx";
+import CreateImageViewer from "../ImageViewer/window.jsx";
+import {getFileNameAndType} from "../../utils/string.js";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData)
@@ -69,7 +71,6 @@ export default function Home() {
         //监听截图快捷键事件
         const unScreenshot = listen('screenshot', async (event) => {
             if (currentOption.current !== 'chat' || !currentToId.current) {
-                console.log(currentOption, currentToId)
                 CreateScreenshot("");
             }
         })
@@ -113,7 +114,6 @@ export default function Home() {
     const onGetUserSet = () => {
         UserSetApi.getUserSet().then(res => {
             if (res.code === 0) {
-                console.log(res.data.sets)
                 registerAllShortcut(res.data.sets)
                 setItem("user-sets", res.data.sets)
             }
@@ -264,7 +264,11 @@ export default function Home() {
                         <div style={{display: "flex", height: 60, alignItems: "center", marginBottom: 10}}>
                             <img className="user-info-portrait"
                                  alt=""
-                                 src={userInfo.portrait}/>
+                                 src={userInfo.portrait}
+                                 onClick={() => {
+                                     CreateImageViewer(getFileNameAndType(userInfo.portrait).fileName, userInfo.portrait)
+                                 }}
+                            />
                             <div style={{flex: 1, overflow: "hidden"}}>
                                 <div className="ellipsis">{userInfo.name}</div>
                                 <div className="ellipsis"

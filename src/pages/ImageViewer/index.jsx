@@ -48,7 +48,7 @@ export default function ImageViewer() {
     }
 
     return (
-        <div className="image-viewer-container" onKeyDown={(e) => console.log(e)}>
+        <div className="image-viewer-container">
             <div className="image-viewer">
                 <CustomDragDiv className="top-bar">
                     <WindowOperation height={40} hide={false}/>

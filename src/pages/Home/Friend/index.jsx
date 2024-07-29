@@ -529,6 +529,8 @@ export default function Friend() {
                                 </CustomAccordion>
                             )
                         })}
+                        {allFriendData?.length <= 0 &&
+                            <CustomEmpty placeholder="暂无好友，请先添加~"/>}
                     </div>
                     :
                     <div className="friend-list-items">

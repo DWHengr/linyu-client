@@ -1,5 +1,6 @@
 .custom-input {
   height: 30px;
+  min-height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -8,6 +9,10 @@
   border: #d9d9d9 1px solid;
   padding: 0 10px;
   font-size: 14px;
+
+  &.required {
+    border: #ff4c4c 1px solid;
+  }
 
   .pre {
     flex-shrink: 0;
@@ -40,9 +45,14 @@
     color: #7F7F7F
   }
 
+  input[type="password"]::-ms-reveal {
+    display: none
+  }
+
   .character-count {
     flex-shrink: 0;
     margin-left: 5px;
+    min-width: 36px;
     color: #7F7F7F
   }
 

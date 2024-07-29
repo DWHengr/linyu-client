@@ -20,13 +20,10 @@ import FileContent from "./ChatContent/File/index.jsx";
 import {stat} from "@tauri-apps/plugin-fs";
 import {useDispatch} from "react-redux";
 import {setFileFileProgress} from "../../store/home/action.js";
-import {isImageFile} from "../../utils/string.js";
+import {getFileNameAndType, isImageFile} from "../../utils/string.js";
 import Img from "./ChatContent/Img/index.jsx";
 import RightClickContent from "../RightClickContent/index.jsx";
 import FriendApi from "../../api/friend.js";
-import {Image} from "@tauri-apps/api/image";
-import {writeImage} from "@tauri-apps/plugin-clipboard-manager";
-import {base64ToArrayBuffer} from "../../utils/img.js";
 import QuillRichTextEditor from "../QuillRichTextEditor/index.jsx";
 import RightClickMenu from "../RightClickMenu/index.jsx";
 import Retraction from "./ChatContent/Retraction/index.jsx";
@@ -34,6 +31,7 @@ import VoiceRecorder from "../VoiceRecorder/index.jsx";
 import Voice from "./ChatContent/Voice/index.jsx";
 import {getItem, setItem} from "../../utils/storage.js";
 import CustomTooltip from "../CustomTooltip/index.jsx";
+import CreateImageViewer from "../../pages/ImageViewer/window.jsx";
 
 function CommonChatFrame({userInfo}) {
 
@@ -640,7 +638,13 @@ function CommonChatFrame({userInfo}) {
                     </div>
                 </div>
                 <div className="user-details-content">
-                    <img src={userDetails?.portrait} style={{width: 80, height: 80, borderRadius: 80}}/>
+                    <img
+                        src={userDetails?.portrait}
+                        style={{width: 80, height: 80, borderRadius: 80}}
+                        onClick={() => {
+                            CreateImageViewer(getFileNameAndType(userDetails.portrait).fileName, userDetails.portrait)
+                        }}
+                    />
                     <div style={{marginLeft: 15}}>
                         <div className="item">
                             <div className="item-label">姓名 / Name</div>

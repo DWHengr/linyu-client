@@ -143,7 +143,6 @@ const screenshot = () => {
                 // 计算右侧和底部的边界
                 const rightBoundary = windowWidth - width;
                 const bottomBoundary = windowHeight - height;
-                console.log(rightBoundary, bottomBoundary)
                 // 边界检查
                 if (targetX < 0) {
                     setLeft(0);

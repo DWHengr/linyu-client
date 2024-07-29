@@ -101,7 +101,6 @@ export default function CreateTalk() {
     const onSearchUsersInfo = (v) => {
         setSearchUsersInfo(v)
         FriendApi.listFlat({friendInfo: v}).then(res => {
-            console.log("res:", res)
             if (res.code === 0) {
                 setContentFriend(res.data)
             }

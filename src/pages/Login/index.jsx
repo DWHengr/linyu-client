@@ -13,6 +13,7 @@ import {getLocalItem, setLocalItem} from "../../utils/storage.js";
 import CreateAboutWindow from "../AboutWindow/window.jsx";
 import CustomInput from "../../componets/CustomInput/index.jsx";
 import CustomButton from "../../componets/CustomButton/index.jsx";
+import CreateRegisterWindow from "../Register/window.jsx";
 
 export default function Login() {
     let [account, setAccount] = useState("")
@@ -66,7 +67,6 @@ export default function Login() {
                 }
             })
             .catch((res) => {
-                console.log(res.message)
                 showToast(res.message, true)
             })
     }
@@ -126,6 +126,12 @@ export default function Login() {
                             onLogin()
                     }}>
                         登 录
+                    </div>
+                    <div
+                        style={{fontSize: 14, marginTop: 15, cursor: "pointer", color: "#4C9BFF"}}
+                        onClick={CreateRegisterWindow}
+                    >
+                        注册账号
                     </div>
                 </div>}
                 {isSetServer &&

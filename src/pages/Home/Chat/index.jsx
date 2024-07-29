@@ -311,6 +311,8 @@ export default function Chat() {
                         onClick={() => onChatListClick(data)}
                     />)
                 })}
+                {(allChatsData?.length <= 0 && topChatsData.length <= 0) &&
+                    <CustomEmpty placeholder="暂时没有新消息~"/>}
             </div> : <div className="chat-list-items">
                 {searchFriendsList.length > 0 ? <div>
                     {searchFriendsList.map((friend) => {

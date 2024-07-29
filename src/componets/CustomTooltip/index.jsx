@@ -12,7 +12,6 @@ const CustomTooltip = ({placement, title, children}) => {
             const childRect = childRef.current.getBoundingClientRect();
             const tooltipRect = tooltipRef.current.getBoundingClientRect();
             const newPosition = calculatePosition(placement, childRect, tooltipRect);
-            console.log(newPosition)
             setPosition(newPosition);
         }
     }, [visible, placement]);
@@ -53,7 +52,7 @@ const CustomTooltip = ({placement, title, children}) => {
                     {title}
                 </div>
             )}
-            <div ref={childRef} onMouseEnter={showTooltip} onMouseLeave={hideTooltip}>
+            <div ref={childRef} onMouseEnter={showTooltip} onMouseLeave={hideTooltip} onClick={hideTooltip}>
                 {children}
             </div>
         </div>
