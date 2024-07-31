@@ -2356,6 +2356,7 @@ version = "0.2.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "06085512b750d640299b79be4bad3d2fa90a9c00b1fd9e1b46364f66f0485c72"
 dependencies = [
+ "cc",
  "pkg-config",
 ]
 
@@ -3864,8 +3865,9 @@ checksum = "94143f37725109f92c262ed2cf5e59bce7498c01bcc1502d7b9afe439a4e9f49"
 
 [[package]]
 name = "screenshots"
-version = "0.5.3"
-source = "git+https://github.com/nashaofu/screenshots-rs?branch=master#efdc2df2d4cd85bf10f0d99e2abbbd1d89f68a4a"
+version = "0.5.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "436a9fd3ae9c4fb426ceb884a087c39e4b451c7ee2f339a1ea3a66121534b41b"
 dependencies = [
  "anyhow",
  "core-graphics 0.22.3",
@@ -3874,7 +3876,7 @@ dependencies = [
  "fxhash",
  "png",
  "widestring",
- "windows 0.44.0",
+ "windows 0.48.0",
  "xcb",
 ]
 
@@ -5651,15 +5653,6 @@ dependencies = [
  "raw-window-handle 0.6.2",
  "windows-sys 0.52.0",
  "windows-version",
-]
-
-[[package]]
-name = "windows"
-version = "0.44.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e745dab35a0c4c77aa3ce42d595e13d2003d6902d6b08c9ef5fc326d08da12b"
-dependencies = [
- "windows-targets 0.42.2",
 ]
 
 [[package]]
