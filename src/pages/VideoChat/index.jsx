@@ -1,7 +1,7 @@
 import {useEffect, useRef, useState} from "react";
 import "./index.less"
 import VideoApi from "../../api/video.js";
-import {listen} from "@tauri-apps/api/event";
+import {emit, listen} from "@tauri-apps/api/event";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import WindowOperation from "../../componets/WindowOperation/index.jsx";
 import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
@@ -10,6 +10,7 @@ import {useToast} from "../../componets/CustomToast/index.jsx";
 import {getItem} from "../../utils/storage.js";
 import {formatTimingTime} from "../../utils/date.js";
 import {invoke} from "@tauri-apps/api/core";
+import MessageApi from "../../api/message.js";
 
 export default function VideoChat() {
     const toUserId = useRef()
@@ -158,8 +159,30 @@ export default function VideoChat() {
 
     const onHangup = () => {
         handlerDestroyTime()
-        VideoApi.hangup({userId: toUserId.current}).then(res => {
-            WebviewWindow.getCurrent().close()
+        //发送挂断消息
+        let msg = {
+            toUserId: toUserId.current,
+            msgContent: {
+                type: "call",
+                content: JSON.stringify({
+                    time: time,
+                    type: isOnlyAudio ? "audio" : "video"
+                })
+            }
+        }
+        MessageApi.sendMsg(msg).then(res => {
+            if (res.code === 0) {
+                if (res.data) {
+                    emit("on-hang-up", {
+                        toUserId: toUserId.current,
+                        data: res.data
+                    })
+                }
+            }
+        }).finally(() => {
+            VideoApi.hangup({userId: toUserId.current}).then(res => {
+                WebviewWindow.getCurrent().close()
+            })
         })
     }
 

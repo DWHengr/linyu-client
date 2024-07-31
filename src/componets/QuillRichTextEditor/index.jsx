@@ -45,7 +45,7 @@ const QuillRichTextEditor = React.forwardRef(({value, onChange, onKeyDown}, ref)
         const quill = quillRef.current.getEditor();
 
         quill.clipboard.addMatcher(Node.ELEMENT_NODE, (node, delta) => {
-            if (node.tagName === 'IMG') {
+            if (node.tagName === 'IMG' || node.tagName === 'img') {
                 return delta;
             }
             let plaintext = node.innerText;

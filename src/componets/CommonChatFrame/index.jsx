@@ -32,6 +32,7 @@ import Voice from "./ChatContent/Voice/index.jsx";
 import {getItem, setItem} from "../../utils/storage.js";
 import CustomTooltip from "../CustomTooltip/index.jsx";
 import CreateImageViewer from "../../pages/ImageViewer/window.jsx";
+import Call from "./ChatContent/Call/index.jsx";
 
 function CommonChatFrame({userInfo}) {
 
@@ -138,12 +139,23 @@ function CommonChatFrame({userInfo}) {
             if (!currentToId.current) return
             onSendFile(e.payload.paths[0])
         });
+        //监听音视频挂断
+        let unHangUp = listen("on-hang-up", (e) => {
+            let msg = e.payload
+            console.log("e.payload", e.payload)
+            if (msg.toUserId === currentToId.current) {
+                messagesRef.current.push(msg.data)
+                setMessages(() => [...messagesRef.current])
+                emit("on-send-msg", {})
+            }
+        });
         return async () => {
             (await unListen)();
             (await unScreenshotListen)();
             (await unScreenshot)();
             (await unDrop)();
             (await unCloseMsgWindow)();
+            (await unHangUp)();
             if (unFocus) (await unFocus)();
         }
     }, [])
@@ -520,36 +532,43 @@ function CommonChatFrame({userInfo}) {
     }
 
     const handleMsgContent = (msg) => {
+        let isRight = msg.fromId === currentUserId.current
         switch (msg.msgContent?.type) {
             case "text": {
                 return <Text
                     value={msg.msgContent?.content}
-                    right={msg.fromId === currentUserId.current}
+                    right={isRight}
                 />
             }
             case "file": {
                 return <FileContent
                     value={msg}
-                    right={msg.fromId === currentUserId.current}
+                    right={isRight}
                 />
             }
             case "img": {
                 return <Img
                     value={msg}
-                    right={msg.fromId === currentUserId.current}
+                    right={isRight}
                 />
             }
             case "retraction": {
                 return <Retraction
                     value={msg}
                     onReedit={onReedit}
-                    right={msg.fromId === currentUserId.current}
+                    right={isRight}
                 />
             }
             case "voice": {
                 return <Voice
                     value={msg}
-                    right={msg.fromId === currentUserId.current}
+                    right={isRight}
+                />
+            }
+            case "call": {
+                return <Call
+                    value={msg}
+                    right={isRight}
                 />
             }
         }
