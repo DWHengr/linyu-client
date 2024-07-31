@@ -38,8 +38,12 @@ const Voice = memo(({value, right = false}) => {
             <div className={"chat-content-voice"}>
                 <div className={`content  ${right ? "right" : ""}`}>
                     {info &&
-                        <CustomAudio key={retryNum} audioUrl={info} time={audioTime}
-                                     onLoadedMetadata={() => clearInterval(interval.current)}
+                        <CustomAudio
+                            type={right ? "" : "minor"}
+                            key={retryNum}
+                            audioUrl={info}
+                            time={audioTime}
+                            onLoadedMetadata={() => clearInterval(interval.current)}
                         />
                     }
                 </div>

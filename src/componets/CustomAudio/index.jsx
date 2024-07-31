@@ -2,7 +2,7 @@ import "./index.less"
 import CustomSoundIcon from "../CustomSoundIcon/index.jsx";
 import React, {useRef, useState} from "react";
 
-export default function CustomAudio({audioUrl, time, onLoadedMetadata}) {
+export default function CustomAudio({audioUrl, time, onLoadedMetadata, type = ""}) {
     const [audioTime, setAudioTime] = useState(time)
     const audioRef = useRef(null)
     const [isPlay, setIsPlay] = useState(false)
@@ -22,10 +22,10 @@ export default function CustomAudio({audioUrl, time, onLoadedMetadata}) {
         }
     };
 
-    return (
-        <div>
-            <div onClick={playAudio} className="custom-audio">
-                <CustomSoundIcon isStart={isPlay} style={{color: "#fff", marginLeft: 10}}/>
+    return (<div>
+            <div onClick={playAudio} className={`custom-audio ${type}`}>
+                <CustomSoundIcon isStart={isPlay} style={{marginLeft: 10}}
+                                 barStyle={{backgroundColor: type === "" ? "#fff" : "#1f1f1f"}}/>
                 <div style={{marginLeft: 10}}>{audioTime}"</div>
                 <audio
                     ref={audioRef}
@@ -38,6 +38,5 @@ export default function CustomAudio({audioUrl, time, onLoadedMetadata}) {
                     src={audioUrl} controls style={{display: "none"}}
                 />
             </div>
-        </div>
-    )
+        </div>)
 }
