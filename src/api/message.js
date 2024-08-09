@@ -24,5 +24,8 @@ export default {
     },
     reedit(param) {
         return Http.post("/v1/api/message/reedit", param);
+    },
+    voiceToText(param) {
+        return Http.get("/v1/api/message/voice/to/text", param);
     }
 };

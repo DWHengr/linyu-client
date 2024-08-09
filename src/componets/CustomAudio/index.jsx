@@ -23,20 +23,21 @@ export default function CustomAudio({audioUrl, time, onLoadedMetadata, type = ""
     };
 
     return (<div>
-            <div onClick={playAudio} className={`custom-audio ${type}`}>
-                <CustomSoundIcon isStart={isPlay} style={{marginLeft: 10}}
-                                 barStyle={{backgroundColor: type === "" ? "#fff" : "#1f1f1f"}}/>
-                <div style={{marginLeft: 10}}>{audioTime}"</div>
-                <audio
-                    ref={audioRef}
-                    onEnded={() => {
-                        setIsPlay(false)
-                    }}
-                    onLoadedMetadata={() => {
-                        if (onLoadedMetadata) onLoadedMetadata()
-                    }}
-                    src={audioUrl} controls style={{display: "none"}}
-                />
-            </div>
-        </div>)
+        <div onClick={playAudio} className={`custom-audio ${type}`}>
+            <CustomSoundIcon isStart={isPlay} style={{marginLeft: 10}}
+                             barStyle={{backgroundColor: type === "" ? "#fff" : "#1f1f1f"}}/>
+            <div style={{marginLeft: 10}}>{audioTime}"</div>
+            <audio
+                ref={audioRef}
+                onEnded={() => {
+                    setIsPlay(false)
+                    setIsPause(true)
+                }}
+                onLoadedMetadata={() => {
+                    if (onLoadedMetadata) onLoadedMetadata()
+                }}
+                src={audioUrl} controls style={{display: "none"}}
+            />
+        </div>
+    </div>)
 }

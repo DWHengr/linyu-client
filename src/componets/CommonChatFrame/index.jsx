@@ -371,7 +371,9 @@ function CommonChatFrame({userInfo}) {
         if (scrollTriggered.current) {
             scrollTriggered.current = false
         } else {
-            onScrollToBottom()
+            setTimeout(() => {
+                onScrollToBottom()
+            }, 100)
         }
     }, [messages])
 
@@ -576,7 +578,8 @@ function CommonChatFrame({userInfo}) {
 
     const msgContentRightOptions = [
         {key: "copy", label: "复制"},
-        {key: "retraction", label: "撤回"}
+        {key: "retraction", label: "撤回"},
+        {key: "voiceToText", label: "语音转文字"}
     ]
     const [msgContentRightFilterOptions, setMsgContentRightFilterOptions] = useState([])
     const [msgContentMenuPosition, setMsgContentMenuPosition] = useState(null)
@@ -595,6 +598,7 @@ function CommonChatFrame({userInfo}) {
         currentRightSelectMsgRef.current = msg
         let filter = [""]
         if (msg.msgContent.type !== 'text') filter.push("copy")
+        if (msg.msgContent.type !== 'voice') filter.push("voiceToText")
         if (msg.fromId !== currentUserId.current) filter.push("retraction")
         setMsgContentRightFilterOptions(filter)
         setMsgContentMenuPosition({x: e.clientX, y: e.clientY})
@@ -615,6 +619,38 @@ function CommonChatFrame({userInfo}) {
         emit("on-send-msg", {})
     }
 
+    const handlerUpdateVoiceToTextMsg = (newMsg) => {
+        let isExist = false
+        let i = 0
+        for (i = messagesRef.current.length - 1; i >= 0; i--) {
+            let msg = messagesRef.current[i]
+            if (msg.id === newMsg.id) {
+                messagesRef.current[i] = newMsg
+                messagesRef.current[i].loading = false
+                isExist = true
+                break
+            }
+        }
+        scrollTriggered.current = !(i === messagesRef.current.length - 1 && isExist);
+        setMessages(() => [...messagesRef.current])
+    }
+
+    const handlerLoadingMsg = (msgId) => {
+        let isExist = false
+        let i = 0
+        for (i = messagesRef.current.length - 1; i >= 0; i--) {
+            let msg = messagesRef.current[i]
+            if (msg.id === msgId) {
+                messagesRef.current[i] = JSON.parse(JSON.stringify(msg))
+                messagesRef.current[i].loading = true
+                isExist = true
+                break
+            }
+        }
+        scrollTriggered.current = !(i === messagesRef.current.length - 1 && isExist);
+        setMessages(() => [...messagesRef.current])
+    }
+
     const onMsgContentClick = (action) => {
         switch (action.key) {
             case "copy": {
@@ -628,6 +664,23 @@ function CommonChatFrame({userInfo}) {
                 })
                 break
             }
+            case "voiceToText": {
+                for (let i = messagesRef.current.length - 1; i >= 0; i--) {
+                    let msg = messagesRef.current[i]
+                    if (msg.id === currentRightSelectMsgRef.current.id) {
+                        if (msg.loading) {
+                            return true
+                        }
+                    }
+                }
+                handlerLoadingMsg(currentRightSelectMsgRef.current.id)
+                MessageApi.voiceToText({msgId: currentRightSelectMsgRef.current.id}).then(res => {
+                    if (res.code === 0) {
+                        handlerUpdateVoiceToTextMsg(res.data)
+                    }
+                })
+                break
+            }
         }
     }
 
@@ -636,7 +689,7 @@ function CommonChatFrame({userInfo}) {
         <RightClickMenu
             position={msgContentMenuPosition}
             options={msgContentRightOptions}
-            width={70}
+            width={90}
             filter={msgContentRightFilterOptions}
             onMenuItemClick={onMsgContentClick}
         />

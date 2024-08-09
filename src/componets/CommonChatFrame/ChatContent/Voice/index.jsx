@@ -11,10 +11,14 @@ const Voice = memo(({value, right = false}) => {
     const interval = useRef(null)
     const [retryNum, setRetryNum] = useState(0)
     const retryNumRef = useRef(0)
+    const [text, setText] = useState('')
+    const [loading, setLoading] = useState(true)
 
     useEffect(() => {
+        setLoading(value.loading)
         fileInfo.current = JSON.parse(value.msgContent?.content)
         setAudioTime(fileInfo.current.time)
+        setText(fileInfo.current.text)
         MessageApi.getMedia({
             msgId: value.id,
         }).then((res) => {
@@ -45,6 +49,18 @@ const Voice = memo(({value, right = false}) => {
                             time={audioTime}
                             onLoadedMetadata={() => clearInterval(interval.current)}
                         />
+                    }
+                    {
+                        text &&
+                        <div className="text">
+                            {text}
+                        </div>
+                    }
+                    {
+                        loading && !text &&
+                        <div className="text dots">
+                            加载中...
+                        </div>
                     }
                 </div>
             </div>
