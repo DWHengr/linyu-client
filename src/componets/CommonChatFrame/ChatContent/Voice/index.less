@@ -9,23 +9,28 @@
   .content {
     display: flex;
     flex-direction: column;
-    align-items: end;
+    align-items: start;
     justify-content: right;
 
     .text {
       font-size: 14px;
       border-radius: 5px;
-      background-color: #4C9BFF;
+      background-color: #FFF;
       margin-top: 1px;
       padding: 5px;
-      border-top: #adadad 1px solid;
       max-width: 240px;
+
+      &.right {
+        background-color: #4C9BFF;
+        color: #fff;
+      }
     }
   }
 
   .content.right {
     color: #fff;
     margin-left: auto;
+    align-items: end;
   }
 
   .loading-spinner {

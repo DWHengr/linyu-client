@@ -52,13 +52,13 @@ const Voice = memo(({value, right = false}) => {
                     }
                     {
                         text &&
-                        <div className="text">
+                        <div className={`text ${right ? "right" : ""}`}>
                             {text}
                         </div>
                     }
                     {
                         loading && !text &&
-                        <div className="text dots">
+                        <div className={`text dots ${right ? "right" : ""}`}>
                             加载中...
                         </div>
                     }

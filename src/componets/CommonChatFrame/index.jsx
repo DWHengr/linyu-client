@@ -142,7 +142,6 @@ function CommonChatFrame({userInfo}) {
         //监听音视频挂断
         let unHangUp = listen("on-hang-up", (e) => {
             let msg = e.payload
-            console.log("e.payload", e.payload)
             if (msg.toUserId === currentToId.current) {
                 messagesRef.current.push(msg.data)
                 setMessages(() => [...messagesRef.current])
@@ -340,7 +339,7 @@ function CommonChatFrame({userInfo}) {
                         container.scrollTop = scrollTopBeforeLoad + (scrollHeightAfterLoad - scrollHeightBeforeLoad);
                     });
                 } else {
-                    scrollTriggered.current = false
+                    scrollTriggered.current = true
                     isQueryComplete.current = true
                 }
             }
