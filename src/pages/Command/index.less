@@ -1,0 +1,90 @@
+.command-window-container {
+  padding: 5px;
+  position: relative;
+
+  .command-window {
+    border: 2px solid #C4C4C4;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    height: calc(100vh - 10px);
+    border-radius: 10px;
+    background-color: #EDF2F9;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    box-sizing: border-box;
+
+    .command-box {
+      height: 60px;
+      background-color: #F9FBFF;
+      padding: 0 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-sizing: border-box;
+
+      .command-one {
+        width: 80px;
+        height: 34px;
+        background-color: rgba(66, 66, 66, 0.6);
+        border-radius: 5px;
+        margin-right: 5px;
+        color: #FFFFFF;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+      }
+
+      .command-two {
+        width: 100px;
+        height: 34px;
+        background-color: rgba(31, 31, 31, 0.8);
+        border-radius: 5px;
+        color: #FFFFFF;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-weight: 600;
+        margin-right: 5px;
+      }
+
+      .command-input {
+        flex: 1;
+
+        input {
+          outline: none;
+          border: none;
+          font-size: 18px;
+          width: 100%;
+          background-color: transparent;
+          display: flex;
+        }
+      }
+    }
+
+    .content {
+      flex: 1;
+
+      .cmd-item {
+        height: 40px;
+        margin: 5px 10px;
+        background-color: #fff;
+        display: flex;
+        padding: 10px;
+        align-items: center;
+        border-radius: 5px;
+        user-select: none;
+        cursor: pointer;
+
+        &:hover {
+          outline: 2px solid #4C9BFF;
+        }
+
+        &:focus-within {
+          outline: 2px solid #4C9BFF;
+        }
+      }
+    }
+  }
+}

@@ -36,6 +36,7 @@ import CreateScreenshot from "../screenshot/window.jsx";
 import CreateAboutWindow from "../AboutWindow/window.jsx";
 import CreateImageViewer from "../ImageViewer/window.jsx";
 import {getFileNameAndType} from "../../utils/string.js";
+import CreateCmdWindow from "../Command/window.jsx";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData)
@@ -74,6 +75,10 @@ export default function Home() {
                 CreateScreenshot("");
             }
         })
+        //监听命令行模式
+        const unCmd = listen('command', async (event) => {
+            CreateCmdWindow();
+        })
         invoke("get_user_info", {}).then(res => {
             dispatch(setCurrentLoginUserInfo(res.user_id, res.username, res.account, res.portrait))
             let token = res.token
@@ -82,6 +87,7 @@ export default function Home() {
                 ws.connect(token)
                 CreateTrayWindow()
                 CrateMessageBox()
+                CreateCmdWindow()
                 onGetUserUnreadNum()
                 onGetUserSet()
             }
@@ -89,6 +95,7 @@ export default function Home() {
         return async () => {
             (await unHideOrShowHome)();
             (await unScreenshot)();
+            (await unCmd)();
         }
     }, [])
 
@@ -101,6 +108,8 @@ export default function Home() {
     }
 
     const registerAllShortcut = async (value) => {
+        //cmd
+        shortcutRegisterAndEmit("alt+space", "command")
         //screenshot
         shortcutRegisterAndEmit(value.screenshot, "screenshot")
         //hideOrShowHome
