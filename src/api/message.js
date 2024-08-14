@@ -7,6 +7,9 @@ export default {
     record(param) {
         return Http.post("/v1/api/message/record", param);
     },
+    recordDesc(param) {
+        return Http.post("/v1/api/message/record/desc", param);
+    },
     sendFile(param, progressHandler) {
         return Http.uploadFile("/v1/api/message/send/file", param, progressHandler)
     },

@@ -22,6 +22,7 @@
       align-items: center;
       justify-content: center;
       box-sizing: border-box;
+      flex-shrink: 0;
 
       .command-one {
         width: 80px;
@@ -64,7 +65,7 @@
     }
 
     .content {
-      flex: 1;
+      overflow: hidden;
 
       .cmd-item {
         height: 40px;
@@ -83,6 +84,19 @@
 
         &:focus-within {
           outline: 2px solid #4C9BFF;
+        }
+      }
+
+      .chat-content {
+        height: 100%;
+        overflow-y: scroll;
+
+
+        .chat-content-show-frame {
+          padding: 10px 15px;
+          display: flex;
+          flex-direction: column;
+          position: relative;
         }
       }
     }

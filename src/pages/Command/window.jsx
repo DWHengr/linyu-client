@@ -23,8 +23,7 @@ export default async function CreateCmdWindow() {
     });
     await webview.setPosition(new PhysicalPosition(0, window.innerHeight + 100))
     await webview.listen("tauri://window-created", async function () {
-        const window = WebviewWindow.getByLabel('command')
-        await window.hide();
-        await window.center()
+        await webview.hide();
+        await webview.center()
     });
 }
