@@ -108,12 +108,19 @@ export default function Chat() {
             }
             dispatch(deleteChatWindowUser(event.payload.fromId))
         })
+        //监听聊天窗口是否销毁
+        const unChatNew = listen('chat-new', (event) => {
+            if (currentToId.current === rightSelected.current) {
+                setSelectedUserInfo(null)
+            }
+        })
         return async () => {
             (await unFocus)();
             (await unReceiveListen)();
             (await unSendListen)();
             (await unChatDestroyed)();
             (await unRefreshChat)();
+            (await unChatNew)();
         }
     }, [])
 
@@ -134,7 +141,6 @@ export default function Chat() {
         onGetChatList()
     }, []);
 
-
     const onMenuItemClick = (item) => {
         switch (item.key) {
             case "top": {
@@ -154,12 +160,7 @@ export default function Chat() {
                 break
             }
             case "newChatWindow" : {
-                dispatch(addChatWindowUser(selectedRightUserInfo.current))
-                let title = selectedRightUserInfo.current.remark ? selectedRightUserInfo.current.remark : selectedRightUserInfo.current.name
-                CreateChatWindow(rightSelected.current, title ? title : "linyu")
-                if (selectedChatId === rightSelected.current) {
-                    setSelectedUserInfo(null)
-                }
+                emit("chat-new", selectedRightUserInfo.current)
                 break
             }
             case "deleteChat": {

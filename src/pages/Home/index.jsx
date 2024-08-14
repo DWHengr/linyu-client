@@ -17,7 +17,7 @@ import Notify from "./Notify/index.jsx";
 import UserApi from "../../api/user.js";
 import {emit, listen} from "@tauri-apps/api/event";
 import CrateMessageBox from "../MessageBox/window.jsx";
-import {setCurrentChatId} from "../../store/chat/action.js";
+import {addChatWindowUser, deleteChatWindowUser, setCurrentChatId} from "../../store/chat/action.js";
 import ChatListApi from "../../api/chatList.js";
 import CreateVideoChat from "../VideoChat/window.jsx";
 import CustomModal from "../../componets/CustomModal/index.jsx";
@@ -37,6 +37,7 @@ import CreateAboutWindow from "../AboutWindow/window.jsx";
 import CreateImageViewer from "../ImageViewer/window.jsx";
 import {getFileNameAndType} from "../../utils/string.js";
 import CreateCmdWindow from "../Command/window.jsx";
+import CreateChatWindow from "../ChatWindow/window.jsx";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData)
@@ -143,6 +144,15 @@ export default function Home() {
                 onGetUserUnreadNum()
             }
         });
+        const unChatDestroyed = listen('chat-destroyed', (event) => {
+            dispatch(deleteChatWindowUser(event.payload.fromId))
+        })
+        const unChatNew = listen('chat-new', (event) => {
+            let data = event.payload
+            dispatch(addChatWindowUser(data))
+            let title = data.remark ? data.remark : data.name
+            CreateChatWindow(data.fromId, title ? title : "linyu")
+        })
         const unUnreadListen = listen('on-unread-info', (event) => {
             onGetUserUnreadNum()
         });
@@ -174,6 +184,8 @@ export default function Home() {
             (await unNotifyListen)();
             (await unVideoListen)();
             (await unChatListJumpListen)();
+            (await unChatDestroyed)();
+            (await unChatNew)();
         }
     }, [])
 

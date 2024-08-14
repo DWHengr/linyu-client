@@ -1,7 +1,6 @@
 import "./index.less"
 import IconMinorButton from "../IconMinorButton/index.jsx";
 import CustomButton from "../CustomButton/index.jsx";
-import Text from "./ChatContent/Text/index.jsx";
 import CustomDragDiv from "../CustomDragDiv/index.jsx";
 import {memo, useCallback, useEffect, useRef, useState} from "react";
 import {emit, listen} from "@tauri-apps/api/event";
@@ -16,23 +15,19 @@ import CreateVideoChat from "../../pages/VideoChat/window.jsx";
 import VideoApi from "../../api/video.js";
 import CreateScreenshot from "../../pages/screenshot/window.jsx";
 import {open} from '@tauri-apps/plugin-dialog';
-import FileContent from "./ChatContent/File/index.jsx";
 import {stat} from "@tauri-apps/plugin-fs";
 import {useDispatch} from "react-redux";
 import {setFileFileProgress} from "../../store/home/action.js";
 import {getFileNameAndType, isImageFile} from "../../utils/string.js";
-import Img from "./ChatContent/Img/index.jsx";
 import RightClickContent from "../RightClickContent/index.jsx";
 import FriendApi from "../../api/friend.js";
 import QuillRichTextEditor from "../QuillRichTextEditor/index.jsx";
 import RightClickMenu from "../RightClickMenu/index.jsx";
-import Retraction from "./ChatContent/Retraction/index.jsx";
 import VoiceRecorder from "../VoiceRecorder/index.jsx";
-import Voice from "./ChatContent/Voice/index.jsx";
 import {getItem, setItem} from "../../utils/storage.js";
 import CustomTooltip from "../CustomTooltip/index.jsx";
 import CreateImageViewer from "../../pages/ImageViewer/window.jsx";
-import Call from "./ChatContent/Call/index.jsx";
+import {MsgContent} from "./ChatContent/MsgContent/index.jsx";
 
 function CommonChatFrame({userInfo}) {
 
@@ -532,49 +527,6 @@ function CommonChatFrame({userInfo}) {
         </div>)
     }
 
-    const handleMsgContent = (msg) => {
-        let isRight = msg.fromId === currentUserId.current
-        switch (msg.msgContent?.type) {
-            case "text": {
-                return <Text
-                    value={msg.msgContent?.content}
-                    right={isRight}
-                />
-            }
-            case "file": {
-                return <FileContent
-                    value={msg}
-                    right={isRight}
-                />
-            }
-            case "img": {
-                return <Img
-                    value={msg}
-                    right={isRight}
-                />
-            }
-            case "retraction": {
-                return <Retraction
-                    value={msg}
-                    onReedit={onReedit}
-                    right={isRight}
-                />
-            }
-            case "voice": {
-                return <Voice
-                    value={msg}
-                    right={isRight}
-                />
-            }
-            case "call": {
-                return <Call
-                    value={msg}
-                    right={isRight}
-                />
-            }
-        }
-    }
-
     const msgContentRightOptions = [
         {key: "copy", label: "复制"},
         {key: "retraction", label: "撤回"},
@@ -760,7 +712,7 @@ function CommonChatFrame({userInfo}) {
                 return (<div key={msg.id}>
                     {msg.isShowTime && <Time value={formatTime(msg.updateTime)}/>}
                     <div onContextMenu={(e) => handlerRightSelectMsgContent(e, msg)}>
-                        {handleMsgContent(msg)}
+                        <MsgContent msg={msg} userId={currentUserId.current} onReedit={onReedit}/>
                     </div>
                 </div>)
             })}

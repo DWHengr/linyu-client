@@ -31,4 +31,7 @@ export default {
     listFlat(param) {
         return Http.get("/v1/api/friend/list/flat", param);
     },
+    listFlatUnread(param) {
+        return Http.get("/v1/api/friend/list/flat/unread", param);
+    },
 };
