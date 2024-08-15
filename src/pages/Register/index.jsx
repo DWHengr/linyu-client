@@ -35,7 +35,7 @@ export default function Register() {
             />
             <CustomDragDiv className="register">
                 <div style={{width: 260, display: "flex", flexDirection: "column", alignItems: "center"}}>
-                    <div style={{fontSize: 24, marginBottom: 50}}>欢迎注册</div>
+                    <div style={{fontSize: 24, marginBottom: 50, fontWeight: 600}}>欢迎注册</div>
                     <div style={{
                         display: "flex",
                         flexDirection: "column",

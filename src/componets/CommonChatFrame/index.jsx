@@ -795,7 +795,7 @@ function CommonChatFrame({userInfo}) {
                     <VoiceRecorder onComplete={onSendVoice}/>
                 </CustomTooltip>
                 <CustomTooltip placement="top" title={userSets.sendMsgShortcut}>
-                    <CustomButton width={40} onClick={onSendMsg}>
+                    <CustomButton style={{marginRight: 0}} width={40} onClick={onSendMsg}>
                         发送
                     </CustomButton>
                 </CustomTooltip>

@@ -239,6 +239,7 @@ export default function VideoChat() {
             <div className="video-container">
                 <WindowOperation
                     hide={false}
+                    height={40}
                     onClose={onHangup}
                 />
                 <div className="video">

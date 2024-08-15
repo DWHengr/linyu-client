@@ -221,11 +221,11 @@ export default function Home() {
     }, [])
 
     const options = [
-        {key: "chat", icon: "icon-liaotian", page: "/home/chat"},
-        {key: "friend", icon: "icon-haoyou", page: "/home/friend"},
-        {key: "talk", icon: "icon-pengyouquan", page: "/home/talk"},
-        {key: "notify", icon: "icon-tongzhi", page: "/home/notify"},
-        {key: "set", icon: "icon-shezhi", page: "/home/set"},
+        {key: "chat", icon: "chat", page: "/home/chat"},
+        {key: "friend", icon: "user", page: "/home/friend"},
+        {key: "talk", icon: "talk", page: "/home/talk"},
+        {key: "notify", icon: "notify", page: "/home/notify"},
+        {key: "set", icon: "set", page: "/home/set"},
     ]
 
     const onGetUserInfo = (e) => {
@@ -463,8 +463,12 @@ export default function Home() {
                                             dispatch(setCurrentOption(option.key))
                                             h.push(option.page)
                                         }}
+
                                     >
-                                        <i className={`iconfont ${option.icon}`} style={{fontSize: 30}}/>
+                                        {/*<i className={`iconfont ${option.icon}`} style={{fontSize: 30}}/>*/}
+                                        <img alt=""
+                                             src={`/icon/${option.icon + (option.key === selectedOptionIndex ? "" : "-empty")}.png`}
+                                             style={{width: 34, height: 34}}/>
                                         {
                                             unreadInfo[option.key] && unreadInfo[option.key] > 0 ?
                                                 <div className="home-nav-option-tip">
@@ -481,7 +485,7 @@ export default function Home() {
                         className="home-nav-my"
                         onClick={onGetUserInfo}
                     >
-                        <img style={{width: 60, height: 60, borderRadius: 60,}} src={homeStoreData.portrait}
+                        <img style={{width: 55, height: 55, borderRadius: 55,}} src={homeStoreData.portrait}
                              alt={homeStoreData.portrait}/>
                     </div>
                 </CustomDragDiv>
