@@ -58,6 +58,12 @@ export default function Shortcut() {
                             <CustomShortcutInput value={userSets.closeMsgWindow}
                                                  onChange={(v) => handleOnChange("closeMsgWindow", v)}/>
                         </div>
+                        <CustomLine width={1}/>
+                        <div className="set-item-option">
+                            <div>命令行模式</div>
+                            <CustomShortcutInput value={userSets.command}
+                                                 onChange={(v) => handleOnChange("command", v)}/>
+                        </div>
                     </div>
                 </div>
             </div>

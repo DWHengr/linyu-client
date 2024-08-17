@@ -110,7 +110,7 @@ export default function Home() {
 
     const registerAllShortcut = async (value) => {
         //cmd
-        shortcutRegisterAndEmit("alt+space", "command")
+        shortcutRegisterAndEmit(value.command, "command")
         //screenshot
         shortcutRegisterAndEmit(value.screenshot, "screenshot")
         //hideOrShowHome
