@@ -6,16 +6,25 @@ import {useState} from "react";
 import CustomButton from "../../componets/CustomButton/index.jsx";
 import {useToast} from "../../componets/CustomToast/index.jsx";
 import UserApi from "../../api/user.js";
+import LoginApi from "../../api/login.js";
+import {JSEncrypt} from "jsencrypt";
 
 export default function Register() {
     const [userInfo, setUserInfo] = useState({username: "", account: "", password: ""})
     const showToast = useToast()
 
-    const onRegister = () => {
+    const onRegister = async () => {
         if (!userInfo.username || !userInfo.account || !userInfo.password) {
             showToast("注册信息有误，请检查~", true)
             return
         }
+        let keyData = await LoginApi.publicKey();
+        if (keyData.code !== 0) {
+            return
+        }
+        const encrypt = new JSEncrypt();
+        encrypt.setPublicKey(keyData.data);
+        userInfo.password = encrypt.encrypt(userInfo.password)
         UserApi.register(userInfo).then(res => {
             if (res.code === 0) {
                 showToast("注册成功~")

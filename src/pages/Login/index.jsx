@@ -14,6 +14,7 @@ import CreateAboutWindow from "../AboutWindow/window.jsx";
 import CustomInput from "../../componets/CustomInput/index.jsx";
 import CustomButton from "../../componets/CustomButton/index.jsx";
 import CreateRegisterWindow from "../Register/window.jsx";
+import {JSEncrypt} from "jsencrypt";
 
 export default function Login() {
     let [account, setAccount] = useState("")
@@ -38,7 +39,7 @@ export default function Login() {
         }
     }, [])
 
-    const onLogin = () => {
+    const onLogin = async () => {
         if (!account) {
             showToast("用户名不能为空~", true)
             return
@@ -47,7 +48,14 @@ export default function Login() {
             showToast("用户名不能为空~", true)
             return
         }
-        LoginApi.login({account: account, password: password})
+        let keyData = await LoginApi.publicKey();
+        if (keyData.code !== 0) {
+            return
+        }
+        const encrypt = new JSEncrypt();
+        encrypt.setPublicKey(keyData.data);
+        const encryptedPassword = encrypt.encrypt(password);
+        LoginApi.login({account: account, password: encryptedPassword})
             .then((res) => {
                 if (res.code === 0) {
                     invoke('save_user_info', {
