@@ -1,7 +1,7 @@
 import "./index.less"
 import {useState} from "react";
 
-export default function CustomPwdInput({value, onChange}) {
+export default function CustomPwdInput({value, onChange, onKeyDown}) {
     const [inputValue, setInputValue] = useState(value)
     const onCleanValue = () => {
         setInputValue("")
@@ -18,6 +18,9 @@ export default function CustomPwdInput({value, onChange}) {
                 onChange={(e) => {
                     setInputValue(e.target.value)
                     if (onChange) onChange(e.target.value)
+                }}
+                onKeyDown={(e) => {
+                    if (onKeyDown) onKeyDown(e)
                 }}
 
             />

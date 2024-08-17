@@ -40,13 +40,19 @@ export default function Login() {
         }
     }, [])
 
+    const handleKeyDown = (event) => {
+        if (event.key === 'Enter') {
+            onLogin()
+        }
+    }
+
     const onLogin = async () => {
         if (!account) {
             showToast("用户名不能为空~", true)
             return
         }
         if (!password) {
-            showToast("用户名不能为空~", true)
+            showToast("密码不能为空~", true)
             return
         }
         let keyData = await LoginApi.publicKey();
@@ -127,7 +133,11 @@ export default function Login() {
                     />
                 </div>
                 <div className="login-pwd-input">
-                    <CustomPwdInput value={password} onChange={(v) => setPassword(v)}/>
+                    <CustomPwdInput
+                        value={password}
+                        onChange={(v) => setPassword(v)}
+                        onKeyDown={handleKeyDown}
+                    />
                 </div>
                 <div className={`login-button ${password && account ? "" : "disabled"}`} onClick={() => {
                     if (password && account)
