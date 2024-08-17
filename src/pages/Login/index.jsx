@@ -15,6 +15,7 @@ import CustomInput from "../../componets/CustomInput/index.jsx";
 import CustomButton from "../../componets/CustomButton/index.jsx";
 import CreateRegisterWindow from "../Register/window.jsx";
 import {JSEncrypt} from "jsencrypt";
+import CustomBox from "../../componets/CustomBox/index.jsx";
 
 export default function Login() {
     let [account, setAccount] = useState("")
@@ -88,94 +89,92 @@ export default function Login() {
     }
 
     return (
-        <div className="login-container">
-            <CustomDragDiv className="login">
-                <CustomDragDiv className="login-operate">
-                    <div style={{marginLeft: 10}}>
-                        <IconButton
-                            icon={<i className={`iconfont icon-guanyu`} style={{fontSize: 22}}/>}
-                            onClick={CreateAboutWindow}
-                        />
-                    </div>
-                    <div style={{display: "flex", marginRight: 10}}>
-                        <IconButton
-                            icon={<i className={`iconfont icon-shezhi`} style={{fontSize: 22}}/>}
-                            onClick={() => setIsSetServer(!isSetServer)}
-                        />
-                        <IconButton
-                            danger
-                            icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 22}}/>}
-                            onClick={
-                                () => {
-                                    const appWindow = WebviewWindow.getByLabel('login')
-                                    appWindow.close()
-                                }
+        <CustomBox className="login">
+            <CustomDragDiv className="login-operate">
+                <div style={{marginLeft: 10}}>
+                    <IconButton
+                        icon={<i className={`iconfont icon-guanyu`} style={{fontSize: 22}}/>}
+                        onClick={CreateAboutWindow}
+                    />
+                </div>
+                <div style={{display: "flex", marginRight: 10}}>
+                    <IconButton
+                        icon={<i className={`iconfont icon-shezhi`} style={{fontSize: 22}}/>}
+                        onClick={() => setIsSetServer(!isSetServer)}
+                    />
+                    <IconButton
+                        danger
+                        icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 22}}/>}
+                        onClick={
+                            () => {
+                                const appWindow = WebviewWindow.getByLabel('login')
+                                appWindow.close()
                             }
-                        />
+                        }
+                    />
+                </div>
+            </CustomDragDiv>
+            {!isSetServer && <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
+                <div className="login-icon">
+                    <img style={{height: 120}} src="/logo.png" alt=""/>
+                </div>
+                <div className="login-pwd-input">
+                    <CustomUserNameInput
+                        value={account}
+                        onChange={(v) => setAccount(v)}
+                        reagents={reagents}
+                        onDeleteItem={handlerDeleteItem}
+                    />
+                </div>
+                <div className="login-pwd-input">
+                    <CustomPwdInput value={password} onChange={(v) => setPassword(v)}/>
+                </div>
+                <div className={`login-button ${password && account ? "" : "disabled"}`} onClick={() => {
+                    if (password && account)
+                        onLogin()
+                }}>
+                    登 录
+                </div>
+                <div
+                    style={{fontSize: 14, marginTop: 15, cursor: "pointer", color: "#4C9BFF"}}
+                    onClick={CreateRegisterWindow}
+                >
+                    注册账号
+                </div>
+            </div>}
+            {isSetServer &&
+                <div style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    width: "100%",
+                    userSelect: "none"
+                }}>
+                    <CustomDragDiv style={{marginTop: 36, fontSize: 20}}>设置服务器</CustomDragDiv>
+                    <div style={{marginTop: 36, width: "85%"}}>
+                        <div style={{marginBottom: 5, fontSize: 14}}>IP地址:</div>
+                        <CustomInput value={serverIp} onChange={(v) => setServerIp(v)}/>
                     </div>
-                </CustomDragDiv>
-                {!isSetServer && <div style={{display: "flex", flexDirection: "column", alignItems: "center"}}>
-                    <div className="login-icon">
-                        <img style={{height: 120}} src="/logo.png" alt=""/>
+                    <div style={{marginTop: 20, width: "85%"}}>
+                        <div style={{marginBottom: 5, fontSize: 14}}>WebSocket地址:</div>
+                        <CustomInput value={serverWs} onChange={(v) => setServerWs(v)}/>
                     </div>
-                    <div className="login-pwd-input">
-                        <CustomUserNameInput
-                            value={account}
-                            onChange={(v) => setAccount(v)}
-                            reagents={reagents}
-                            onDeleteItem={handlerDeleteItem}
-                        />
-                    </div>
-                    <div className="login-pwd-input">
-                        <CustomPwdInput value={password} onChange={(v) => setPassword(v)}/>
-                    </div>
-                    <div className={`login-button ${password && account ? "" : "disabled"}`} onClick={() => {
-                        if (password && account)
-                            onLogin()
-                    }}>
-                        登 录
-                    </div>
-                    <div
-                        style={{fontSize: 14, marginTop: 15, cursor: "pointer", color: "#4C9BFF"}}
-                        onClick={CreateRegisterWindow}
-                    >
-                        注册账号
+                    <div style={{display: "flex", marginTop: 50, width: "85%", justifyContent: "end"}}>
+                        <CustomButton width={70} onClick={() => {
+                            setLocalItem("serverIp", serverIp)
+                            setLocalItem("serverWs", serverWs)
+                            setIsSetServer(false)
+                            showToast("设置成功~")
+                        }}>
+                            确定
+                        </CustomButton>
+                        <CustomButton type="minor" width={70}
+                                      onClick={() => setIsSetServer(false)}
+                        >
+                            取消
+                        </CustomButton>
                     </div>
                 </div>}
-                {isSetServer &&
-                    <div style={{
-                        display: "flex",
-                        flexDirection: "column",
-                        alignItems: "center",
-                        width: "100%",
-                        userSelect: "none"
-                    }}>
-                        <CustomDragDiv style={{marginTop: 36, fontSize: 20}}>设置服务器</CustomDragDiv>
-                        <div style={{marginTop: 36, width: "85%"}}>
-                            <div style={{marginBottom: 5, fontSize: 14}}>IP地址:</div>
-                            <CustomInput value={serverIp} onChange={(v) => setServerIp(v)}/>
-                        </div>
-                        <div style={{marginTop: 20, width: "85%"}}>
-                            <div style={{marginBottom: 5, fontSize: 14}}>WebSocket地址:</div>
-                            <CustomInput value={serverWs} onChange={(v) => setServerWs(v)}/>
-                        </div>
-                        <div style={{display: "flex", marginTop: 50, width: "85%", justifyContent: "end"}}>
-                            <CustomButton width={70} onClick={() => {
-                                setLocalItem("serverIp", serverIp)
-                                setLocalItem("serverWs", serverWs)
-                                setIsSetServer(false)
-                                showToast("设置成功~")
-                            }}>
-                                确定
-                            </CustomButton>
-                            <CustomButton type="minor" width={70}
-                                          onClick={() => setIsSetServer(false)}
-                            >
-                                取消
-                            </CustomButton>
-                        </div>
-                    </div>}
-            </CustomDragDiv>
-        </div>
+        </CustomBox>
     )
 }

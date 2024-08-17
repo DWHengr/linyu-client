@@ -1,20 +1,11 @@
-.register-container {
-  padding: 5px;
+.register {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(-45deg, #80d2ff, #d7e3fd, #7fb5ff);
+  animation: gradientAnimation 15s ease infinite;
   position: relative;
-
-  .register {
-    border: 1px solid #E1E0E0;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-    height: calc(100vh - 10px);
-    border-radius: 10px;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    background: linear-gradient(-45deg, #80d2ff, #d7e3fd, #7fb5ff);
-    animation: gradientAnimation 15s ease infinite;
-    position: relative;
-    justify-content: center;
-    align-items: center;
-
-  }
+  justify-content: center;
+  align-items: center;
 }

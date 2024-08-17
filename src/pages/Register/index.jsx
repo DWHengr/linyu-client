@@ -8,6 +8,7 @@ import {useToast} from "../../componets/CustomToast/index.jsx";
 import UserApi from "../../api/user.js";
 import LoginApi from "../../api/login.js";
 import {JSEncrypt} from "jsencrypt";
+import CustomBox from "../../componets/CustomBox/index.jsx";
 
 export default function Register() {
     const [userInfo, setUserInfo] = useState({username: "", account: "", password: ""})
@@ -36,7 +37,7 @@ export default function Register() {
     }
 
     return (
-        <CustomDragDiv className="register-container">
+        <CustomBox>
             <WindowOperation
                 hide={false}
                 height={40}
@@ -85,7 +86,7 @@ export default function Register() {
                 </div>
 
             </CustomDragDiv>
-        </CustomDragDiv>
+        </CustomBox>
     )
 
 }

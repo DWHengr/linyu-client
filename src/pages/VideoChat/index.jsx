@@ -11,6 +11,7 @@ import {getItem} from "../../utils/storage.js";
 import {formatTimingTime} from "../../utils/date.js";
 import {invoke} from "@tauri-apps/api/core";
 import MessageApi from "../../api/message.js";
+import CustomBox from "../../componets/CustomBox/index.jsx";
 
 export default function VideoChat() {
     const toUserId = useRef()
@@ -234,8 +235,8 @@ export default function VideoChat() {
     };
 
 
-    return (<div className="video-chat-container ">
-        <CustomDragDiv className="video-chat">
+    return (
+        <CustomBox className="video-chat">
             <div className="video-container">
                 <WindowOperation
                     hide={false}
@@ -342,6 +343,5 @@ export default function VideoChat() {
                     </CustomDragDiv>
                 </div>
             </div>
-        </CustomDragDiv>
-    </div>)
+        </CustomBox>)
 }

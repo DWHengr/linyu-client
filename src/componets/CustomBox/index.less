@@ -1,0 +1,23 @@
+.custom-box-container {
+  padding: 5px;
+  overflow: hidden;
+
+  .custom-box {
+    overflow: hidden;
+    border: 1px solid #E1E0E0;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+    height: calc(100vh - 10px);
+    width: calc(100vw - 10px);
+    border-radius: 10px;
+  }
+
+  &.full {
+    padding: 0;
+
+    .custom-box {
+      height: 100vh;
+      width: 100vw;
+      border-radius: 0;
+    }
+  }
+}

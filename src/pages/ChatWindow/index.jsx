@@ -6,6 +6,7 @@ import ChatListApi from "../../api/chatList.js";
 import CommonChatFrame from "../../componets/CommonChatFrame/index.jsx";
 import {useDispatch} from "react-redux";
 import {addChatWindowUser} from "../../store/chat/action.js";
+import CustomBox from "../../componets/CustomBox/index.jsx";
 
 export default function ChatWindow() {
 
@@ -24,11 +25,9 @@ export default function ChatWindow() {
     }, [])
 
     return (
-        <div className="chat-window-container">
-            <div className="chat-window">
-                {userInfo && <CommonChatFrame userInfo={userInfo}/>}
-                <WindowOperation hide={false}/>
-            </div>
-        </div>
+        <CustomBox className="chat-window">
+            {userInfo && <CommonChatFrame userInfo={userInfo}/>}
+            <WindowOperation hide={false}/>
+        </CustomBox>
     )
 }

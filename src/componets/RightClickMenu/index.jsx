@@ -31,8 +31,10 @@ export default function RightClickMenu({position, options, visible = false, onMe
                             return <></>
                         }
                         return (
-                            <div className="option" key={item.key} onClick={(e) => {
-                                onItemClick(item)
+                            <div className="option" key={item.key} onMouseDown={(e) => {
+                                if (e.button === 0) {
+                                    onItemClick(item)
+                                }
                             }}>
                                 {item.label}
                             </div>
