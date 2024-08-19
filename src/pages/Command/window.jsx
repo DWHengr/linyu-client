@@ -19,9 +19,10 @@ export default async function CreateCmdWindow() {
         shadow: false,
         resizable: false,
         alwaysOnTop: true,
-        skipTaskbar: true
+        skipTaskbar: true,
+        x: 0,
+        y: window.screen.height + 100
     });
-    await webview.setPosition(new PhysicalPosition(0, window.innerHeight + 100))
     await webview.listen("tauri://window-created", async function () {
         await webview.hide();
         await webview.center()
