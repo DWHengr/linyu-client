@@ -265,7 +265,8 @@ export default function Command() {
         }
     }, [cmdTwo])
 
-    return (<div className="command-window-container">
+    return (
+        <div className="command-window-container">
             <FocusLock>
                 <CustomDragDiv className="command-window">
                     <CustomDragDiv className="command-box">
@@ -375,6 +376,7 @@ export default function Command() {
                             </div>}
                         </div>
                     </CustomDragDiv>
+                    <div style={{marginLeft: 5, color: "#888888", userSelect: "none"}}>按ESC键，退出命名行模式</div>
                 </CustomDragDiv>
             </FocusLock>
         </div>)

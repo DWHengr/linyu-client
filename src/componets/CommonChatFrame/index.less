@@ -23,22 +23,22 @@
     display: flex;
     flex-direction: column;
     position: relative;
+  }
 
-    .hint {
-      padding: 2px 10px;
-      background-color: white;
-      position: fixed;
-      right: 15px;
-      bottom: 265px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 20px;
-      box-shadow: 0 0 5px 0.1px #999;
-      user-select: none;
-      color: #4C9BFF;
-      cursor: pointer;
-    }
+  .hint {
+    padding: 2px 10px;
+    background-color: white;
+    position: fixed;
+    right: 15px;
+    bottom: 265px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 20px;
+    box-shadow: 0 0 5px 0.1px #999;
+    user-select: none;
+    color: #4C9BFF;
+    cursor: pointer;
   }
 
   .resize-handle {
@@ -134,8 +134,9 @@
   height: 190px;
   padding: 5px 15px;
   border-radius: 5px;
-  background: linear-gradient(to bottom right, #F9FBFF, rgba(249, 251, 255, 0.5)),
-  linear-gradient(to bottom, #A0D9F6, rgba(160, 217, 246, 0));
+  background-image: linear-gradient(130deg, rgba(249, 251, 255, 0.6), rgba(227, 236, 255, 0.6));
+  backdrop-filter: blur(10px);
+  border: rgba(255, 255, 255, 0.8) 2px solid;
 
   .user-details-title {
     height: 35px;

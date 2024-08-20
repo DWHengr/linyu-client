@@ -365,9 +365,7 @@ function CommonChatFrame({userInfo}) {
         if (scrollTriggered.current) {
             scrollTriggered.current = false
         } else {
-            setTimeout(() => {
-                onScrollToBottom()
-            }, 100)
+            onScrollToBottom()
         }
     }, [messages])
 
@@ -716,6 +714,8 @@ function CommonChatFrame({userInfo}) {
                     </div>
                 </div>)
             })}
+        </div>
+        <div>
             {newMsgUnreadNum !== 0 &&
                 <div className="hint"
                      onClick={onScrollToBottom}

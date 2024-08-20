@@ -39,7 +39,7 @@ export default function RightClickContent({position, visible, children}) {
     }, [contentVisible])
 
     return (
-        <div className="right-click-menu">
+        <div className="right-click-content">
             {contentVisible && (
                 <div className="overlay">
                     <div

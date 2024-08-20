@@ -16,6 +16,7 @@ import CustomButton from "../../componets/CustomButton/index.jsx";
 import CreateRegisterWindow from "../Register/window.jsx";
 import {JSEncrypt} from "jsencrypt";
 import CustomBox from "../../componets/CustomBox/index.jsx";
+import {exit} from "@tauri-apps/plugin-process";
 
 export default function Login() {
     let [account, setAccount] = useState("")
@@ -113,8 +114,7 @@ export default function Login() {
                         icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 22}}/>}
                         onClick={
                             () => {
-                                const appWindow = WebviewWindow.getByLabel('login')
-                                appWindow.close()
+                                exit()
                             }
                         }
                     />

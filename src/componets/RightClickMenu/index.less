@@ -1,31 +1,20 @@
-.right-click-menu {
-  .overlay {
-    z-index: 999;
-  }
 
-  .content {
-    z-index: 100;
-    position: absolute;
-    background-color: rgba(237, 242, 249, 0.8);
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(10px);
+.options {
+  background-color: rgba(237, 242, 249, 0.7);
+  backdrop-filter: blur(10px);
+  border-radius: 5px;
+
+  .option {
+    padding: 2px 10px;
     border-radius: 5px;
-    outline: none;
-  }
+    cursor: pointer;
+    font-size: 14px;
+    height: 28px;
+    display: flex;
+    align-items: center;
 
-  .options {
-    .option {
-      padding: 2px 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 14px;
-      height: 28px;
-      display: flex;
-      align-items: center;
-
-      &:hover {
-        background-color: rgb(220, 234, 255);
-      }
+    &:hover {
+      background-color: rgb(220, 234, 255);
     }
   }
 }
