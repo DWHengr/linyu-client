@@ -1,7 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react';
 import "./index.less"
 
-const CustomEditableText = ({text, onSave, placeholder}) => {
+const CustomEditableText = ({text, onSave, placeholder, style}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(text);
     const inputRef = useRef(null);
@@ -47,7 +47,10 @@ const CustomEditableText = ({text, onSave, placeholder}) => {
     };
 
     return (
-        <div className="custom-editable-text">
+        <div
+            className="custom-editable-text"
+            style={style}
+        >
             {isEditing ? (
                 <input
                     ref={inputRef}
@@ -56,6 +59,7 @@ const CustomEditableText = ({text, onSave, placeholder}) => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder={placeholder}
+                    style={{width: '100%'}}
                 />
             ) : (
                 <span onClick={handleClick}>

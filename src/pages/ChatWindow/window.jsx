@@ -1,7 +1,9 @@
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
 import {emit} from "@tauri-apps/api/event";
+import {setItem} from "../../utils/storage.js";
 
-export default function CreateChatWindow(userId, username) {
+export default async function CreateChatWindow(userId, username, type) {
+    await setItem("chat-windows-" + userId, {userId, username, type})
     const window = WebviewWindow.getByLabel('chat-' + userId)
     if (window) {
         window.show()

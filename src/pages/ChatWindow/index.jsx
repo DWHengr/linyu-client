@@ -7,6 +7,7 @@ import CommonChatFrame from "../../componets/CommonChatFrame/index.jsx";
 import {useDispatch} from "react-redux";
 import {addChatWindowUser} from "../../store/chat/action.js";
 import CustomBox from "../../componets/CustomBox/index.jsx";
+import {getItem} from "../../utils/storage.js";
 
 export default function ChatWindow() {
 
@@ -16,17 +17,19 @@ export default function ChatWindow() {
     useEffect(() => {
         let label = WebviewWindow.getCurrent().label;
         let fromId = label.split('-')[1];
-        ChatListApi.detail(fromId).then(res => {
-            if (res.code === 0) {
-                setUserInfo(res.data)
-                dispatch(addChatWindowUser(res))
-            }
+        getItem("chat-windows-" + fromId).then(res => {
+            ChatListApi.detail({targetId: fromId, type: res.type}).then(res => {
+                if (res.code === 0) {
+                    setUserInfo(res.data)
+                    dispatch(addChatWindowUser(res))
+                }
+            })
         })
     }, [])
 
     return (
         <CustomBox className="chat-window">
-            {userInfo && <CommonChatFrame userInfo={userInfo}/>}
+            {userInfo && <CommonChatFrame chatInfo={userInfo}/>}
             <WindowOperation hide={false}/>
         </CustomBox>
     )

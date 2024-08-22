@@ -28,19 +28,24 @@ import {getItem, setItem} from "../../utils/storage.js";
 import CustomTooltip from "../CustomTooltip/index.jsx";
 import CreateImageViewer from "../../pages/ImageViewer/window.jsx";
 import {MsgContent} from "./ChatContent/MsgContent/index.jsx";
+import ChatGroupMemberApi from "../../api/chatGroupMember.js";
+import CustomDrawer from "../CustomDrawer/index.jsx";
+import ChatGroupApi from "../../api/chatGroup.js";
+import CustomEditableText from "../CustomEditableText/index.jsx";
+import CustomSearchInput from "../CustomSearchInput/index.jsx";
 
-function CommonChatFrame({userInfo}) {
+function CommonChatFrame({chatInfo}) {
 
     const [messages, setMessages] = useState([])
     const showFrameRef = useRef(null)
-    const currentToId = useRef(userInfo.fromId)//消息目标用户
+    const currentToId = useRef(chatInfo.fromId)//消息目标用户
     const msgContentRef = useRef(null)//输入框消息内容
     const messagesRef = useRef([])//保持会话的消息
     const currentUserId = useRef(null)//当前用户
     const currentMsgRecordIndex = useRef(0)//消息记录查询的索引
     const scrollTriggered = useRef(false) //滚动条是否触发
     const isQueryComplete = useRef(false) //消息记录是否全部加载
-    const userInfoRef = useRef(userInfo)
+    const userInfoRef = useRef(chatInfo)
     const newMsgUnreadNumRef = useRef(0)
     const [newMsgUnreadNum, setNewMsgUnreadNum] = useState(newMsgUnreadNumRef.current)
     const dispatch = useDispatch()
@@ -62,6 +67,9 @@ function CommonChatFrame({userInfo}) {
     const [isResizing, setIsResizing] = useState(false);
     const [startY, setStartY] = useState(0);
     const [startHeight, setStartHeight] = useState(0);
+    const [chatGroupMemberList, setChatGroupMemberList] = useState([])
+    const [chatGroupInfoOpen, setChatGroupInfoOpen] = useState(false)
+    const [groupDetails, setGroupDetails] = useState(null)
 
     useEffect(() => {
         const window = WebviewWindow.getCurrent()
@@ -95,11 +103,12 @@ function CommonChatFrame({userInfo}) {
         //监听后端发送的消息
         const unListen = listen('on-receive-msg', async (event) => {
             let data = event.payload
+            console.log(data)
             if (data?.msgContent?.type === "retraction") {
                 handlerUpdateRetractionMsg(data.id)
                 return;
             }
-            if (currentToId.current === data.fromId) {
+            if (currentToId.current === data.fromId || (data.source === 'group' && currentToId.current === data.toId)) {
                 const window = WebviewWindow.getCurrent()
                 let isFocused = await window.isFocused()
                 let isMinimized = await window.isMinimized();
@@ -205,10 +214,8 @@ function CommonChatFrame({userInfo}) {
         let fileType = isImageFile(fileName) ? "img" : "file"
         let msg = {
             toUserId: currentToId.current, msgContent: {
-                type: fileType,
-                content: JSON.stringify({
-                    name: fileName,
-                    size: fileInfo.size,
+                type: fileType, source: chatInfo.type, content: JSON.stringify({
+                    name: fileName, size: fileInfo.size,
                 })
             }
         }
@@ -341,19 +348,31 @@ function CommonChatFrame({userInfo}) {
         })
     }
 
+    const onChatGroupMemberList = () => {
+        ChatGroupMemberApi.list({chatGroupId: chatInfo.fromId}).then(res => {
+            console.log(res)
+            if (res.code === 0) {
+                setChatGroupMemberList(res.data)
+            }
+        })
+    }
+
     useEffect(() => {
         setEditorHtml("")
-        userInfoRef.current = userInfo
+        userInfoRef.current = chatInfo
         //会话切换，重置
         isQueryComplete.current = false
         currentMsgRecordIndex.current = 0
         scrollTriggered.current = false
         messagesRef.current = []
-        currentToId.current = userInfo.fromId
+        currentToId.current = chatInfo.fromId
         const container = showFrameRef.current
         container.scrollTop = container.scrollHeight
         onMessageRecord()
-    }, [userInfo])
+        if (chatInfo.type === 'group') {
+            onChatGroupMemberList()
+        }
+    }, [chatInfo])
 
     const onScrollToBottom = () => {
         const container = showFrameRef.current
@@ -388,9 +407,9 @@ function CommonChatFrame({userInfo}) {
         data?.map(item => {
             if (item.type === 'text') {
                 let msg = {
-                    toUserId: currentToId.current, msgContent: {
+                    toUserId: currentToId.current, source: chatInfo.type, msgContent: {
                         type: "text", content: item.text
-                    }, isShowTime: true
+                    }
                 }
                 MessageApi.sendMsg(msg).then(res => {
                     if (res.code === 0) {
@@ -406,10 +425,8 @@ function CommonChatFrame({userInfo}) {
                 let file = onUploadImg(item.url)
                 let msg = {
                     toUserId: currentToId.current, msgContent: {
-                        type: "img",
-                        content: JSON.stringify({
-                            name: file.name,
-                            size: file.size,
+                        type: "img", source: chatInfo.type, content: JSON.stringify({
+                            name: file.name, size: file.size,
                         })
                     }
                 }
@@ -434,12 +451,9 @@ function CommonChatFrame({userInfo}) {
     const onSendVoice = (audioBlob, time) => {
         const audioFile = new File([audioBlob], 'voice.wav', {type: 'audio/wav'});
         let msg = {
-            toUserId: currentToId.current, msgContent: {
-                type: "voice",
-                content: JSON.stringify({
-                    name: audioFile.name,
-                    size: audioFile.size,
-                    time: time,
+            toUserId: currentToId.current, source: chatInfo.type, msgContent: {
+                type: "voice", content: JSON.stringify({
+                    name: audioFile.name, size: audioFile.size, time: time,
                 })
             }
         }
@@ -486,7 +500,7 @@ function CommonChatFrame({userInfo}) {
     }
 
     const onUserDetails = (e) => {
-        FriendApi.details(userInfo.fromId).then(res => {
+        FriendApi.details(chatInfo.fromId).then(res => {
             if (res.code === 0) {
                 setUserDetails(res.data)
             }
@@ -525,11 +539,10 @@ function CommonChatFrame({userInfo}) {
         </div>)
     }
 
-    const msgContentRightOptions = [
-        {key: "copy", label: "复制"},
-        {key: "retraction", label: "撤回"},
-        {key: "voiceToText", label: "语音转文字"}
-    ]
+    const msgContentRightOptions = [{key: "copy", label: "复制"}, {
+        key: "retraction",
+        label: "撤回"
+    }, {key: "voiceToText", label: "语音转文字"}]
     const [msgContentRightFilterOptions, setMsgContentRightFilterOptions] = useState([])
     const [msgContentMenuPosition, setMsgContentMenuPosition] = useState(null)
     const currentRightSelectMsgRef = useRef()
@@ -633,6 +646,26 @@ function CommonChatFrame({userInfo}) {
         }
     }
 
+    const onGroupDetails = () => {
+        setChatGroupInfoOpen(true)
+        ChatGroupApi.details({chatGroupId: chatInfo.fromId}).then(res => {
+            if (res.code === 0) {
+                setGroupDetails(res.data)
+            }
+        })
+    }
+
+    const handlerGroupDisplayName = (member) => {
+        if (!member) return;
+        if (member.groupName) {
+            return member.groupName;
+        } else if (member.remark) {
+            return member.remark;
+        } else {
+            return member.name;
+        }
+    };
+
     return (<div className="common-chat-content">
         <BiaoQingPop/>
         <RightClickMenu
@@ -652,8 +685,7 @@ function CommonChatFrame({userInfo}) {
                     <div style={{display: "flex", alignItems: "center"}}>
                         <i className={`iconfont ${userDetails?.sex === '女' ? 'icon-nv' : 'icon-nan'}`}
                            style={{
-                               marginRight: 5,
-                               color: userDetails?.sex === '女' ? "#FFA0CF" : "#4C9BFF"
+                               marginRight: 5, color: userDetails?.sex === '女' ? "#FFA0CF" : "#4C9BFF"
                            }}/>
                         <div>{userDetails?.account}</div>
                     </div>
@@ -690,42 +722,130 @@ function CommonChatFrame({userInfo}) {
                 </div>
             </div>
         </RightClickContent>
+        <CustomDrawer isOpen={chatGroupInfoOpen} onClose={() => setChatGroupInfoOpen(false)}>
+            <div className="chat-group-drawer">
+                <div className="chat-group-drawer-item">
+                    <div className="item-label">群聊名称</div>
+                    <CustomEditableText
+                        style={{color: "#969696", fontSize: 14, width: 300}}
+                        placeholder="群聊名称"
+                        text={groupDetails?.name}
+                    />
+                </div>
+                <div className="chat-group-drawer-item">
+                    <div className="item-label">备注</div>
+                    <CustomEditableText
+                        style={{color: "#969696", fontSize: 14, width: 300}}
+                        placeholder="群聊的备注，仅自己可见"
+                        text={groupDetails?.groupRemark}
+                    />
+                </div>
+                <div className="chat-group-drawer-item">
+                    <div className="item-label">本群昵称</div>
+                    <CustomEditableText
+                        style={{color: "#969696", fontSize: 14, width: 300}}
+                        placeholder="设置本群昵称"
+                        text={groupDetails?.groupName}
+                    />
+                </div>
+                <div className="chat-group-drawer-item">
+                    <div className="item-label">群公告</div>
+                    <div style={{color: "#969696", fontSize: 14}}>{groupDetails?.notice}</div>
+                </div>
+                <div className="chat-group-member-list">
+                    <div className="item-label">
+                        <div>群成员({groupDetails?.memberNum})</div>
+                    </div>
+                    <CustomSearchInput
+                        style={{marginTop: 4, marginBottom: 4, border: '#FFF 2px solid', height: 30}}
+                        placeholder="搜索成员"
+                        value=""
+                    />
+                    <div className="member">
+                        {
+                            Object.entries(chatGroupMemberList).map(([userId, member]) => {
+                                return (
+                                    <div key={userId} className="member-item">
+                                        <img alt=""
+                                             src={member.portrait}
+                                             className="item-portrait"
+                                        />
+                                        <div className="item-name">
+                                            {handlerGroupDisplayName(member)}
+                                        </div>
+                                    </div>
+                                )
+                            })
+                        }
+                    </div>
+                </div>
+            </div>
+        </CustomDrawer>
         <CustomDragDiv className="chat-content-title">
             <img
                 style={{
                     width: 40, height: 40, backgroundColor: "#4C9BFF", borderRadius: 50, marginLeft: 10
                 }}
-                src={userInfo.portrait}
-                alt={userInfo.portrait}
-                onClick={onUserDetails}
+                src={chatInfo.portrait}
+                alt={chatInfo.portrait}
+                onClick={(e) => {
+                    if (chatInfo.type === 'group') {
+                        onGroupDetails()
+                    } else {
+                        onUserDetails(e)
+                    }
+                }}
             />
             <div style={{
                 fontWeight: 600, color: "#1F1F1F", marginLeft: 10,
             }}>
-                {userInfo.remark ? userInfo.remark : userInfo.name}
+                {chatInfo.remark ? chatInfo.remark : chatInfo.name}
             </div>
         </CustomDragDiv>
         <div ref={showFrameRef} className="chat-content-show-frame">
             {messages?.map((msg) => {
+                let isRight = msg.fromId === currentUserId.current
                 return (<div key={msg.id}>
                     {msg.isShowTime && <Time value={formatTime(msg.updateTime)}/>}
-                    <div onContextMenu={(e) => handlerRightSelectMsgContent(e, msg)}>
-                        <MsgContent msg={msg} userId={currentUserId.current} onReedit={onReedit}/>
+                    <div>
+                        {chatInfo.type === 'group' &&
+                            <div style={{display: "flex", justifyContent: isRight ? 'end' : ''}}>
+                                {!isRight && <img alt="" src={chatGroupMemberList[msg.fromId]?.portrait}
+                                                  style={{width: 35, height: 35, borderRadius: 35}}/>}
+                                <div style={{
+                                    marginRight: 5,
+                                    marginLeft: 5,
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: isRight ? 'end' : ''
+                                }}>
+                                    <div style={{fontSize: 12, color: "#969696"}}>
+                                        {handlerGroupDisplayName(chatGroupMemberList[msg.fromId])}
+                                    </div>
+                                    <div onContextMenu={(e) => handlerRightSelectMsgContent(e, msg)}>
+                                        <MsgContent msg={msg} userId={currentUserId.current} onReedit={onReedit}/>
+                                    </div>
+                                </div>
+                                {isRight && <img alt="" src={chatGroupMemberList[msg.fromId]?.portrait}
+                                                 style={{width: 35, height: 35, borderRadius: 35}}/>}
+                            </div>}
+                        {chatInfo.type === 'user' && <div onContextMenu={(e) => handlerRightSelectMsgContent(e, msg)}>
+                            <MsgContent msg={msg} userId={currentUserId.current} onReedit={onReedit}/>
+                        </div>}
                     </div>
                 </div>)
             })}
         </div>
         <div>
-            {newMsgUnreadNum !== 0 &&
-                <div className="hint"
-                     onClick={onScrollToBottom}
-                     style={{bottom: height + 15}}
-                >
-                    <i className={`iconfont icon icon-xiala`} style={{fontSize: 12}}/>
-                    {newMsgUnreadNum > 0 && <div style={{marginLeft: 5}}>
-                        {newMsgUnreadNum}
-                    </div>}
+            {newMsgUnreadNum !== 0 && <div className="hint"
+                                           onClick={onScrollToBottom}
+                                           style={{bottom: height + 15}}
+            >
+                <i className={`iconfont icon icon-xiala`} style={{fontSize: 12}}/>
+                {newMsgUnreadNum > 0 && <div style={{marginLeft: 5}}>
+                    {newMsgUnreadNum}
                 </div>}
+            </div>}
         </div>
         <div
             className="chat-content-send-frame"
@@ -763,7 +883,7 @@ function CommonChatFrame({userInfo}) {
                         title={`截图 ${userSets.screenshot}`}
                     />
                 </div>
-                <div style={{display: "flex"}}>
+                {chatInfo.type === 'user' && <div style={{display: "flex"}}>
                     <IconMinorButton
                         icon={<i className={`iconfont icon icon-dianhua`} style={{fontSize: 24}}/>}
                         onClick={() => onVideo(true)}
@@ -774,7 +894,7 @@ function CommonChatFrame({userInfo}) {
                         onClick={() => onVideo(false)}
                         title="视频"
                     />
-                </div>
+                </div>}
             </div>
             <div className="chat-content-send-frame-msg">
                 <QuillRichTextEditor

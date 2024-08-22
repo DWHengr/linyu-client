@@ -25,6 +25,37 @@
         position: absolute;
         right: 4px;
       }
+
+      .friend-select-card {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        .friend-select-card-item {
+          flex: 1;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          border: #FFFFFF 3px solid;
+          border-radius: 10px;
+          padding: 2px 0;
+          user-select: none;
+          cursor: pointer;
+          font-size: 14px;
+          font-weight: 600;
+          margin-bottom: 5px;
+
+          &:hover {
+            background-image: none;
+            background-color: rgba(237, 242, 249);
+          }
+
+          &.selected {
+            background-color: #E3ECFF;
+            background-image: linear-gradient(-130deg, rgba(249, 251, 255), #E3ECFF);
+          }
+        }
+      }
     }
 
     .friend-list-items {
@@ -37,6 +68,13 @@
         font-size: 12px;
         color: #646464
       }
+    }
+
+    .group-chat-list-items {
+      flex: 1;
+      overflow-y: scroll;
+      padding: 0 5px 0;
+
     }
   }
 

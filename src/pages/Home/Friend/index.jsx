@@ -32,6 +32,7 @@ import {getFileNameAndType} from "../../../utils/string.js";
 import CustomImg from "../../../componets/CustomImg/index.jsx";
 import CreateVideoChat from "../../VideoChat/window.jsx";
 import VideoApi from "../../../api/video.js";
+import ChatGroupApi from "../../../api/chatGroup.js";
 
 export default function Friend() {
     const [selectedFriendId, setSelectedFriendId] = useState(null)
@@ -62,16 +63,30 @@ export default function Friend() {
     const [isGroupDelAffirmModalOpen, setIsGroupDelAffirmModalOpen] = useState(false)
     const [isFriendDelAffirmModalOpen, setIsFriendDelAffirmModalOpen] = useState(false)
     const [groupList, setGroupList] = useState([])
+    //选项卡类型
+    const [selectCard, setSelectCard] = useState("friend")
+    //群聊
+    const [allGroupChatData, setAllGroupChatData] = useState([])
+    const [selectedChatGroupId, setSelectedChatGroupId] = useState(null)
 
     useEffect(() => {
         onFriendList()
         onGroupList()
+        onChatGroupList()
     }, [])
 
     const onFriendList = () => {
         FriendApi.list().then(res => {
             if (res.code === 0) {
                 setAllFriendData(res.data)
+            }
+        })
+    }
+
+    const onChatGroupList = () => {
+        ChatGroupApi.list().then(res => {
+            if (res.code === 0) {
+                setAllGroupChatData(res.data)
             }
         })
     }
@@ -296,6 +311,30 @@ export default function Friend() {
         </div>)
     }
 
+    const ChatGroupCard = ({info, onClick}) => {
+        let isSelected = info.id === selectedChatGroupId
+        return (<div
+            className={`friend-card ${isSelected ? "selected" : ""}`}
+            onClick={() => onClick(info)}
+        >
+            <img className="friend-card-portrait" src={info.portrait}
+                 alt={info.portrait}/>
+            <div className="friend-card-content">
+                <div className="friend-card-content-item">
+                    <div
+                        style={{
+                            fontSize: 14, fontWeight: 600, color: `${isSelected ? "#FFF" : "1F1F1F"}`,
+                        }}
+                        className="ellipsis"
+                    >
+                        {info.groupRemark ? info.groupRemark + "（" + info.name + "）" : info.name}
+                    </div>
+                </div>
+            </div>
+        </div>)
+    }
+
+
     return (
         <div className="friend">
             {/*好有添加弹窗*/}
@@ -486,7 +525,7 @@ export default function Friend() {
             <div className="friend-list">
                 <CustomDragDiv className="friend-list-top">
                     <label className="friend-list-top-title">
-                        好友列表
+                        通讯列表
                         <div className="friend-list-top-title-end"
                              onClick={(e) => setAddMenuPosition({x: e.clientX, y: e.clientY})}>
                             <IconMinorButton
@@ -497,41 +536,73 @@ export default function Friend() {
                     <div>
                         <CustomSearchInput
                             value={searchInfo}
+                            style={{marginBottom: 5}}
                             onChange={(v) => setSearchInfo(v)}
                         />
                     </div>
-                </CustomDragDiv>
-                {!searchInfo ? <div
-                        className="friend-list-items">
-                        {allFriendData.map((item, index) => {
-                            return (
-                                <CustomAccordion
-                                    key={item.name + index}
-                                    title={item.name}
-                                    titleEnd={`（${item.friends ? item.friends.length : 0}）`}
-                                    onContextMenu={(e) => {
-                                        setGroupRightOptionsFilter(item.isCustom ? [""] : ["modifyGroup", "deleteGroup"])
-                                        selectedGroupId.current = item.groupId
-                                        setGroupUpdateInfo(item.name)
-                                        setGroupMenuPosition({x: e.clientX, y: e.clientY})
-                                    }}
-                                >
-                                    {item?.friends?.map((friend) => {
-                                        return (
-                                            <div key={item.groupId + "" + friend.friendId}>
-                                                <FriendCard
-                                                    info={friend}
-                                                    onClick={() => onFriendDetails(friend.friendId)}
-                                                />
-                                            </div>
-                                        )
-                                    })}
-                                </CustomAccordion>
-                            )
-                        })}
-                        {allFriendData?.length <= 0 &&
-                            <CustomEmpty placeholder="暂无好友，请先添加~"/>}
+                    <div className="friend-select-card">
+                        <div
+                            className={`friend-select-card-item ${selectCard === 'friend' ? 'selected' : ''}`}
+                            style={{marginRight: 2}}
+                            onClick={() => setSelectCard('friend')}
+                        >
+                            好友
+                        </div>
+                        <div
+                            className={`friend-select-card-item ${selectCard === 'groupChat' ? 'selected' : ''}`}
+                            onClick={() => setSelectCard('groupChat')}
+                        >
+                            群聊
+                        </div>
                     </div>
+                </CustomDragDiv>
+                {!searchInfo ?
+                    (
+                        selectCard === 'friend' ?
+                            <div
+                                className="friend-list-items">
+                                {allFriendData.map((item, index) => {
+                                    return (
+                                        <CustomAccordion
+                                            key={item.name + index}
+                                            title={item.name}
+                                            titleEnd={`（${item.friends ? item.friends.length : 0}）`}
+                                            onContextMenu={(e) => {
+                                                setGroupRightOptionsFilter(item.isCustom ? [""] : ["modifyGroup", "deleteGroup"])
+                                                selectedGroupId.current = item.groupId
+                                                setGroupUpdateInfo(item.name)
+                                                setGroupMenuPosition({x: e.clientX, y: e.clientY})
+                                            }}
+                                        >
+                                            {item?.friends?.map((friend) => {
+                                                return (
+                                                    <div key={item.groupId + "" + friend.friendId}>
+                                                        <FriendCard
+                                                            info={friend}
+                                                            onClick={() => onFriendDetails(friend.friendId)}
+                                                        />
+                                                    </div>
+                                                )
+                                            })}
+                                        </CustomAccordion>
+                                    )
+                                })}
+                                {allFriendData?.length <= 0 &&
+                                    <CustomEmpty placeholder="暂无好友，请先添加~"/>}
+                            </div>
+                            :
+                            <div className="group-chat-list-items">
+                                {allGroupChatData?.map((item) => {
+                                    return (
+                                        <div key={item.id}>
+                                            <ChatGroupCard info={item} onClick={() => setSelectedChatGroupId(item.id)}/>
+                                        </div>
+                                    )
+                                })}
+                                {allGroupChatData?.length <= 0 &&
+                                    <CustomEmpty placeholder="暂无群聊天，请先加入/创建~"/>}
+                            </div>
+                    )
                     :
                     <div className="friend-list-items">
                         {searchFriendsList.length > 0 ?

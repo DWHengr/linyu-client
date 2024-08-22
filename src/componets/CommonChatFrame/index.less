@@ -129,6 +129,67 @@
   }
 }
 
+.chat-group-drawer {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  height: calc(100% - 20px);
+
+  .chat-group-drawer-item {
+    margin-bottom: 10px;
+
+    .item-label {
+      font-weight: 600;
+      user-select: none;
+    }
+  }
+
+  .chat-group-member-list {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .item-label {
+      font-weight: 600;
+      user-select: none;
+    }
+
+    .member {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      font-weight: 600;
+      overflow-y: scroll;
+
+      .member-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 5px;
+        padding: 2px 5px;
+        user-select: none;
+        border-radius: 5px;
+
+        &:hover {
+          background-color: #F9FBFF;
+        }
+
+        .item-portrait {
+          width: 30px;
+          height: 30px;
+          border-radius: 30px;
+          margin-right: 5px;
+        }
+
+        .item-name {
+          font-size: 12px;
+        }
+
+      }
+    }
+  }
+}
+
 .user-details {
   width: 320px;
   height: 190px;

@@ -125,7 +125,8 @@ export default function Command() {
     }
     const onSendMsg = (text) => {
         let msg = {
-            toUserId: userInfoRef.current.friendId, msgContent: {
+            toUserId: userInfoRef.current.friendId,
+            msgContent: {
                 type: "text", content: text
             },
         }

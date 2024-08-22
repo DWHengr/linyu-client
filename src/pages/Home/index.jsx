@@ -153,7 +153,7 @@ export default function Home() {
             let data = event.payload
             dispatch(addChatWindowUser(data))
             let title = data.remark ? data.remark : data.name
-            CreateChatWindow(data.fromId, title ? title : "linyu")
+            CreateChatWindow(data.fromId, title ? title : "linyu", data.type)
         })
         const unUnreadListen = listen('on-unread-info', (event) => {
             onGetUserUnreadNum()

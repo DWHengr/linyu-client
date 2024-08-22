@@ -193,7 +193,7 @@ export default function Chat() {
         let storeUserInfo = chatStoreData.chatWindowUsers.get(data.fromId);
         if (storeUserInfo) {
             setSelectedUserInfo(null)
-            CreateChatWindow(storeUserInfo.fromId, "linyu")
+            CreateChatWindow(storeUserInfo.fromId, "linyu", storeUserInfo.type)
             return
         }
         if (selectedChatId === data.fromId) return
@@ -325,7 +325,7 @@ export default function Chat() {
                 </div> : <CustomEmpty/>}
             </div>}
         </div>
-        {selectedUserInfo ? <CommonChatFrame userInfo={selectedUserInfo}/> :
+        {selectedUserInfo ? <CommonChatFrame chatInfo={selectedUserInfo}/> :
             <CustomDragDiv style={{display: "flex", flex: 1, alignItems: "center", justifyContent: "center"}}>
                 <img style={{height: 120}} src="/bg.png" alt=""/>
             </CustomDragDiv>}
