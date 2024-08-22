@@ -1,0 +1,49 @@
+.drawer-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  pointer-events: none;
+  z-index: 1112;
+  margin: 5px;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.drawer-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: flex-end;
+  opacity: 0.5;
+  transition: opacity 0.3s ease;
+}
+
+.drawer {
+  width: 340px;
+  height: 100%;
+  border-radius: 0 10px 10px 0;
+  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.2);
+  background-image: linear-gradient(-130deg, rgba(249, 251, 255, 0.7), rgba(227, 236, 255, 0.7));
+  backdrop-filter: blur(15px);
+  border-left: #fff 2px solid;
+  overflow-y: auto;
+  transform: translateX(110%);
+  transition: transform 0.3s ease-out;
+}
+
+.drawer-wrapper.open {
+  pointer-events: auto;
+
+  .drawer-overlay {
+    opacity: 1;
+  }
+
+  .drawer {
+    transform: translateX(0);
+  }
+}
