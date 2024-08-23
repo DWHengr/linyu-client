@@ -132,7 +132,7 @@ function CommonChatFrame({chatInfo}) {
         let unFocus = null;
         if (window.label !== "home") {
             let unFocus = window.listen("tauri://focus", (e) => {
-                let fromId = window.label.split('-')[1]
+                let fromId = window.label.split('--')[1]
                 emit("refresh-chat", {id: fromId})
                 e.stopPropagation()
             });

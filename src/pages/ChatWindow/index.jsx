@@ -16,7 +16,7 @@ export default function ChatWindow() {
 
     useEffect(() => {
         let label = WebviewWindow.getCurrent().label;
-        let fromId = label.split('-')[1];
+        let fromId = label.split('--')[1];
         getItem("chat-windows-" + fromId).then(res => {
             ChatListApi.detail({targetId: fromId, type: res.type}).then(res => {
                 if (res.code === 0) {

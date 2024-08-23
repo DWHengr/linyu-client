@@ -34,8 +34,6 @@ export default function VideoChat() {
 
 
     useEffect(() => {
-        let label = WebviewWindow.getCurrent().label
-        let param = label.split('-')
         getItem("video-chat").then(value => {
             toUserId.current = value.userId
             setIsSender(value.isSender)
