@@ -4,7 +4,7 @@ import {setItem} from "../../utils/storage.js";
 
 export default async function CreateChatWindow(userId, username, type) {
     await setItem("chat-windows-" + userId, {userId, username, type})
-    const window = WebviewWindow.getByLabel('chat-' + userId)
+    const window = await WebviewWindow.getByLabel('chat-' + userId)
     if (window) {
         window.show()
         window.unminimize()

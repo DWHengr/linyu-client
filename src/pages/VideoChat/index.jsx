@@ -41,7 +41,10 @@ export default function VideoChat() {
             setIsSender(value.isSender)
             isOnlyAudioRef.current = value.isOnlyAudio
             setIsOnlyAudio(value.isOnlyAudio)
-            ChatListApi.detail(toUserId.current).then(res => {
+            ChatListApi.detail({
+                targetId: toUserId.current,
+                type: 'user'
+            }).then(res => {
                 if (res.code === 0) {
                     setUserInfo(res.data)
                 }

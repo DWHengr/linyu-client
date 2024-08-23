@@ -1,7 +1,7 @@
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
 
-export default function CreateRegisterWindow() {
-    const window = WebviewWindow.getByLabel('register')
+export default async function CreateRegisterWindow() {
+    const window = await WebviewWindow.getByLabel('register')
     if (window) {
         window.show()
         window.unminimize()

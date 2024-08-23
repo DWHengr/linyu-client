@@ -23,11 +23,11 @@ export default function TrayMenu() {
     }, [])
 
     const onShowHome = async () => {
-        const homeWindow = WebviewWindow.getByLabel('home')
+        const homeWindow = await WebviewWindow.getByLabel('home')
         await homeWindow.show()
         await homeWindow.unminimize()
         await homeWindow.setFocus()
-        const trayWindow = WebviewWindow.getByLabel('tray_menu')
+        const trayWindow = await WebviewWindow.getByLabel('tray_menu')
         await trayWindow.hide()
     }
 

@@ -3,7 +3,7 @@ import {setItem} from "../../utils/storage.js";
 
 export default async function CreateVideoChat(userId, isSender, isOnlyAudio = false) {
     await setItem("video-chat", {userId, isSender, isOnlyAudio})
-    const window = WebviewWindow.getByLabel(`video-chat`)
+    const window = await WebviewWindow.getByLabel(`video-chat`)
     if (window) {
         await window.show()
         await window.setFocus()

@@ -8,7 +8,7 @@ export default async function CreateLogin() {
     TrayIcon.getById("tray").then(async (res) => {
         res.setTooltip("linyu")
     })
-    const window = WebviewWindow.getByLabel(`login`)
+    const window = await WebviewWindow.getByLabel(`login`)
     if (window) {
         await window.show()
         await window.setFocus()
@@ -26,8 +26,8 @@ export default async function CreateLogin() {
         fullscreen: false,
         shadow: false,
     });
-    webview.once("tauri://webview-created", function () {
-        let windows = getAllWindows()
+    webview.once("tauri://webview-created", async function () {
+        let windows = await getAllWindows()
         windows?.map(w => {
             if (w.label !== 'login') {
                 w.close();

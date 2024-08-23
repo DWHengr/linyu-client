@@ -128,8 +128,8 @@ export default function Friend() {
     }
 
 
-    const onSendMsgClick = (friendId) => {
-        ChatListApi.create({userId: friendId}).then(res => {
+    const onSendMsgClick = (friendId, type) => {
+        ChatListApi.create({userId: friendId, type: type}).then(res => {
             if (res.code === 0) {
                 dispatch(setCurrentChatId(friendId, res.data))
                 dispatch(setCurrentOption("chat"))
@@ -612,7 +612,7 @@ export default function Friend() {
                                         return (
                                             <FriendSearchCard
                                                 info={friend}
-                                                onClick={() => onSendMsgClick(friend.friendId)}
+                                                onClick={() => onSendMsgClick(friend.friendId, 'user')}
                                             />
                                         )
                                     })
@@ -736,7 +736,7 @@ export default function Friend() {
                                     <CustomButton
                                         type=""
                                         width={100}
-                                        onClick={() => onSendMsgClick(selectedFriendId)}
+                                        onClick={() => onSendMsgClick(selectedFriendId, 'user')}
                                     >
                                         发消息
                                     </CustomButton>

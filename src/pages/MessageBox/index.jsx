@@ -30,7 +30,7 @@ function MessageBox() {
             let userSets = await getItem("user-sets");
             if (!userSets.friendMsgNotify) return
             if (chatsLengthRef.current <= 0) return
-            const homeWindow = WebviewWindow.getByLabel('massage-box')
+            const homeWindow = await WebviewWindow.getByLabel('massage-box')
             if (!homeWindow) return
 
             let position = event.payload;
@@ -39,7 +39,7 @@ function MessageBox() {
             logicalPosition.x = logicalPosition.x - messageBoxWindowWidth / 2
             logicalPosition.y = window.screen.availHeight - messageBoxWindowHeight - chatsLengthRef.current * 70
 
-            let trayWindow = WebviewWindow.getByLabel('massage-box')
+            let trayWindow = await WebviewWindow.getByLabel('massage-box')
             if (trayWindow) {
                 await trayWindow.setAlwaysOnTop(true)
                 await trayWindow.setPosition(logicalPosition)
@@ -110,7 +110,7 @@ function MessageBox() {
         (async () => {
             let userSets = await getItem("user-sets");
             if (!userSets.friendMsgNotify) return
-            const boxWindow = WebviewWindow.getByLabel('massage-box')
+            const boxWindow = await WebviewWindow.getByLabel('massage-box')
             if (chats.length <= 0) {
                 onClearIntervalId()
             } else {
@@ -147,11 +147,11 @@ function MessageBox() {
     }
 
     const onReadAll = () => {
-        ChatListAPI.readAll().then(res => {
+        ChatListAPI.readAll().then(async res => {
             setChats([])
             onClearIntervalId()
             emit("on-unread-info")
-            const window = WebviewWindow.getByLabel('massage-box')
+            const window = await WebviewWindow.getByLabel('massage-box')
             window.hide();
         })
     }

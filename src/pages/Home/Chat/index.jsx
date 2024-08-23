@@ -73,56 +73,81 @@ export default function Chat() {
     }
 
     useEffect(() => {
-        //home窗口聚焦
-        const window = WebviewWindow.getByLabel('home')
-        let unFocus = window.listen("tauri://focus", (e) => {
-            onRead(currentToId.current)
-            e.stopPropagation()
-        });
-        let unRefreshChat = window.listen("refresh-chat", (e) => {
-            onRead(e.payload.id)
-            e.stopPropagation()
-        });
-        //监听后端接受到的消息
-        const unReceiveListen = listen('on-receive-msg', async (event) => {
-            let data = event.payload
-            const window = WebviewWindow.getByLabel('home')
-            let isFocused = await window.isFocused()
-            let isMaximized = await window.isMaximized()
-            //为当前发送的用户，并且home窗口聚集
-            if (currentToId.current === data.fromId && isFocused && isMaximized) {
-                onRead(data.fromId)
-            } else {
-                onGetChatList()
+        let cleanupFunctions = [];
+        const setup = async () => {
+            try {
+                // home窗口聚焦
+                const window = await WebviewWindow.getByLabel('home');
+
+                const unFocus = await window.listen("tauri://focus", (e) => {
+                    onRead(currentToId.current);
+                    e.stopPropagation();
+                });
+                cleanupFunctions.push(unFocus);
+
+                const unRefreshChat = await window.listen("refresh-chat", (e) => {
+                    onRead(e.payload.id);
+                    e.stopPropagation();
+                });
+                cleanupFunctions.push(unRefreshChat);
+
+                // 监听后端接受到的消息
+                const unReceiveListen = await listen('on-receive-msg', async (event) => {
+                    let data = event.payload;
+                    const window = await WebviewWindow.getByLabel('home');
+                    let isFocused = await window.isFocused();
+                    let isMaximized = await window.isMaximized();
+                    // 为当前发送的用户，并且home窗口聚集
+                    if (currentToId.current === data.fromId && isFocused && isMaximized) {
+                        onRead(data.fromId);
+                    } else {
+                        onGetChatList();
+                    }
+                });
+                cleanupFunctions.push(unReceiveListen);
+
+                // 监听前端接受到的消息
+                const unSendListen = await listen('on-send-msg', (event) => {
+                    onGetChatList();
+                });
+                cleanupFunctions.push(unSendListen);
+
+                // 监听聊天窗口是否销毁
+                const unChatDestroyed = await listen('chat-destroyed', (event) => {
+                    let storeUserInfo = chatWindowUsersRef.current.get(event.payload.fromId);
+                    if (currentToId.current === storeUserInfo.fromId) {
+                        setSelectedUserInfo(storeUserInfo);
+                    }
+                    dispatch(deleteChatWindowUser(event.payload.fromId));
+                });
+                cleanupFunctions.push(unChatDestroyed);
+
+                // 监听聊天窗口是否创建
+                const unChatNew = await listen('chat-new', (event) => {
+                    if (currentToId.current === rightSelected.current) {
+                        setSelectedUserInfo(null);
+                    }
+                });
+                cleanupFunctions.push(unChatNew);
+
+            } catch (error) {
+                console.error("Error in useEffect setup:", error);
             }
-        });
-        //监听前端接受到的消息
-        const unSendListen = listen('on-send-msg', (event) => {
-            onGetChatList()
-        });
-        //监听聊天窗口是否销毁
-        const unChatDestroyed = listen('chat-destroyed', (event) => {
-            let storeUserInfo = chatWindowUsersRef.current.get(event.payload.fromId);
-            if (currentToId.current === storeUserInfo.fromId) {
-                setSelectedUserInfo(storeUserInfo)
-            }
-            dispatch(deleteChatWindowUser(event.payload.fromId))
-        })
-        //监听聊天窗口是否销毁
-        const unChatNew = listen('chat-new', (event) => {
-            if (currentToId.current === rightSelected.current) {
-                setSelectedUserInfo(null)
-            }
-        })
-        return async () => {
-            (await unFocus)();
-            (await unReceiveListen)();
-            (await unSendListen)();
-            (await unChatDestroyed)();
-            (await unRefreshChat)();
-            (await unChatNew)();
-        }
-    }, [])
+        };
+
+        setup();
+
+        // 清理函数
+        return () => {
+            cleanupFunctions.forEach(cleanup => {
+                if (typeof cleanup === 'function') {
+                    cleanup();
+                } else if (cleanup && typeof cleanup.then === 'function') {
+                    cleanup.then(fn => fn && fn());
+                }
+            });
+        };
+    }, []);
 
     useEffect(() => {
         chatWindowUsersRef.current = chatStoreData.chatWindowUsers

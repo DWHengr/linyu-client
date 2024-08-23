@@ -58,49 +58,71 @@ export default function Home() {
     const [userInfoVisible, setUserInfoVisible] = useState(false)
 
     useEffect(() => {
-        const appWindow = WebviewWindow.getByLabel('home')
-        // appWindow.listen("tauri://close-requested", function (e) {
-        //     appWindow.hide()
-        // });
-        let unHideOrShowHome = listen("hideOrShowHome", async function (e) {
-            let isVisible = await appWindow.isVisible();
-            if (isVisible) {
-                await appWindow.hide()
-            } else {
-                await appWindow.setFocus()
-                await appWindow.unminimize()
-                await appWindow.show()
+        const cleanupFunctions = [];
+
+        const setup = async () => {
+            try {
+                const appWindow = await WebviewWindow.getByLabel('home');
+
+                // 监听隐藏或显示 home 窗口
+                const unHideOrShowHome = await listen("hideOrShowHome", async function (e) {
+                    let isVisible = await appWindow.isVisible();
+                    if (isVisible) {
+                        await appWindow.hide();
+                    } else {
+                        await appWindow.setFocus();
+                        await appWindow.unminimize();
+                        await appWindow.show();
+                    }
+                });
+                cleanupFunctions.push(unHideOrShowHome);
+
+                // 监听截图快捷键事件
+                const unScreenshot = await listen('screenshot', async (event) => {
+                    if (currentOption.current !== 'chat' || !currentToId.current) {
+                        CreateScreenshot("");
+                    }
+                });
+                cleanupFunctions.push(unScreenshot);
+
+                // 监听命令行模式
+                const unCmd = await listen('command', async (event) => {
+                    CreateCmdWindow();
+                });
+                cleanupFunctions.push(unCmd);
+
+                // 获取用户信息并初始化
+                const res = await invoke("get_user_info", {});
+                dispatch(setCurrentLoginUserInfo(res.user_id, res.username, res.account, res.portrait));
+                let token = res.token;
+                userInfoBackCache.current = res;
+                if (token) {
+                    ws.connect(token);
+                    CreateTrayWindow();
+                    CrateMessageBox();
+                    CreateCmdWindow();
+                    onGetUserUnreadNum();
+                    onGetUserSet();
+                }
+
+            } catch (error) {
+                console.error("Error in useEffect setup:", error);
             }
-        });
-        //监听截图快捷键事件
-        const unScreenshot = listen('screenshot', async (event) => {
-            if (currentOption.current !== 'chat' || !currentToId.current) {
-                CreateScreenshot("");
-            }
-        })
-        //监听命令行模式
-        const unCmd = listen('command', async (event) => {
-            CreateCmdWindow();
-        })
-        invoke("get_user_info", {}).then(res => {
-            dispatch(setCurrentLoginUserInfo(res.user_id, res.username, res.account, res.portrait))
-            let token = res.token
-            userInfoBackCache.current = res
-            if (token) {
-                ws.connect(token)
-                CreateTrayWindow()
-                CrateMessageBox()
-                CreateCmdWindow()
-                onGetUserUnreadNum()
-                onGetUserSet()
-            }
-        })
-        return async () => {
-            (await unHideOrShowHome)();
-            (await unScreenshot)();
-            (await unCmd)();
-        }
-    }, [])
+        };
+
+        setup();
+
+        // 清理函数
+        return () => {
+            cleanupFunctions.forEach(cleanup => {
+                if (typeof cleanup === 'function') {
+                    cleanup();
+                } else if (cleanup && typeof cleanup.then === 'function') {
+                    cleanup.then(fn => fn && fn());
+                }
+            });
+        };
+    }, []);
 
     const onGetChatList = () => {
         ChatListApi.list().then(res => {
@@ -172,7 +194,7 @@ export default function Home() {
         });
         let unChatListJumpListen = listen('chat-list-jump', async (event) => {
             let info = event.payload
-            const window = WebviewWindow.getByLabel('home')
+            const window = await WebviewWindow.getByLabel('home')
             window.show()
             window.unminimize()
             window.setFocus()

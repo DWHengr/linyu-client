@@ -20,12 +20,12 @@ export default async function CrateMessageBox() {
         x: 0,
         y: window.screen.height + 100
     });
-    await webview.listen("tauri://blur", function () {
-        const window = WebviewWindow.getByLabel('massage-box')
+    await webview.listen("tauri://blur", async function () {
+        const window = await WebviewWindow.getByLabel('massage-box')
         window.hide();
     });
-    await webview.listen("tauri://window-created", function () {
-        const window = WebviewWindow.getByLabel('massage-box')
+    await webview.listen("tauri://window-created", async function () {
+        const window = await WebviewWindow.getByLabel('massage-box')
         window.hide();
     });
 }

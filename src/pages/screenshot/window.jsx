@@ -3,7 +3,7 @@ import {setItem} from "../../utils/storage.js";
 
 export default async function CreateScreenshot(toUserWindowLabel) {
     await setItem("screenshot", {toUserWindowLabel})
-    const window = WebviewWindow.getByLabel("screenshot")
+    const window = await WebviewWindow.getByLabel("screenshot")
     if (window) {
         await window.show()
         await window.setFocus()

@@ -2,7 +2,7 @@ import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
 import {PhysicalPosition} from "@tauri-apps/api/window";
 
 export default async function CreateCmdWindow() {
-    let webview = WebviewWindow.getByLabel('command')
+    let webview = await WebviewWindow.getByLabel('command')
     if (webview) {
         await webview.show()
         await webview.setFocus()

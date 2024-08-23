@@ -62,12 +62,13 @@ const screenshot = () => {
         setTop(0);
         setWidth(0);
         setHeight(0);
-        WebviewWindow.getByLabel("screenshot").hide()
+        let window = await WebviewWindow.getByLabel("screenshot")
+        window.hide()
     };
 
     const capture = async () => {
         await clear();
-        let window = WebviewWindow.getByLabel("screenshot");
+        let window = await WebviewWindow.getByLabel("screenshot");
         let scaleFactor = await window.scaleFactor()
         const captureDetails = {
             left: Math.floor(left * scaleFactor),

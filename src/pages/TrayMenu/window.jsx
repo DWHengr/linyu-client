@@ -21,12 +21,12 @@ export default async function CreateTrayWindow() {
         x: 0,
         y: window.screen.height + 100
     });
-    await webview.listen("tauri://blur", function () {
-        const trayWindow = WebviewWindow.getByLabel('tray_menu')
+    await webview.listen("tauri://blur", async function () {
+        const trayWindow = await WebviewWindow.getByLabel('tray_menu')
         trayWindow.hide();
     });
-    await webview.listen("tauri://window-created", function () {
-        const trayWindow = WebviewWindow.getByLabel('tray_menu')
+    await webview.listen("tauri://window-created", async function () {
+        const trayWindow = await WebviewWindow.getByLabel('tray_menu')
         trayWindow.hide();
     });
 }

@@ -7,7 +7,6 @@ const Call = memo(({value, right = false}) => {
 
     useEffect(() => {
         let content = JSON.parse(value.msgContent?.content)
-        console.log(content)
         setMsgContent(content)
     }, [value])
 

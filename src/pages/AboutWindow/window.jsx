@@ -1,7 +1,7 @@
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
 
-export default function CreateAboutWindow() {
-    const window = WebviewWindow.getByLabel('about')
+export default async function CreateAboutWindow() {
+    const window = await WebviewWindow.getByLabel('about')
     if (window) {
         window.show()
         window.unminimize()

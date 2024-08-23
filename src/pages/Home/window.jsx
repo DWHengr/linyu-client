@@ -7,7 +7,7 @@ import {TrayIcon} from "@tauri-apps/api/tray";
 
 listen('tray_menu', async (event) => {
 
-    const homeWindow = WebviewWindow.getByLabel('home')
+    const homeWindow = await WebviewWindow.getByLabel('home')
     if (!homeWindow) return
 
     let position = event.payload;
@@ -15,7 +15,7 @@ listen('tray_menu', async (event) => {
     let logicalPosition = new PhysicalPosition(position.x, position.y).toLogical(scaleFactor);
     logicalPosition.y = logicalPosition.y - trayWindowHeight
 
-    let trayWindow = WebviewWindow.getByLabel('tray_menu')
+    let trayWindow = await WebviewWindow.getByLabel('tray_menu')
     if (trayWindow) {
         await trayWindow.setAlwaysOnTop(true)
         await trayWindow.setPosition(logicalPosition)
@@ -41,8 +41,8 @@ export default function CreateHomeWindow() {
         transparent: true,
         shadow: false
     });
-    webview.once("tauri://webview-created", function () {
-        const appWindow = WebviewWindow.getByLabel('login')
+    webview.once("tauri://webview-created", async function () {
+        const appWindow = await WebviewWindow.getByLabel('login')
         appWindow?.close();
     });
 }

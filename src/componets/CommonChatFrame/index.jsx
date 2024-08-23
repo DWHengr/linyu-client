@@ -103,7 +103,6 @@ function CommonChatFrame({chatInfo}) {
         //监听后端发送的消息
         const unListen = listen('on-receive-msg', async (event) => {
             let data = event.payload
-            console.log(data)
             if (data?.msgContent?.type === "retraction") {
                 handlerUpdateRetractionMsg(data.id)
                 return;
@@ -260,7 +259,12 @@ function CommonChatFrame({chatInfo}) {
     useEffect(() => {
         const handleEscKey = (event) => {
             if (event.key === 'Escape' || event.keyCode === 27) {
-                WebviewWindow.getCurrent().close()
+                const window = WebviewWindow.getCurrent();
+                if (window.label !== "home") {
+                    window.close()
+                } else {
+                    window.hide()
+                }
             }
         };
         document.addEventListener('keydown', handleEscKey);
@@ -350,7 +354,6 @@ function CommonChatFrame({chatInfo}) {
 
     const onChatGroupMemberList = () => {
         ChatGroupMemberApi.list({chatGroupId: chatInfo.fromId}).then(res => {
-            console.log(res)
             if (res.code === 0) {
                 setChatGroupMemberList(res.data)
             }
