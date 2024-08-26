@@ -1,7 +1,7 @@
 import React, {useState, useRef, useEffect} from 'react';
 import "./index.less"
 
-const CustomEditableText = ({text, onSave, placeholder, style}) => {
+const CustomEditableText = ({text, onSave, placeholder, style, inputStyle = {}}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(text);
     const inputRef = useRef(null);
@@ -50,6 +50,7 @@ const CustomEditableText = ({text, onSave, placeholder, style}) => {
         <div
             className="custom-editable-text"
             style={style}
+            onClick={handleClick}
         >
             {isEditing ? (
                 <input
@@ -59,12 +60,12 @@ const CustomEditableText = ({text, onSave, placeholder, style}) => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     placeholder={placeholder}
-                    style={{width: '100%'}}
+                    style={{width: '100%', ...inputStyle}}
                 />
             ) : (
-                <span onClick={handleClick}>
-          {text || <span style={{color: 'grey'}}>{placeholder ? placeholder : "请设置值"}</span>}
-        </span>
+                <div onClick={handleClick} style={{padding: 5}}>
+                    {text || <span style={{color: 'grey'}}>{placeholder ? placeholder : "请设置值"}</span>}
+                </div>
             )}
         </div>
     );

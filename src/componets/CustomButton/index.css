@@ -25,6 +25,15 @@
     }
 }
 
+.custom-button.error {
+    background-color: #ff4c4c;
+
+    &:hover {
+        background-color: rgba(255, 76, 76, 0.6);
+    }
+}
+
+
 .custom-button.disabled {
     cursor: not-allowed;
     background-color: rgba(76, 155, 255, 0.5);

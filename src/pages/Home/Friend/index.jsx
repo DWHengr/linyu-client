@@ -68,6 +68,8 @@ export default function Friend() {
     //群聊
     const [allGroupChatData, setAllGroupChatData] = useState([])
     const [selectedChatGroupId, setSelectedChatGroupId] = useState(null)
+    const [chatGroupInfo, setChatGroupInfo] = useState(null)
+    const [isChatGroupModalOpen, setIsChatGroupModalOpen] = useState(false)
 
     useEffect(() => {
         onFriendList()
@@ -100,6 +102,7 @@ export default function Friend() {
 
     const addRightOptions = [
         {key: "addFriend", label: "添加好友"},
+        {key: "createChatGroup", label: "创建群聊"},
     ]
 
     const [moreRightOptionsFilter, setMoreRightOptionsFilter] = useState([])
@@ -164,6 +167,10 @@ export default function Friend() {
                 setIsAddFriendModalOpen(true)
                 break
             }
+            case "createChatGroup": {
+                setIsChatGroupModalOpen(true)
+                break
+            }
         }
     }
 
@@ -203,6 +210,15 @@ export default function Friend() {
                 break
             }
         }
+    }
+
+    const onCreateChatGroup = () => {
+        ChatGroupApi.create({name: chatGroupInfo}).then(res => {
+            if (res.code === 0) {
+                onChatGroupList()
+                setIsChatGroupModalOpen(false)
+            }
+        })
     }
 
     let onMoreMenuClick = (action) => {
@@ -490,6 +506,74 @@ export default function Friend() {
                                 type="minor"
                                 onClick={() => {
                                     setIsGroupModalOpen(false)
+                                }}
+                            >
+                                取消
+                            </CustomButton>
+                        </div>
+                    </div>
+                </CustomModal>
+            </div>
+            {/*创建群聊弹窗*/}
+            <div>
+                <CustomModal
+                    isOpen={isChatGroupModalOpen}
+                >
+                    <div style={{
+                        width: 300,
+                        height: 120,
+                        backgroundColor: "white",
+                        borderRadius: 10,
+                        padding: 10,
+                        display: "flex",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        position: "relative",
+                        justifyContent: "center"
+                    }}>
+                        <div style={{
+                            display: "flex",
+                            position: "absolute",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            width: "100%",
+                            height: 30,
+                            top: 5,
+                            borderBottom: "#f1f1f1 1px solid"
+                        }}>
+                            <div style={{fontSize: 12}}>
+                                创建群聊
+                            </div>
+                            <div style={{position: "absolute", right: 10}}>
+                                <IconButton
+                                    danger
+                                    icon={<i className={`iconfont icon-guanbi`} style={{fontSize: 20}}/>}
+                                    onClick={() => {
+                                        setIsChatGroupModalOpen(false)
+                                    }}
+                                />
+                            </div>
+                        </div>
+                        <div style={{width: "100%"}}>
+                            <CustomInput
+                                value={chatGroupInfo}
+                                placeholder="填写群聊名称"
+                                onChange={(v) => setChatGroupInfo(v)}
+                            />
+                        </div>
+                        <div style={{display: "flex", position: "absolute", right: 10, bottom: 10}}>
+                            <CustomButton
+                                width={55}
+                                disabled={!chatGroupInfo}
+                                onClick={onCreateChatGroup}
+                            >
+                                确定
+                            </CustomButton>
+                            <CustomButton
+                                width={55}
+                                type="minor"
+                                onClick={() => {
+                                    setIsChatGroupModalOpen(false)
                                 }}
                             >
                                 取消

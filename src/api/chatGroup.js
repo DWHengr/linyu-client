@@ -6,5 +6,8 @@ export default {
     },
     details(param) {
         return Http.post("/v1/api/chat-group/details", param);
+    },
+    create(param) {
+        return Http.post("/v1/api/chat-group/create", param);
     }
 };

@@ -135,12 +135,44 @@
   flex-direction: column;
   height: calc(100% - 20px);
 
+  .chat-group-portrait-info {
+    height: 70px;
+    background-color: #FFFFFF;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    padding: 5px;
+
+    .portrait-info {
+      width: 50px;
+      height: 50px;
+      border-radius: 50px;
+      position: relative;
+      cursor: pointer;
+
+      .portrait-info-cover {
+        width: 50px;
+        height: 50px;
+        border-radius: 50px;
+        position: absolute;
+        background-color: rgba(112, 112, 112, 0.4);
+        top: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+    }
+  }
+
   .chat-group-drawer-item {
     margin-bottom: 10px;
 
     .item-label {
       font-weight: 600;
       user-select: none;
+      font-size: 14px;
     }
   }
 
@@ -153,6 +185,9 @@
     .item-label {
       font-weight: 600;
       user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .member {

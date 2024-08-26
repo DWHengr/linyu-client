@@ -2,7 +2,7 @@ import "./index.less"
 import IconMinorButton from "../IconMinorButton/index.jsx";
 import CustomButton from "../CustomButton/index.jsx";
 import CustomDragDiv from "../CustomDragDiv/index.jsx";
-import {memo, useCallback, useEffect, useRef, useState} from "react";
+import React, {memo, useCallback, useEffect, useRef, useState} from "react";
 import {emit, listen} from "@tauri-apps/api/event";
 import MessageApi from "../../api/message.js";
 import {invoke} from "@tauri-apps/api/core";
@@ -33,6 +33,9 @@ import CustomDrawer from "../CustomDrawer/index.jsx";
 import ChatGroupApi from "../../api/chatGroup.js";
 import CustomEditableText from "../CustomEditableText/index.jsx";
 import CustomSearchInput from "../CustomSearchInput/index.jsx";
+import CustomModal from "../CustomModal/index.jsx";
+import ChatGroupInvite from "../ChatGroupInvite/index.jsx";
+import Dropzone from "react-dropzone";
 
 function CommonChatFrame({chatInfo}) {
 
@@ -70,6 +73,7 @@ function CommonChatFrame({chatInfo}) {
     const [chatGroupMemberList, setChatGroupMemberList] = useState([])
     const [chatGroupInfoOpen, setChatGroupInfoOpen] = useState(false)
     const [groupDetails, setGroupDetails] = useState(null)
+    const [chatGroupInviteOpen, setChatGroupInviteOpen] = useState(false)
 
     useEffect(() => {
         const window = WebviewWindow.getCurrent()
@@ -671,6 +675,17 @@ function CommonChatFrame({chatInfo}) {
 
     return (<div className="common-chat-content">
         <BiaoQingPop/>
+        {
+            chatInfo.type === 'group' &&
+            <CustomModal isOpen={chatGroupInviteOpen}>
+                <ChatGroupInvite
+                    onOk={() => {
+                    }}
+                    onCancel={() => setChatGroupInviteOpen(false)}
+                    existing={chatGroupMemberList}
+                />
+            </CustomModal>
+        }
         <RightClickMenu
             position={msgContentMenuPosition}
             options={msgContentRightOptions}
@@ -727,10 +742,54 @@ function CommonChatFrame({chatInfo}) {
         </RightClickContent>
         <CustomDrawer isOpen={chatGroupInfoOpen} onClose={() => setChatGroupInfoOpen(false)}>
             <div className="chat-group-drawer">
+                <div className="chat-group-portrait-info">
+                    <Dropzone
+                        onDrop={(acceptedFiles) => {
+                        }}
+                        accept={
+                            {
+                                'image/*': ['.png'],
+                            }
+                        }
+                    >
+                        {({getRootProps, getInputProps}) => (
+                            <div {...getRootProps()}>
+                                <input {...getInputProps()} />
+                                <div className="portrait-info">
+                                    <img style={{width: 50, height: 50, borderRadius: 50}}
+                                         src={groupDetails?.portrait}
+                                         alt=""
+                                    />
+                                    <div className="portrait-info-cover">
+                                        <i className={`iconfont icon-xiangji`}
+                                           style={{color: "#fff", fontSize: 20}}/>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+                    </Dropzone>
+                    <div style={{fontWeight: 600, marginLeft: 5}}>
+                        {groupDetails?.name}
+                    </div>
+                    <div style={{marginLeft: "auto"}}>
+                        <CustomButton
+                            width={30}
+                            type='error'
+                            style={{fontSize: 12}}
+                        >
+                            退出
+                        </CustomButton>
+                    </div>
+                </div>
                 <div className="chat-group-drawer-item">
                     <div className="item-label">群聊名称</div>
                     <CustomEditableText
-                        style={{color: "#969696", fontSize: 14, width: 300}}
+                        style={{
+                            color: "#969696",
+                            fontSize: 14,
+                            backgroundColor: '#fff',
+                            borderRadius: 5
+                        }}
                         placeholder="群聊名称"
                         text={groupDetails?.name}
                     />
@@ -738,7 +797,12 @@ function CommonChatFrame({chatInfo}) {
                 <div className="chat-group-drawer-item">
                     <div className="item-label">备注</div>
                     <CustomEditableText
-                        style={{color: "#969696", fontSize: 14, width: 300}}
+                        style={{
+                            color: "#969696",
+                            fontSize: 14,
+                            backgroundColor: '#fff',
+                            borderRadius: 5
+                        }}
                         placeholder="群聊的备注，仅自己可见"
                         text={groupDetails?.groupRemark}
                     />
@@ -746,18 +810,43 @@ function CommonChatFrame({chatInfo}) {
                 <div className="chat-group-drawer-item">
                     <div className="item-label">本群昵称</div>
                     <CustomEditableText
-                        style={{color: "#969696", fontSize: 14, width: 300}}
+                        style={{
+                            color: "#969696",
+                            fontSize: 14,
+                            backgroundColor: '#fff',
+                            borderRadius: 5
+                        }}
                         placeholder="设置本群昵称"
                         text={groupDetails?.groupName}
                     />
                 </div>
                 <div className="chat-group-drawer-item">
                     <div className="item-label">群公告</div>
-                    <div style={{color: "#969696", fontSize: 14}}>{groupDetails?.notice}</div>
+                    <div style={{
+                        color: "#969696",
+                        fontSize: 14,
+                        backgroundColor: '#fff',
+                        borderRadius: 5,
+                        padding: 5
+                    }}>
+                        <div>
+                            {groupDetails?.notice}
+                        </div>
+                        <div>
+                            <i className={`iconfont icon icon`} style={{fontSize: 20}}/>
+                        </div>
+                    </div>
                 </div>
                 <div className="chat-group-member-list">
                     <div className="item-label">
                         <div>群成员({groupDetails?.memberNum})</div>
+                        <IconMinorButton
+                            onClick={() => {
+                                setChatGroupInfoOpen(false)
+                                setChatGroupInviteOpen(true)
+                            }}
+                            icon={<i className={`iconfont icon-yaoqing`} style={{fontSize: 22}}/>}
+                        />
                     </div>
                     <CustomSearchInput
                         style={{marginTop: 4, marginBottom: 4, border: '#FFF 2px solid', height: 30}}

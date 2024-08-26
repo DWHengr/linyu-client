@@ -10,6 +10,7 @@ export default function WindowOperation({
                                             onHide,
                                             height,
                                             isMaximize = true,
+                                            isMinimize = true,
                                             style = {}
                                         }) {
 
@@ -63,10 +64,12 @@ export default function WindowOperation({
 
     return (
         <div className="window-operation" style={{height: height, ...style}}>
-            <IconButton
-                icon={<i className={`iconfont icon-zuixiaohua`} style={{fontSize: 22}}/>}
-                onClick={handleMinimize}
-            />
+            {
+                isMinimize && <IconButton
+                    icon={<i className={`iconfont icon-zuixiaohua`} style={{fontSize: 22}}/>}
+                    onClick={handleMinimize}
+                />
+            }
             {
                 isMaximize && <IconButton
                     icon={<i className={`iconfont ${isMax ? "icon-chuangkouhua" : "icon-zuidahua"}`}
