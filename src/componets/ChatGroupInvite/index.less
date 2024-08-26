@@ -1,0 +1,66 @@
+.chat-group-invite-container {
+  width: 600px;
+  height: 540px;
+  background-color: #FFFFFF;
+  border-radius: 10px;
+  user-select: none;
+
+  .chat-group-invite {
+    display: flex;
+    height: 100%;
+
+    .invite-left {
+      width: 220px;
+      display: flex;
+      flex-direction: column;
+      border-right: #e3e3e3 1px solid;
+      padding: 10px 5px 10px 10px;
+      overflow: hidden;
+
+      .friend-list {
+        overflow-y: scroll;
+
+        .friend-list-item {
+          display: flex;
+          align-items: center;
+          height: 40px;
+          border-radius: 5px;
+          padding-left: 5px;
+          margin-right: 5px;
+
+          &:hover {
+            background-color: #EDF2F9;
+          }
+        }
+      }
+    }
+
+    .invite-right {
+      flex: 1;
+      padding: 10px 5px 10px 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+
+      .friend-list {
+        overflow-y: scroll;
+        flex: 1;
+        border-bottom: #e3e3e3 1px solid;
+
+        .friend-list-item {
+          display: flex;
+          align-items: center;
+          height: 50px;
+          border-radius: 5px;
+          padding: 0 10px;
+          margin-right: 5px;
+          justify-content: space-between;
+
+          &:hover {
+            background-color: #EDF2F9;
+          }
+        }
+      }
+    }
+  }
+}
