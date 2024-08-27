@@ -892,6 +892,7 @@ function CommonChatFrame({chatInfo}) {
                 fontWeight: 600, color: "#1F1F1F", marginLeft: 10,
             }}>
                 {chatInfo.remark ? chatInfo.remark : chatInfo.name}
+                {chatInfo.type === 'group' && <span>({Object.entries(chatGroupMemberList)?.length})</span>}
             </div>
         </CustomDragDiv>
         <div ref={showFrameRef} className="chat-content-show-frame">

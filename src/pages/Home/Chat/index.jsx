@@ -245,13 +245,19 @@ export default function Chat() {
                  alt={info.portrait}/>
             <div className="chat-card-content">
                 <div className="chat-card-content-item">
-                    <div
-                        style={{
-                            fontSize: 14, fontWeight: 600, color: `${isSelected ? "#FFF" : "1F1F1F"}`
-                        }}
-                        className="ellipsis"
-                    >
-                        {info.remark ? info.remark : info.name}
+                    <div style={{display: "flex", alignItems: "center"}}>
+                        <div
+                            style={{
+                                fontSize: 14, fontWeight: 600, color: `${isSelected ? "#FFF" : "1F1F1F"}`
+                            }}
+                            className="ellipsis"
+                        >
+                            {info.remark ? info.remark : info.name}
+                        </div>
+                        {
+                            info.type === 'group' &&
+                            <div className="qun">群</div>
+                        }
                     </div>
                     <div style={{
                         fontSize: 10, color: `${isSelected ? "#F6F6F6" : "#646464"}`
