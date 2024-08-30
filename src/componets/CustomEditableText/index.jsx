@@ -1,12 +1,13 @@
 import React, {useState, useRef, useEffect} from 'react';
 import "./index.less"
 
-const CustomEditableText = ({text, onSave, placeholder, style, inputStyle = {}}) => {
+const CustomEditableText = ({text, onSave, placeholder, style, inputStyle = {}, readOnly = false}) => {
     const [isEditing, setIsEditing] = useState(false);
     const [value, setValue] = useState(text);
     const inputRef = useRef(null);
 
     const handleClick = () => {
+        if (readOnly) return
         setIsEditing(true);
     };
 

@@ -36,6 +36,7 @@ import CustomSearchInput from "../CustomSearchInput/index.jsx";
 import CustomModal from "../CustomModal/index.jsx";
 import ChatGroupInvite from "../ChatGroupInvite/index.jsx";
 import Dropzone from "react-dropzone";
+import CustomAffirmModal from "../CustomAffirmModal/index.jsx";
 
 function CommonChatFrame({chatInfo}) {
 
@@ -74,6 +75,7 @@ function CommonChatFrame({chatInfo}) {
     const [chatGroupInfoOpen, setChatGroupInfoOpen] = useState(false)
     const [groupDetails, setGroupDetails] = useState(null)
     const [chatGroupInviteOpen, setChatGroupInviteOpen] = useState(false)
+    const [isChatGroupQuitAffirmModalOpen, setIsChatGroupQuitAffirmModalOpen] = useState(false)
 
     useEffect(() => {
         const window = WebviewWindow.getCurrent()
@@ -662,8 +664,10 @@ function CommonChatFrame({chatInfo}) {
         })
     }
 
-    const handlerGroupDisplayName = (member) => {
-        if (!member) return;
+    const handlerGroupDisplayName = (member, msg) => {
+        if (!member) {
+            return msg?.msgContent?.formUserName
+        }
         if (member.groupName) {
             return member.groupName;
         } else if (member.remark) {
@@ -673,14 +677,63 @@ function CommonChatFrame({chatInfo}) {
         }
     };
 
+    const handlerGroupDisplayPortrait = (member, msg) => {
+        if (!member) {
+            return msg?.msgContent?.formUserPortrait
+        }
+        return member?.portrait
+    };
+
+    const onGroupAvatarChange = (file) => {
+        ChatGroupApi.uploadPortrait(file, {groupId: groupDetails?.id}).then(res => {
+            if (res.code === 0) {
+                setGroupDetails({...groupDetails, portrait: res.data})
+            }
+        })
+    }
+
+    const onUpdateChatGroupName = (value) => {
+        ChatGroupApi.updateGroupName({groupId: groupDetails?.id, name: value}).then(res => {
+            if (res.code === 0) {
+                setGroupDetails({...groupDetails, portrait: res.data})
+            }
+        })
+    }
+
+    const onUpdateChatGroup = (key, value) => {
+        ChatGroupApi.update({groupId: groupDetails?.id, updateKey: key, updateValue: value}).then(res => {
+            if (res.code === 0) {
+                onGroupDetails()
+            }
+        })
+    }
+
+    const onInviteMember = (userIds) => {
+        if (!userIds || userIds.length <= 0) return
+        ChatGroupApi.invite({groupId: groupDetails?.id, userIds: userIds}).then(res => {
+            if (res.code === 0) {
+                onChatGroupMemberList()
+                onGroupDetails()
+                setChatGroupInviteOpen(false)
+            }
+        })
+    }
+
+    const onQuitChatGroup = () => {
+        ChatGroupApi.quit({groupId: groupDetails?.id}).then(res => {
+            if (res.code === 0) {
+                emit("chat-list-delete")
+            }
+        })
+    }
+
     return (<div className="common-chat-content">
         <BiaoQingPop/>
         {
             chatInfo.type === 'group' &&
             <CustomModal isOpen={chatGroupInviteOpen}>
                 <ChatGroupInvite
-                    onOk={() => {
-                    }}
+                    onOk={(userIds) => onInviteMember(userIds)}
                     onCancel={() => setChatGroupInviteOpen(false)}
                     existing={chatGroupMemberList}
                 />
@@ -692,6 +745,12 @@ function CommonChatFrame({chatInfo}) {
             width={90}
             filter={msgContentRightFilterOptions}
             onMenuItemClick={onMsgContentClick}
+        />
+        <CustomAffirmModal
+            isOpen={isChatGroupQuitAffirmModalOpen}
+            txt="确认退出该群?"
+            onOk={onQuitChatGroup}
+            onCancel={() => setIsChatGroupQuitAffirmModalOpen(false)}
         />
         <RightClickContent position={userInfoPosition}>
             <div className="user-details">
@@ -743,9 +802,8 @@ function CommonChatFrame({chatInfo}) {
         <CustomDrawer isOpen={chatGroupInfoOpen} onClose={() => setChatGroupInfoOpen(false)}>
             <div className="chat-group-drawer">
                 <div className="chat-group-portrait-info">
-                    <Dropzone
-                        onDrop={(acceptedFiles) => {
-                        }}
+                    {groupDetails?.ownerUserId === currentUserId.current && <Dropzone
+                        onDrop={(acceptedFiles) => onGroupAvatarChange(acceptedFiles[0])}
                         accept={
                             {
                                 'image/*': ['.png'],
@@ -764,10 +822,22 @@ function CommonChatFrame({chatInfo}) {
                                         <i className={`iconfont icon-xiangji`}
                                            style={{color: "#fff", fontSize: 20}}/>
                                     </div>
+
                                 </div>
                             </div>
                         )}
                     </Dropzone>
+                    }
+                    {groupDetails?.ownerUserId !== currentUserId.current &&
+                        <img style={{width: 50, height: 50, borderRadius: 50}}
+                             src={groupDetails?.portrait}
+                             alt=""
+                             onClick={() => {
+                                 getFileNameAndType(groupDetails?.portrait)
+                                 CreateImageViewer("group." + getFileNameAndType(groupDetails?.portrait).fileType, groupDetails.portrait)
+                             }}
+                        />
+                    }
                     <div style={{fontWeight: 600, marginLeft: 5}}>
                         {groupDetails?.name}
                     </div>
@@ -776,6 +846,7 @@ function CommonChatFrame({chatInfo}) {
                             width={30}
                             type='error'
                             style={{fontSize: 12}}
+                            onClick={() => setIsChatGroupQuitAffirmModalOpen(true)}
                         >
                             退出
                         </CustomButton>
@@ -784,6 +855,7 @@ function CommonChatFrame({chatInfo}) {
                 <div className="chat-group-drawer-item">
                     <div className="item-label">群聊名称</div>
                     <CustomEditableText
+                        readOnly={currentUserId.current !== groupDetails?.ownerUserId}
                         style={{
                             color: "#969696",
                             fontSize: 14,
@@ -792,6 +864,7 @@ function CommonChatFrame({chatInfo}) {
                         }}
                         placeholder="群聊名称"
                         text={groupDetails?.name}
+                        onSave={(v) => onUpdateChatGroupName(v)}
                     />
                 </div>
                 <div className="chat-group-drawer-item">
@@ -805,6 +878,7 @@ function CommonChatFrame({chatInfo}) {
                         }}
                         placeholder="群聊的备注，仅自己可见"
                         text={groupDetails?.groupRemark}
+                        onSave={(v) => onUpdateChatGroup('group_remark', v)}
                     />
                 </div>
                 <div className="chat-group-drawer-item">
@@ -818,6 +892,7 @@ function CommonChatFrame({chatInfo}) {
                         }}
                         placeholder="设置本群昵称"
                         text={groupDetails?.groupName}
+                        onSave={(v) => onUpdateChatGroup('group_name', v)}
                     />
                 </div>
                 <div className="chat-group-drawer-item">
@@ -898,12 +973,14 @@ function CommonChatFrame({chatInfo}) {
         <div ref={showFrameRef} className="chat-content-show-frame">
             {messages?.map((msg) => {
                 let isRight = msg.fromId === currentUserId.current
+                let member = chatGroupMemberList[msg.fromId]
                 return (<div key={msg.id}>
                     {msg.isShowTime && <Time value={formatTime(msg.updateTime)}/>}
                     <div>
                         {chatInfo.type === 'group' &&
                             <div style={{display: "flex", justifyContent: isRight ? 'end' : ''}}>
-                                {!isRight && <img alt="" src={chatGroupMemberList[msg.fromId]?.portrait}
+                                {!isRight && <img alt=""
+                                                  src={handlerGroupDisplayPortrait(member, msg)}
                                                   style={{width: 35, height: 35, borderRadius: 35}}/>}
                                 <div style={{
                                     marginRight: 5,
@@ -912,8 +989,15 @@ function CommonChatFrame({chatInfo}) {
                                     flexDirection: "column",
                                     alignItems: isRight ? 'end' : ''
                                 }}>
-                                    <div style={{fontSize: 12, color: "#969696"}}>
-                                        {handlerGroupDisplayName(chatGroupMemberList[msg.fromId])}
+                                    <div
+                                        style={{display: "flex", fontSize: 12, color: "#969696", alignItems: "center"}}>
+                                        <div>
+                                            {handlerGroupDisplayName(member, msg)}
+                                        </div>
+                                        {
+                                            !member &&
+                                            <div className="badge-symbol">已移除</div>
+                                        }
                                     </div>
                                     <div onContextMenu={(e) => handlerRightSelectMsgContent(e, msg)}>
                                         <MsgContent msg={msg} userId={currentUserId.current} onReedit={onReedit}/>
@@ -922,23 +1006,26 @@ function CommonChatFrame({chatInfo}) {
                                 {isRight && <img alt="" src={chatGroupMemberList[msg.fromId]?.portrait}
                                                  style={{width: 35, height: 35, borderRadius: 35}}/>}
                             </div>}
-                        {chatInfo.type === 'user' && <div onContextMenu={(e) => handlerRightSelectMsgContent(e, msg)}>
-                            <MsgContent msg={msg} userId={currentUserId.current} onReedit={onReedit}/>
-                        </div>}
+                        {chatInfo.type === 'user' &&
+                            <div onContextMenu={(e) => handlerRightSelectMsgContent(e, msg)}>
+                                <MsgContent msg={msg} userId={currentUserId.current} onReedit={onReedit}/>
+                            </div>
+                        }
                     </div>
                 </div>)
             })}
         </div>
         <div>
-            {newMsgUnreadNum !== 0 && <div className="hint"
-                                           onClick={onScrollToBottom}
-                                           style={{bottom: height + 15}}
-            >
-                <i className={`iconfont icon icon-xiala`} style={{fontSize: 12}}/>
-                {newMsgUnreadNum > 0 && <div style={{marginLeft: 5}}>
-                    {newMsgUnreadNum}
+            {newMsgUnreadNum !== 0 &&
+                <div className="hint"
+                     onClick={onScrollToBottom}
+                     style={{bottom: height + 15}}
+                >
+                    <i className={`iconfont icon icon-xiala`} style={{fontSize: 12}}/>
+                    {newMsgUnreadNum > 0 && <div style={{marginLeft: 5}}>
+                        {newMsgUnreadNum}
+                    </div>}
                 </div>}
-            </div>}
         </div>
         <div
             className="chat-content-send-frame"

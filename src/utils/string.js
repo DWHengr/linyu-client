@@ -1,10 +1,12 @@
 export function getFileNameAndType(url) {
-    const regex = /\/([^\/?#]+)$/i;
-    const match = url.match(regex);
-
+    const urlObj = new URL(url);
+    const pathname = urlObj.pathname;
+    const regex = /\/([^\/]+)$/;
+    const match = pathname.match(regex);
     if (match && match.length > 1) {
         const fileName = match[1];
-        const fileType = fileName.split('.').pop();
+        const fileNameParts = fileName.split('.');
+        const fileType = fileNameParts.length > 1 ? fileNameParts.pop() : null;
         return {
             fileName: fileName,
             fileType: fileType

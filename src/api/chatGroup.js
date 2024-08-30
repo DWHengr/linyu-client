@@ -9,5 +9,20 @@ export default {
     },
     create(param) {
         return Http.post("/v1/api/chat-group/create", param);
+    },
+    uploadPortrait(file, param) {
+        return Http.upload(`/v1/api/chat-group/upload/portrait`, file, param)
+    },
+    updateGroupName(param) {
+        return Http.post("/v1/api/chat-group/update/name", param);
+    },
+    update(param) {
+        return Http.post("/v1/api/chat-group/update", param);
+    },
+    invite(param) {
+        return Http.post("/v1/api/chat-group/invite", param);
+    },
+    quit(param) {
+        return Http.post("/v1/api/chat-group/quit", param);
     }
 };

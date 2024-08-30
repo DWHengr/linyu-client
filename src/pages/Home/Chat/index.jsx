@@ -130,6 +130,15 @@ export default function Chat() {
                 });
                 cleanupFunctions.push(unChatNew);
 
+                // 监听聊天列表删除是否创建
+                const unChatListDelete = await listen('chat-list-delete', (event) => {
+                    dispatch(setCurrentChatId(''))
+                    setSelectedUserInfo(null)
+                    setSelectedChatId(null)
+                    onGetChatList()
+                });
+                cleanupFunctions.push(unChatListDelete);
+
             } catch (error) {
                 console.error("Error in useEffect setup:", error);
             }
@@ -195,6 +204,7 @@ export default function Chat() {
                             setSelectedUserInfo(null)
                             setSelectedChatId(null)
                         }
+                        dispatch(setCurrentChatId(''))
                         onGetChatList()
                     }
                 })

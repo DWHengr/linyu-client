@@ -1,6 +1,6 @@
 import './index.less'
 import CustomEmpty from "../CustomEmpty/index.jsx";
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import FriendApi from "../../api/friend.js";
 import CustomAccordion from "../CustomAccordion/index.jsx";
 import SelectionIcon from "../CustomSelectionIcon/index.jsx";
@@ -9,8 +9,8 @@ import CustomSearchInput from "../CustomSearchInput/index.jsx";
 
 export default function ChatGroupInvite({existing, onCancel, onOk}) {
     const [allFriendData, setAllFriendData] = useState([])
-    const [selectedUsers, setSelectedUsers] = useState([]);
-
+    const [selectedUsers, setSelectedUsers] = useState([])
+    const selectedUserIds = useRef([])
     useEffect(() => {
         onFriendList()
     }, [])
@@ -26,9 +26,11 @@ export default function ChatGroupInvite({existing, onCancel, onOk}) {
         setSelectedUsers(prevUsers => {
             const userIndex = prevUsers.findIndex(u => u.friendId === user.friendId);
             if (userIndex === -1) {
+                selectedUserIds.current.push(user.friendId)
                 return [...prevUsers, user];
             } else {
-                return prevUsers.filter(u => u.friendId !== user.friendId);
+                selectedUserIds.current.filter(id => id !== user.friendId)
+                return prevUsers.filter(u => u.friendId !== user.friendId)
             }
         });
     };
@@ -134,7 +136,7 @@ export default function ChatGroupInvite({existing, onCancel, onOk}) {
                         })}
                     </div>
                     <div style={{display: "flex", marginTop: 10, justifyContent: "end"}}>
-                        <CustomButton width={80} onClick={onOk}>确定</CustomButton>
+                        <CustomButton width={80} onClick={() => onOk(selectedUserIds.current)}>确定</CustomButton>
                         <CustomButton width={80} onClick={onCancel} type='minor'>取消</CustomButton>
                     </div>
                 </div>
