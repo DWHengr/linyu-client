@@ -37,6 +37,7 @@ import CustomModal from "../CustomModal/index.jsx";
 import ChatGroupInvite from "../ChatGroupInvite/index.jsx";
 import Dropzone from "react-dropzone";
 import CustomAffirmModal from "../CustomAffirmModal/index.jsx";
+import CreateChatGroupNotice from "../../pages/ChatGroupNotice/window.jsx";
 
 function CommonChatFrame({chatInfo}) {
 
@@ -380,6 +381,7 @@ function CommonChatFrame({chatInfo}) {
         onMessageRecord()
         if (chatInfo.type === 'group') {
             onChatGroupMemberList()
+            onGroupDetails()
         }
     }, [chatInfo])
 
@@ -433,8 +435,10 @@ function CommonChatFrame({chatInfo}) {
             if (item.type === 'img') {
                 let file = onUploadImg(item.url)
                 let msg = {
-                    toUserId: currentToId.current, msgContent: {
-                        type: "img", source: chatInfo.type, content: JSON.stringify({
+                    toUserId: currentToId.current,
+                    source: chatInfo.type,
+                    msgContent: {
+                        type: "img", content: JSON.stringify({
                             name: file.name, size: file.size,
                         })
                     }
@@ -656,7 +660,6 @@ function CommonChatFrame({chatInfo}) {
     }
 
     const onGroupDetails = () => {
-        setChatGroupInfoOpen(true)
         ChatGroupApi.details({chatGroupId: chatInfo.fromId}).then(res => {
             if (res.code === 0) {
                 setGroupDetails(res.data)
@@ -897,18 +900,23 @@ function CommonChatFrame({chatInfo}) {
                 </div>
                 <div className="chat-group-drawer-item">
                     <div className="item-label">群公告</div>
-                    <div style={{
-                        color: "#969696",
-                        fontSize: 14,
-                        backgroundColor: '#fff',
-                        borderRadius: 5,
-                        padding: 5
-                    }}>
+                    <div
+                        style={{
+                            color: "#969696",
+                            fontSize: 14,
+                            backgroundColor: '#fff',
+                            borderRadius: 5,
+                            padding: 5,
+                            display: "flex",
+                            cursor: "pointer"
+                        }}
+                        onClick={() => CreateChatGroupNotice(groupDetails?.id)}
+                    >
                         <div>
-                            {groupDetails?.notice}
+                            {groupDetails?.notice?.noticeContent ? groupDetails.notice.noticeContent : "群公告暂未设置"}
                         </div>
-                        <div>
-                            <i className={`iconfont icon icon`} style={{fontSize: 20}}/>
+                        <div style={{marginLeft: "auto"}}>
+                            <i className={`iconfont icon icon-weixiala`} style={{fontSize: 14}}/>
                         </div>
                     </div>
                 </div>
@@ -957,18 +965,27 @@ function CommonChatFrame({chatInfo}) {
                 alt={chatInfo.portrait}
                 onClick={(e) => {
                     if (chatInfo.type === 'group') {
+                        setChatGroupInfoOpen(true)
                         onGroupDetails()
                     } else {
                         onUserDetails(e)
                     }
                 }}
             />
-            <div style={{
+            <CustomDragDiv style={{
                 fontWeight: 600, color: "#1F1F1F", marginLeft: 10,
             }}>
                 {chatInfo.remark ? chatInfo.remark : chatInfo.name}
                 {chatInfo.type === 'group' && <span>({Object.entries(chatGroupMemberList)?.length})</span>}
-            </div>
+                {chatInfo.type === 'group' && groupDetails?.notice &&
+                    <div className="notice" onClick={() => CreateChatGroupNotice(groupDetails?.id)}>
+                        <i className={`iconfont icon-gonggao`} style={{fontSize: 14, marginRight: 5}}/>
+                        <div className="ellipsis">
+                            {groupDetails.notice.noticeContent}
+                        </div>
+                    </div>
+                }
+            </CustomDragDiv>
         </CustomDragDiv>
         <div ref={showFrameRef} className="chat-content-show-frame">
             {messages?.map((msg) => {
