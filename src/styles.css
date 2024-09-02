@@ -19,6 +19,10 @@ body {
     overflow: hidden;
 }
 
-img{
+img {
     -webkit-user-drag: none;
+}
+
+textarea {
+    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
 }

@@ -12,6 +12,7 @@ import ImageViewer from "./pages/ImageViewer/index.jsx";
 import AboutWindow from "./pages/AboutWindow/index.jsx";
 import Register from "./pages/Register/index.jsx";
 import Command from "./pages/Command/index.jsx";
+import ChatGroupNotice from "./pages/ChatGroupNotice/index.jsx";
 
 function App() {
 
@@ -44,6 +45,7 @@ function App() {
                 <Route path="/about" component={AboutWindow}></Route>
                 <Route path="/register" component={Register}></Route>
                 <Route path="/command" component={Command}></Route>
+                <Route path="/notice" component={ChatGroupNotice}></Route>
                 <Redirect path="/" to="/login"/>
             </Switch>
         </div>

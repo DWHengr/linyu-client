@@ -1,0 +1,104 @@
+.chat-group-notice {
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background-image: linear-gradient(to bottom, #EDF2F9, #fff);
+  position: relative;
+  padding: 10px 0 10px 10px;
+
+  .notices {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    .notices-title {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+      align-items: center;
+      margin-right: 10px;
+    }
+
+    .notices-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow-y: scroll;
+      padding-right: 5px;
+      margin-right: 5px;
+      padding-bottom: 10px;
+
+      .notice-item {
+        margin: 5px 0;
+        padding: 10px;
+        background-color: #FFFFFF;
+        border-radius: 5px;
+        font-size: 14px;
+        border: #FFFFFF 2px solid;
+
+        .item-title {
+          color: #969696;
+          display: flex;
+          align-items: center;
+          margin-bottom: 5px;
+
+          .item-portrait {
+            width: 20px;
+            height: 20px;
+            border-radius: 20px;
+            margin-right: 5px;
+            user-select: none;
+          }
+
+          .item-operation {
+            margin-left: 5px;
+            cursor: pointer;
+            display: none;
+
+            &:hover {
+              color: #1F1F1F;
+            }
+          }
+        }
+
+        &:hover {
+          box-sizing: border-box;
+          background-color: #EDF2F9;
+
+          .item-title {
+            .item-operation {
+              display: flex;
+            }
+          }
+        }
+      }
+
+    }
+  }
+
+  .edit {
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px;
+    height: calc(100% - 20px);
+
+    textarea {
+      background-color: transparent;
+      outline: none;
+      border: none;
+      resize: none;
+      width: 100%;
+      font-size: 14px;
+    }
+
+    .edit-title {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      user-select: none;
+      margin-bottom: 5px;
+    }
+  }
+}
