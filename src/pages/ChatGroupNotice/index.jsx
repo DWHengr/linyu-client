@@ -12,6 +12,7 @@ import CustomAffirmModal from "../../componets/CustomAffirmModal/index.jsx";
 import CustomLine from "../../componets/CustomLine/index.jsx";
 import {useToast} from "../../componets/CustomToast/index.jsx";
 import {invoke} from "@tauri-apps/api/core";
+import CustomEmpty from "../../componets/CustomEmpty/index.jsx";
 
 export default function ChatGroupNotice() {
     const [groupNotices, setGroupNotices] = useState([])
@@ -116,6 +117,9 @@ export default function ChatGroupNotice() {
                         发布新公告
                     </CustomButton>}
                 </CustomDragDiv>
+                <div style={{marginRight: 10}}>
+                    <CustomLine width={1}/>
+                </div>
                 <CustomDragDiv className="notices-content">
                     {groupNotices?.map(notice => {
                         return (<div key={notice.id} className="notice-item">
@@ -179,6 +183,9 @@ export default function ChatGroupNotice() {
                     </CustomButton>
                 </div>
             </CustomDragDiv>}
+            {
+                !isEdit && groupNotices?.length <= 0 && <CustomEmpty placeholder="暂时无群公告~"></CustomEmpty>
+            }
         </CustomDragDiv>
     </CustomBox>)
 
