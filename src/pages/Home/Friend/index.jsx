@@ -920,7 +920,7 @@ export default function Friend() {
                             <div className="info-item">
                                 <i className={`iconfont icon-gonggao`} style={{fontSize: 14, marginRight: 5}}/>
                                 <div className="flex-shrink">群公告：</div>
-                                <div>{chatGroupDetails.notice}</div>
+                                <div>{chatGroupDetails?.notice?.noticeContent}</div>
                             </div>
                             <div className="info-item" style={{flexDirection: "column", alignItems: "normal"}}>
                                 <div style={{display: "flex"}}>
