@@ -7,7 +7,7 @@ const Retraction = memo(({value, right = false, onReedit}) => {
         <>
             <div className="chat-content-retraction">
                 <div>{`${right ? "你" : "对方"}撤回了一条消息`}</div>
-                {right && value?.type === "text" &&
+                {right && value?.msgContent?.ext === "text" &&
                     < div
                         style={{color: "#4C9BFF", marginLeft: 5, cursor: "pointer"}}
                         onClick={() => {

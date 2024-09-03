@@ -45,6 +45,7 @@
     "core:webview:allow-create-webview-window",
     "clipboard-manager:default",
     "clipboard-manager:allow-write-image",
+    "clipboard-manager:allow-write-text",
     "dialog:allow-save",
     "upload:allow-download",
     "dialog:allow-open",

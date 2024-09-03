@@ -231,10 +231,6 @@
         user-select: none;
         border-radius: 5px;
 
-        &:hover {
-          background-color: #F9FBFF;
-        }
-
         .item-portrait {
           width: 30px;
           height: 30px;
@@ -246,6 +242,29 @@
           font-size: 12px;
         }
 
+        .item-operations {
+          display: none;
+          color: #969696;
+          margin-left: auto;
+
+          .item-operation {
+            font-size: 20px;
+            margin-right: 5px;
+            cursor: pointer;
+
+            &:hover {
+              color: #1F1F1F;
+            }
+          }
+        }
+
+        &:hover {
+          background-color: #F9FBFF;
+
+          .item-operations {
+            display: flex;
+          }
+        }
       }
     }
   }

@@ -24,5 +24,14 @@ export default {
     },
     quit(param) {
         return Http.post("/v1/api/chat-group/quit", param);
+    },
+    kick(param) {
+        return Http.post("/v1/api/chat-group/kick", param);
+    },
+    dissolve(param) {
+        return Http.post("/v1/api/chat-group/dissolve", param);
+    },
+    transfer(param) {
+        return Http.post("/v1/api/chat-group/transfer", param);
     }
 };
