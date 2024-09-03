@@ -16,6 +16,7 @@ import FriendSearchCard from "../../../componets/FriendSearchCard/index.jsx";
 import CustomEmpty from "../../../componets/CustomEmpty/index.jsx";
 import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import MsgContentShow from "../../../componets/MsgContentShow/index.jsx";
+import {invoke} from "@tauri-apps/api/core";
 
 export default function Chat() {
     const chatStoreData = useSelector((state) => state.chatData);
@@ -31,15 +32,23 @@ export default function Chat() {
     const [allChatsData, setAllChatsData] = useState([])
     const dispatch = useDispatch();
     const chatWindowUsersRef = useRef(chatStoreData.chatWindowUsers);
+    const currentUserId = useRef(null)
     let h = useHistory();
     const [chatListRightOptionsFilter, setChatListRightOptionsFilter] = useState([])
     //搜索
     const [searchInfo, setSearchInfo] = useState("")
     const [searchFriendsList, setSearchFriendsList] = useState([])
 
+    useEffect(() => {
+        invoke("get_user_info", {}).then(res => {
+            currentUserId.current = res.user_id
+        })
+        onGetChatList()
+    }, []);
+
+
     const chatListRightOptions = [{key: "top", label: "置顶"}, {
-        key: "unTop",
-        label: "取消置顶"
+        key: "unTop", label: "取消置顶"
     }, // {key: "unNoDisturb", label: "设置免打扰"},
         // {key: "unNoDisturb ", label: "取消免打扰"},
         {key: "newChatWindow", label: "打开独立窗口"}, {key: "deleteChat", label: "从聊天列表中移除"},]
@@ -102,6 +111,12 @@ export default function Chat() {
                         onRead(data.fromId);
                     } else {
                         onGetChatList();
+                    }
+                    if (data.type === 'system' && data.toId === selectedChatId &&
+                        (data?.msgContent?.ext === currentUserId.current || data?.msgContent?.ext === 'all')) {
+                        dispatch(setCurrentChatId(''))
+                        setSelectedUserInfo(null)
+                        setSelectedChatId(null)
                     }
                 });
                 cleanupFunctions.push(unReceiveListen);
@@ -170,10 +185,6 @@ export default function Chat() {
     useEffect(() => {
         currentToId.current = selectedChatId
     }, [selectedChatId])
-
-    useEffect(() => {
-        onGetChatList()
-    }, []);
 
     const onMenuItemClick = (item) => {
         switch (item.key) {
@@ -264,10 +275,7 @@ export default function Chat() {
                         >
                             {info.remark ? info.remark : info.name}
                         </div>
-                        {
-                            info.type === 'group' &&
-                            <div className="qun">群</div>
-                        }
+                        {info.type === 'group' && <div className="qun">群</div>}
                     </div>
                     <div style={{
                         fontSize: 10, color: `${isSelected ? "#F6F6F6" : "#646464"}`
@@ -280,18 +288,7 @@ export default function Chat() {
                     >
                         <MsgContentShow msgContent={info.lastMsgContent}/>
                     </div>
-                    {info.unreadNum > 0 && !isSelected ? <div style={{
-                        width: 18,
-                        minWidth: 18,
-                        height: 18,
-                        borderRadius: 16,
-                        backgroundColor: "#4C9BFF",
-                        fontSize: 12,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        color: "#fff"
-                    }}>
+                    {info.unreadNum > 0 && !isSelected ? <div className="unread">
                         {info.unreadNum < 99 ? info.unreadNum : "99+"}
                     </div> : <></>}
                 </div>
