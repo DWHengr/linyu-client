@@ -42,12 +42,11 @@ const File = memo(({value, right = false}) => {
     const onDownload = async () => {
         let sum = 1;
         let userinfo = await invoke("get_user_info", {})
-        const {fileName, fileType} = getFileNameAndType(fileInfo.url)
         save({
             title: "林语",
-            defaultPath: fileName,
+            defaultPath: fileInfo?.name,
             filters: [
-                {name: "文件", extensions: [fileType]}
+                {name: "文件", extensions: [fileInfo?.type]}
             ]
         }).then((path) => {
             MessageApi.getFile({

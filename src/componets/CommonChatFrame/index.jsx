@@ -229,8 +229,10 @@ function CommonChatFrame({chatInfo}) {
         let fileName = path.split('\\').pop();
         let fileType = isImageFile(fileName) ? "img" : "file"
         let msg = {
-            toUserId: currentToId.current, msgContent: {
-                type: fileType, source: chatInfo.type, content: JSON.stringify({
+            toUserId: currentToId.current,
+            source: chatInfo.type,
+            msgContent: {
+                type: fileType, content: JSON.stringify({
                     name: fileName, size: fileInfo.size,
                 })
             }
