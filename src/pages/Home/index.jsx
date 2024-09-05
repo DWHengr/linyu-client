@@ -40,6 +40,9 @@ import CreateCmdWindow from "../Command/window.jsx";
 import CreateChatWindow from "../ChatWindow/window.jsx";
 import CustomBox from "../../componets/CustomBox/index.jsx";
 import CreateLogin from "../Login/window.jsx";
+import {check} from "@tauri-apps/plugin-updater";
+import {relaunch} from "@tauri-apps/plugin-process";
+import ProgressBar from "../../componets/ProgressBar/index.jsx";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData)
@@ -56,6 +59,54 @@ export default function Home() {
     let showToast = useToast()
     const [userInfoPosition, setUserInfoPosition] = useState(null)
     const [userInfoVisible, setUserInfoVisible] = useState(false)
+    const [isUpdaterOpen, setIsUpdaterOpen] = useState(false)
+    const [updaterProgress, setUpdaterProgress] = useState(0)
+    const [updating, SetUpdating] = useState(false)
+    const [updater, setUpdater] = useState(null)
+
+    useEffect(() => {
+        (async () => {
+            try {
+                let result = await check();
+                if (result.available) {
+                    setUpdater(result)
+                    setIsUpdaterOpen(true)
+                }
+            } catch (e) {
+                setIsUpdaterOpen(false)
+            }
+        })();
+    }, [])
+
+    const onUpdater = async () => {
+        SetUpdating(true)
+        try {
+            let downloaded = 0;
+            let contentLength = 0;
+            await updater.downloadAndInstall((event) => {
+                switch (event.event) {
+                    case 'Started':
+                        contentLength = event.data.contentLength
+                        break;
+                    case 'Progress':
+                        downloaded += event.data.chunkLength
+                        setUpdaterProgress(downloaded / contentLength * 100)
+                        break;
+                    case 'Finished':
+                        SetUpdating(false)
+                        setUpdaterProgress(0)
+                        setIsUpdaterOpen(false)
+                        break;
+                }
+            });
+            await relaunch();
+        } catch (e) {
+            showToast("更新失败~", true)
+            setIsUpdaterOpen(false)
+        } finally {
+            setUpdater(null)
+        }
+    }
 
     useEffect(() => {
         const cleanupFunctions = [];
@@ -300,6 +351,32 @@ export default function Home() {
 
     return (
         <div>
+            <CustomModal isOpen={isUpdaterOpen}>
+                <div className="updater">
+                    <img className="updater-icon" alt="" src="/public/updater.png"/>
+                    <div style={{fontWeight: 600}}>
+                        版本更新
+                    </div>
+                    <div style={{color: "#969696", fontSize: 12}}>
+                        新版本{updater?.version}
+                    </div>
+                    <div className="updater-content">
+                        <div>[更新内容]</div>
+                        <div>{updater?.body}</div>
+                    </div>
+                    {updating && <ProgressBar progress={updaterProgress}/>}
+                    {
+                        !updating &&
+                        <div className="updater-operate">
+                            <CustomButton width={80} onClick={() => {
+                                setIsUpdaterOpen(false)
+                                setUpdater(null)
+                            }} type="minor">稍后更新</CustomButton>
+                            <CustomButton width={80} onClick={onUpdater}>立即更新</CustomButton>
+                        </div>
+                    }
+                </div>
+            </CustomModal>
             <RightClickContent position={userInfoPosition} visible={userInfoVisible}>
                 <div className="user-info">
                     <div style={{display: "flex", height: 60, alignItems: "center", marginBottom: 10}}>

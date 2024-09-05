@@ -19,6 +19,8 @@ fn main() {
         .setup(move |app| {
             app.handle().plugin(tauri_plugin_global_shortcut::Builder::new().build())?;
             tray::create_tray(app.handle())?;
+            #[cfg(desktop)]
+            app.handle().plugin(tauri_plugin_updater::Builder::new().build())?;
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![get_user_info, save_user_info,default_window_icon,screenshot,audio])

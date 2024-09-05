@@ -27,6 +27,16 @@
       "csp": null
     }
   },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "dialog": true,
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVERDExMEEyQzgxQTk4Q0QKUldUTm1CcklvaERSN1NObE4waFUxeUxEZVZxdjBNZ21YZGNBclNaT2RyRkdkdzRERmtVWlNTT0cK",
+      "endpoints": [
+        "https://127.0.0.1/files/updater.json"
+      ]
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",
@@ -37,6 +47,7 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
+    "createUpdaterArtifacts": true,
     "windows": {
       "wix": {
         "language": "zh-CN"
