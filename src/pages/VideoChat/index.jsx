@@ -93,8 +93,9 @@ export default function VideoChat() {
                 case "hangup": {
                     handlerDestroyTime()
                     showToast("对方已挂断~", true)
-                    setTimeout(function () {
-                        WebviewWindow.getCurrent().close()
+                    setTimeout(async function () {
+                        const window = await WebviewWindow.getByLabel('video-chat')
+                        window.close()
                     }, 2000);
                     break
                 }
@@ -182,8 +183,9 @@ export default function VideoChat() {
                 }
             }
         }).finally(() => {
-            VideoApi.hangup({userId: toUserId.current}).then(res => {
-                WebviewWindow.getCurrent().close()
+            VideoApi.hangup({userId: toUserId.current}).then(async res => {
+                const window = await WebviewWindow.getByLabel('video-chat')
+                window.close()
             })
         })
     }
