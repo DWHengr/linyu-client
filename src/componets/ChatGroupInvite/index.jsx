@@ -10,10 +10,28 @@ import CustomSearchInput from "../CustomSearchInput/index.jsx";
 export default function ChatGroupInvite({existing, onCancel, onOk}) {
     const [allFriendData, setAllFriendData] = useState([])
     const [selectedUsers, setSelectedUsers] = useState([])
-    const selectedUserIds = useRef([])
+    const selectedUserIds = useRef(new Set())
+    const [searchValue, setSearchValue] = useState("")
+    const [searchFriendData, setSearchFriendData] = useState([])
+
     useEffect(() => {
         onFriendList()
     }, [])
+
+    useEffect(() => {
+        if (searchValue) {
+            handlerSearchFriend()
+        }
+    }, [searchValue])
+
+    const handlerSearchFriend = () => {
+        FriendApi.search({friendInfo: searchValue}).then(res => {
+            if (res.code === 0) {
+                setSearchFriendData(res.data)
+            }
+        })
+    }
+
     const onFriendList = () => {
         FriendApi.list().then(res => {
             if (res.code === 0) {
@@ -26,10 +44,10 @@ export default function ChatGroupInvite({existing, onCancel, onOk}) {
         setSelectedUsers(prevUsers => {
             const userIndex = prevUsers.findIndex(u => u.friendId === user.friendId);
             if (userIndex === -1) {
-                selectedUserIds.current.push(user.friendId)
+                selectedUserIds.current.add(user.friendId)
                 return [...prevUsers, user];
             } else {
-                selectedUserIds.current.filter(id => id !== user.friendId)
+                selectedUserIds.current.delete(user.friendId)
                 return prevUsers.filter(u => u.friendId !== user.friendId)
             }
         });
@@ -53,10 +71,11 @@ export default function ChatGroupInvite({existing, onCancel, onOk}) {
                     <CustomSearchInput
                         style={{marginTop: 4, marginBottom: 4, height: 30}}
                         placeholder="搜索好友"
-                        value=""
+                        value={searchValue}
+                        onChange={(v) => setSearchValue(v)}
                     />
                     <div className="friend-list">
-                        {allFriendData.map((item, index) => {
+                        {!searchValue && allFriendData.map((item, index) => {
                             return (
                                 <CustomAccordion
                                     key={item.name + index}
@@ -79,12 +98,7 @@ export default function ChatGroupInvite({existing, onCancel, onOk}) {
                                                 />
                                                 <img
                                                     alt="" src={friend.portrait}
-                                                    style={{
-                                                        width: 25,
-                                                        height: 25,
-                                                        borderRadius: 25,
-                                                        marginRight: 5
-                                                    }}
+                                                    style={{width: 25, height: 25, borderRadius: 25, marginRight: 5}}
                                                 />
                                                 <div
                                                     style={{fontSize: 14}}>{friend.remark ? friend.remark : friend.name}
@@ -94,6 +108,30 @@ export default function ChatGroupInvite({existing, onCancel, onOk}) {
                                         )
                                     })}
                                 </CustomAccordion>
+                            )
+                        })}
+                        {searchValue && searchFriendData?.map((friend) => {
+                            let status = getSelectionIconStatus(friend)
+                            return (
+                                <div
+                                    key={friend.friendId}
+                                    className="friend-list-item"
+                                    onClick={() => {
+                                        if (status !== 'disabled') handleUserClick(friend)
+                                    }}
+                                >
+                                    <SelectionIcon
+                                        status={status}
+                                        style={{width: 18, height: 18, marginRight: 5}}
+                                    />
+                                    <img
+                                        alt="" src={friend.portrait}
+                                        style={{width: 25, height: 25, borderRadius: 25, marginRight: 5}}
+                                    />
+                                    <div
+                                        style={{fontSize: 14}}>{friend.remark ? friend.remark : friend.name}
+                                    </div>
+                                </div>
                             )
                         })}
                         {allFriendData?.length <= 0 &&
@@ -136,7 +174,8 @@ export default function ChatGroupInvite({existing, onCancel, onOk}) {
                         })}
                     </div>
                     <div style={{display: "flex", marginTop: 10, justifyContent: "end"}}>
-                        <CustomButton width={80} onClick={() => onOk(selectedUserIds.current)}>确定</CustomButton>
+                        <CustomButton width={80}
+                                      onClick={() => onOk(Array.from(selectedUserIds.current))}>确定</CustomButton>
                         <CustomButton width={80} onClick={onCancel} type='minor'>取消</CustomButton>
                     </div>
                 </div>
