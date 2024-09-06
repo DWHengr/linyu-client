@@ -8,14 +8,13 @@ import {TrayIcon} from "@tauri-apps/api/tray";
 listen('tray_menu', async (event) => {
 
     const homeWindow = await WebviewWindow.getByLabel('home')
+    let trayWindow = await WebviewWindow.getByLabel('tray_menu')
     if (!homeWindow) return
 
     let position = event.payload;
-    let scaleFactor = await homeWindow.scaleFactor();
+    let scaleFactor = await trayWindow.scaleFactor();
     let logicalPosition = new PhysicalPosition(position.x, position.y).toLogical(scaleFactor);
     logicalPosition.y = logicalPosition.y - trayWindowHeight
-
-    let trayWindow = await WebviewWindow.getByLabel('tray_menu')
     if (trayWindow) {
         await trayWindow.setAlwaysOnTop(true)
         await trayWindow.setPosition(logicalPosition)
