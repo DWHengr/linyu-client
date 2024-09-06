@@ -112,7 +112,7 @@ export default function Chat() {
                     } else {
                         onGetChatList();
                     }
-                    if (data.type === 'system' && data.toId === selectedChatId &&
+                    if (data.msgContent?.type === 'quit' && data.toId === selectedChatId &&
                         (data?.msgContent?.ext === currentUserId.current || data?.msgContent?.ext === 'all')) {
                         dispatch(setCurrentChatId(''))
                         setSelectedUserInfo(null)

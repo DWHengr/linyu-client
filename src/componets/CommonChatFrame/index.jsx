@@ -40,8 +40,8 @@ import CustomAffirmModal from "../CustomAffirmModal/index.jsx";
 import CreateChatGroupNotice from "../../pages/ChatGroupNotice/window.jsx";
 import NotifyApi from "../../api/notify.js";
 import {useToast} from "../CustomToast/index.jsx";
-import GroupQuit from "./ChatContent/GroupQuit/index.jsx";
 import {writeText} from "@tauri-apps/plugin-clipboard-manager";
+import SystemMsg from "./ChatContent/SystemMsg/index.jsx";
 
 function CommonChatFrame({chatInfo}) {
 
@@ -85,6 +85,8 @@ function CommonChatFrame({chatInfo}) {
     const [isChatGroupTransferAffirmModalOpen, setIsChatGroupTransferAffirmModalOpen] = useState(false)
     const [isChatGroupKickAffirmModalOpen, setIsChatGroupKickAffirmModalOpen] = useState(false)
     const [selectedMemberId, setSelectedMemberId] = useState(null)
+    const [searchMemberValue, setSearchMemberValue] = useState("")
+    const [searchMemberList, setSearchMemberList] = useState([])
 
     const showToast = useToast()
 
@@ -179,6 +181,22 @@ function CommonChatFrame({chatInfo}) {
         }
     }, [])
 
+
+    useEffect(() => {
+        if (searchMemberValue) {
+            let result = {}
+            Object.entries(chatGroupMemberList).map(([userid, member]) => {
+                if (member.name?.includes(searchMemberValue) ||
+                    member.remark?.includes(searchMemberValue) ||
+                    member.groupName?.includes(searchMemberValue)) {
+                    result[userid] = member
+                }
+            })
+            setSearchMemberList(result)
+        } else {
+            setSearchMemberList(chatGroupMemberList)
+        }
+    }, [searchMemberValue, chatGroupMemberList]);
 
     useEffect(() => {
         if (userLocalSets?.sendMsgDivHeight) {
@@ -861,6 +879,7 @@ function CommonChatFrame({chatInfo}) {
                 </div>
             </div>
         </RightClickContent>
+        {/*群信息*/}
         <CustomDrawer isOpen={chatGroupInfoOpen} onClose={() => setChatGroupInfoOpen(false)}>
             <div className="chat-group-drawer">
                 <div className="chat-group-portrait-info">
@@ -986,10 +1005,11 @@ function CommonChatFrame({chatInfo}) {
                     <CustomSearchInput
                         style={{marginTop: 4, marginBottom: 4, border: '#FFF 2px solid', height: 30}}
                         placeholder="搜索成员"
-                        value=""
+                        value={searchMemberValue}
+                        onChange={(v) => setSearchMemberValue(v)}
                     />
                     <div className="member">
-                        {Object.entries(chatGroupMemberList).map(([userId, member]) => {
+                        {Object.entries(searchMemberList).map(([userId, member]) => {
                             return (<div key={userId} className="member-item">
                                 <img alt=""
                                      src={member.portrait}
@@ -1058,7 +1078,7 @@ function CommonChatFrame({chatInfo}) {
                 let member = chatGroupMemberList[msg.fromId]
                 return (<div key={msg.id}>
                     {msg.isShowTime && <Time value={formatTime(msg.updateTime)}/>}
-                    {msg.type === 'system' && <GroupQuit value={msg.msgContent?.content}/>}
+                    {msg.type === 'system' && <SystemMsg value={msg.msgContent}/>}
                     {msg.type !== 'system' && <div>
                         {chatInfo.type === 'group' &&
                             <div style={{display: "flex", justifyContent: isRight ? 'end' : ''}}>
