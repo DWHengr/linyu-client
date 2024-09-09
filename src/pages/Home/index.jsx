@@ -353,7 +353,7 @@ export default function Home() {
         <div>
             <CustomModal isOpen={isUpdaterOpen}>
                 <div className="updater">
-                    <img className="updater-icon" alt="" src="/public/updater.png"/>
+                    <img className="updater-icon" alt="" src="/updater.png"/>
                     <div style={{fontWeight: 600}}>
                         版本更新
                     </div>

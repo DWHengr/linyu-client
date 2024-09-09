@@ -102,26 +102,6 @@
         text-align: center;
         background-color: rgba(182, 182, 182, 0.4);
       }
-
-      .dots::after {
-        content: '';
-        animation: dots 1.5s steps(3, end) infinite;
-      }
-
-      @keyframes dots {
-        0%, 20% {
-          content: '.';
-        }
-        40% {
-          content: '..';
-        }
-        60% {
-          content: '...';
-        }
-        80%, 100% {
-          content: '';
-        }
-      }
     }
   }
 }

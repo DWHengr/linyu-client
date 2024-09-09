@@ -26,6 +26,7 @@ export default function Login() {
     const [serverIp, setServerIp] = useState("")
     const [serverWs, setServerWs] = useState("")
     const [isSetServer, setIsSetServer] = useState(false)
+    const [logging, setLogging] = useState(false)
 
     useEffect(() => {
         let ip = getLocalItem("serverIp")
@@ -48,6 +49,7 @@ export default function Login() {
     }
 
     const onLogin = async () => {
+        setLogging(true)
         if (!account) {
             showToast("用户名不能为空~", true)
             return
@@ -84,7 +86,9 @@ export default function Login() {
             })
             .catch((res) => {
                 showToast(res.message, true)
-            })
+            }).finally(() => {
+            setLogging(false)
+        })
     }
 
     const handlerDeleteItem = (item) => {
@@ -139,11 +143,17 @@ export default function Login() {
                         onKeyDown={handleKeyDown}
                     />
                 </div>
-                <div className={`login-button ${password && account ? "" : "disabled"}`} onClick={() => {
-                    if (password && account)
-                        onLogin()
-                }}>
-                    登 录
+                <div className={`login-button ${password && account && !logging ? "" : "disabled"}`}
+                     onClick={() => {
+                         if (password && account)
+                             onLogin()
+                     }}
+                >
+                    {!logging ? <span>登 录</span> :
+                        <span className="dots">
+                         登 录 中
+                        </span>
+                    }
                 </div>
                 <div
                     style={{fontSize: 14, marginTop: 15, cursor: "pointer", color: "#4C9BFF"}}
@@ -170,12 +180,14 @@ export default function Login() {
                         <CustomInput value={serverWs} onChange={(v) => setServerWs(v)}/>
                     </div>
                     <div style={{display: "flex", marginTop: 50, width: "85%", justifyContent: "end"}}>
-                        <CustomButton width={70} onClick={() => {
-                            setLocalItem("serverIp", serverIp)
-                            setLocalItem("serverWs", serverWs)
-                            setIsSetServer(false)
-                            showToast("设置成功~")
-                        }}>
+                        <CustomButton width={70}
+                                      onClick={() => {
+                                          setLocalItem("serverIp", serverIp)
+                                          setLocalItem("serverWs", serverWs)
+                                          setIsSetServer(false)
+                                          showToast("设置成功~")
+                                      }}
+                        >
                             确定
                         </CustomButton>
                         <CustomButton type="minor" width={70}

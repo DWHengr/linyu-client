@@ -52,26 +52,6 @@
     animation: spin 2s linear infinite;
   }
 
-  .dots::after {
-    content: '';
-    animation: dots 1.5s steps(3, end) infinite;
-  }
-
-  @keyframes dots {
-    0%, 20% {
-      content: '.';
-    }
-    40% {
-      content: '..';
-    }
-    60% {
-      content: '...';
-    }
-    80%, 100% {
-      content: '';
-    }
-  }
-
   @keyframes spin {
     0% {
       transform: rotate(0deg);
