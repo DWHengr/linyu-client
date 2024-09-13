@@ -21,5 +21,8 @@ export default {
     },
     register(param) {
         return Http.post("/v1/api/user/register", param)
-    }
+    },
+    emailVerification(param) {
+        return Http.post("/v1/api/user/email/verify", param)
+    },
 };
