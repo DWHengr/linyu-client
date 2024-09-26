@@ -33,13 +33,16 @@ export default function SystemNotify() {
             <div className="system-notify-content">
                 {
                     notices?.map(notify => {
-                        let content = JSON.parse(notify.content)
                         return (
-                            <div key={notify.id}>
+                            <div style={{marginTop: 10}} key={notify.id}>
                                 <Time value={formatTime(notify.createTime)}/>
                                 <div className="system-notify-item">
-                                    <img className="system-notify-item-img" src={content.img} alt="加载失败"/>
-                                    <div className="system-notify-item-text">{content.text}</div>
+                                    <div className="system-notify-item-img">
+                                        <img className="system-notify-item-img" src={notify.content.img}
+                                             alt="加载失败"/>
+                                        <div className="system-notify-item-title">{notify.content.title}</div>
+                                    </div>
+                                    <div className="system-notify-item-text">{notify.content.text}</div>
                                 </div>
                             </div>
                         )
