@@ -10,7 +10,8 @@ export default function CustomInput({
                                         limit = -1,
                                         type = "input",
                                         required = false,
-                                        requiredMsg = "内容不能为空"
+                                        requiredMsg = "内容不能为空",
+                                        isOnlyChars = false
                                     }) {
     const [isShowRequiredMsg, setIsShowRequiredMsg] = useState(false)
     const [inputValue, setInputValue] = useState(value)
@@ -50,6 +51,14 @@ export default function CustomInput({
                         if (e.target.value.length <= limit || limit === -1) {
                             setInputValue(e.target.value)
                             if (onChange) onChange(e.target.value)
+                        }
+                        if (isOnlyChars) {
+                            let value = e.target.value.toLocaleLowerCase().replace(/[^a-zA-Z0-9]/g, '');
+                            // if (value.length > 0 && !value[0].match(/[a-zA-Z]/)) {
+                            //     value = value.replace(/^[0-9]+/, '');
+                            // }
+                            setInputValue(value)
+                            if (onChange) onChange(value)
                         }
                     }}
 

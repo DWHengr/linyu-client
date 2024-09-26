@@ -536,7 +536,7 @@ function CommonChatFrame({chatInfo}) {
             multiple: true,
         });
         if (Array.isArray(selected)) {
-            onSendFile(selected[0].path)
+            onSendFile(selected[0])
         }
     }
 

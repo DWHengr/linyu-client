@@ -18,7 +18,7 @@ async function send(configs) {
     return new Promise(async (resolve, reject) => {
         fetch(configs.url, {
             method: configs.method, body: JSON.stringify(configs.data), headers: {
-                ...configs.headers, "x-token": token ? token : "", "Content-Type": "application/json",
+                ...configs.headers, "x-token": token ? token : "", "Content-Type": "application/json; charset=utf-8",
             }
         })
             .then(async (response) => {
@@ -72,7 +72,10 @@ async function upload(url, file, params = {}) {
             fetch(SERVICE_URL + url, {
                 method: "POST", body: file, headers: {
                     ...params,
-                    "x-token": token ? token : "", "name": file.name, "type": file.type, "size": file.size,
+                    "x-token": token ? token : "",
+                    "name": encodeURIComponent(file.name),
+                    "type": file.type,
+                    "size": file.size,
                 }
             })
                 .then(async (response) => {

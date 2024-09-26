@@ -34,7 +34,6 @@ export default function Register() {
     }, [timer]);
 
     const onRegister = async () => {
-        console.log(userInfo)
         if (!userInfo.username || !userInfo.account || !userInfo.password || !userInfo.email || !userInfo.code) {
             showToast("注册信息有误，请检查~", true);
             return;
@@ -103,6 +102,7 @@ export default function Register() {
                             required={true}
                             requiredMsg="账号不能为空"
                             value={userInfo.account}
+                            isOnlyChars={true}
                             onChange={(v) => setUserInfo({...userInfo, account: v})}
                         />
                         <CustomInput
