@@ -1,4 +1,4 @@
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow"
 
 
 export let trayWindowWidth = 120

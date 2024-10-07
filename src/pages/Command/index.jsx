@@ -1,7 +1,7 @@
 import "./index.less"
 import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import {useEffect, useRef, useState} from "react";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import FocusLock from 'react-focus-lock';
 import {useToast} from "../../componets/CustomToast/index.jsx";
 import FriendApi from "../../api/friend.js";

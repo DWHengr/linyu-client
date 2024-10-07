@@ -1,4 +1,4 @@
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow"
 import {emit} from "@tauri-apps/api/event";
 import {setItem} from "../../utils/storage.js";
 

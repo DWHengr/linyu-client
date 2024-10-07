@@ -1,4 +1,4 @@
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow"
 import {PhysicalPosition} from "@tauri-apps/api/window";
 
 export default async function CreateCmdWindow() {

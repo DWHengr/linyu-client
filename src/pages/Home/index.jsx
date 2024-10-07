@@ -11,7 +11,7 @@ import ws from "../../utils/ws.js";
 import {invoke} from "@tauri-apps/api/core";
 import {useDispatch, useSelector} from "react-redux";
 import {setCurrentLoginUserInfo, setCurrentOption} from "../../store/home/action.js";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import CreateTrayWindow from "../TrayMenu/window.jsx";
 import Notify from "./Notify/index.jsx";
 import UserApi from "../../api/user.js";

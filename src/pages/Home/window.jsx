@@ -1,4 +1,4 @@
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow"
 import {listen} from "@tauri-apps/api/event";
 import {PhysicalPosition} from "@tauri-apps/api/window";
 import {trayWindowHeight} from "../TrayMenu/window.jsx";

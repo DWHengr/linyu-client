@@ -2,7 +2,7 @@ import React, {useEffect, useState} from 'react';
 import {emitTo} from '@tauri-apps/api/event';
 import {invoke} from "@tauri-apps/api/core";
 import './index.less';
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {getItem} from "../../utils/storage.js";
 import {Image} from "@tauri-apps/api/image";
 import {base64ToArrayBuffer} from "../../utils/img.js";

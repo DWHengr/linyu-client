@@ -3,7 +3,7 @@ import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import {memo, useEffect, useRef, useState} from "react";
 import {invoke} from "@tauri-apps/api/core";
 import {emit, listen} from "@tauri-apps/api/event";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {LogicalSize} from "@tauri-apps/api/dpi";
 import {messageBoxWindowHeight, messageBoxWindowWidth} from "./window.jsx";
 import {useDispatch} from "react-redux";

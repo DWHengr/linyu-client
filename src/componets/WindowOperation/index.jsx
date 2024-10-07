@@ -1,6 +1,6 @@
 import "./index.less"
 import IconButton from "../IconButton/index.jsx";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {useEffect, useState} from "react";
 
 export default function WindowOperation({

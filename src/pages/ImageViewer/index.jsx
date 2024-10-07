@@ -6,7 +6,7 @@ import {save} from "@tauri-apps/plugin-dialog";
 import {useEffect, useState} from "react";
 import {getItem} from "../../utils/storage.js";
 import {writeFile} from "@tauri-apps/plugin-fs";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 
 
 export default function ImageViewer() {

@@ -1,6 +1,6 @@
 import "./index.less"
 import {useEffect, useState} from "react";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import CustomDragDiv from "../CustomDragDiv/index.jsx";
 
 export default function CustomBox({children, className}) {

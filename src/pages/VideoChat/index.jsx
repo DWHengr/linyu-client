@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from "react";
 import "./index.less"
 import VideoApi from "../../api/video.js";
 import {emit, listen} from "@tauri-apps/api/event";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import WindowOperation from "../../componets/WindowOperation/index.jsx";
 import CustomDragDiv from "../../componets/CustomDragDiv/index.jsx";
 import ChatListApi from "../../api/chatList.js";

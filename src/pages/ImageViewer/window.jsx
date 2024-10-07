@@ -1,4 +1,4 @@
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow"
 import {setItem} from "../../utils/storage.js";
 
 export default async function CreateImageViewer(fileName, url) {

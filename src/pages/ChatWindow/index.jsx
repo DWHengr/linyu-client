@@ -1,7 +1,7 @@
 import "./index.less"
 import WindowOperation from "../../componets/WindowOperation/index.jsx";
 import {useEffect, useState} from "react";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import ChatListApi from "../../api/chatList.js";
 import CommonChatFrame from "../../componets/CommonChatFrame/index.jsx";
 import {useDispatch} from "react-redux";

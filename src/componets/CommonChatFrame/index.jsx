@@ -8,7 +8,7 @@ import MessageApi from "../../api/message.js";
 import {invoke} from "@tauri-apps/api/core";
 import CustomOverlay from "../CustomOverlay/index.jsx";
 import {emojis} from "../../utils/emoji.js";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import Time from "./ChatContent/Time/index.jsx";
 import {formatTime, getYearDayMonth} from "../../utils/date.js";
 import CreateVideoChat from "../../pages/VideoChat/window.jsx";

@@ -1,4 +1,4 @@
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow"
 
 export default async function CreateAboutWindow() {
     const window = await WebviewWindow.getByLabel('about')

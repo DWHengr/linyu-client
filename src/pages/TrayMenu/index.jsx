@@ -3,7 +3,7 @@ import {exit} from "@tauri-apps/plugin-process";
 import CustomLine from "../../componets/CustomLine/index.jsx";
 import {useEffect, useState} from "react";
 import {invoke} from "@tauri-apps/api/core";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {listen} from "@tauri-apps/api/event";
 
 export default function TrayMenu() {

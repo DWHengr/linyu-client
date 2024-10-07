@@ -1,4 +1,4 @@
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow"
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow"
 import {setItem} from "../../utils/storage.js";
 import {getAllWindows} from "@tauri-apps/api/window";
 import {TrayIcon} from "@tauri-apps/api/tray";

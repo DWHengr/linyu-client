@@ -14,7 +14,7 @@ import FriendApi from "../../../api/friend.js";
 import {useHistory} from "react-router-dom";
 import FriendSearchCard from "../../../componets/FriendSearchCard/index.jsx";
 import CustomEmpty from "../../../componets/CustomEmpty/index.jsx";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import MsgContentShow from "../../../componets/MsgContentShow/index.jsx";
 import {invoke} from "@tauri-apps/api/core";
 

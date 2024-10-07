@@ -7,7 +7,7 @@ import LoginApi from "../../api/login.js";
 import {useEffect, useState} from "react";
 import CreateHomeWindow from "../Home/window.jsx";
 import {invoke} from "@tauri-apps/api/core";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
+import {WebviewWindow} from "@tauri-apps/api/webviewWindow";
 import {useToast} from "../../componets/CustomToast/index.jsx";
 import {getLocalItem, setLocalItem} from "../../utils/storage.js";
 import CreateAboutWindow from "../AboutWindow/window.jsx";
