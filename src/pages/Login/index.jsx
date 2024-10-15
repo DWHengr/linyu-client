@@ -17,6 +17,7 @@ import CreateRegisterWindow from "../Register/window.jsx";
 import {JSEncrypt} from "jsencrypt";
 import CustomBox from "../../componets/CustomBox/index.jsx";
 import {exit} from "@tauri-apps/plugin-process";
+import {getAllWindows} from "@tauri-apps/api/window";
 
 export default function Login() {
     let [account, setAccount] = useState("")
@@ -27,6 +28,17 @@ export default function Login() {
     const [serverWs, setServerWs] = useState("")
     const [isSetServer, setIsSetServer] = useState(false)
     const [logging, setLogging] = useState(false)
+
+    useEffect(() => {
+        (async () => {
+            let windows = await getAllWindows()
+            windows?.map(w => {
+                if (w.label !== 'login') {
+                    w.close();
+                }
+            })
+        })()
+    })
 
     useEffect(() => {
         let ip = getLocalItem("serverIp")
