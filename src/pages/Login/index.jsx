@@ -18,6 +18,7 @@ import {JSEncrypt} from "jsencrypt";
 import CustomBox from "../../componets/CustomBox/index.jsx";
 import {exit} from "@tauri-apps/plugin-process";
 import {getAllWindows} from "@tauri-apps/api/window";
+import Ws from "../../utils/ws.js";
 
 export default function Login() {
     let [account, setAccount] = useState("")
@@ -31,6 +32,7 @@ export default function Login() {
 
     useEffect(() => {
         (async () => {
+            Ws.disconnect()
             let windows = await getAllWindows()
             windows?.map(w => {
                 if (w.label !== 'login') {

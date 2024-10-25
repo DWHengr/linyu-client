@@ -4,7 +4,7 @@ import {useEffect, useState} from "react";
 export default function SystemMsg({value}) {
     const [systemMsgList, setSystemMsgList] = useState([])
     useEffect(() => {
-        setSystemMsgList(JSON.parse(value.content))
+        setSystemMsgList(JSON.parse(value?.content))
     }, [value])
     return (
         <div className="chat-content-system-msg">

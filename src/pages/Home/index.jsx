@@ -113,6 +113,20 @@ export default function Home() {
 
         const setup = async () => {
             try {
+                // 获取用户信息并初始化
+                const res = await invoke("get_user_info", {});
+                dispatch(setCurrentLoginUserInfo(res.user_id, res.username, res.account, res.portrait));
+                let token = res.token;
+                userInfoBackCache.current = res;
+                if (token) {
+                    ws.connect(token);
+                    CreateTrayWindow();
+                    CrateMessageBox();
+                    CreateCmdWindow();
+                    onGetUserUnreadNum();
+                    onGetUserSet();
+                }
+
                 const appWindow = await WebviewWindow.getByLabel('home');
 
                 // 监听隐藏或显示 home 窗口
@@ -141,20 +155,6 @@ export default function Home() {
                     CreateCmdWindow();
                 });
                 cleanupFunctions.push(unCmd);
-
-                // 获取用户信息并初始化
-                const res = await invoke("get_user_info", {});
-                dispatch(setCurrentLoginUserInfo(res.user_id, res.username, res.account, res.portrait));
-                let token = res.token;
-                userInfoBackCache.current = res;
-                if (token) {
-                    ws.connect(token);
-                    CreateTrayWindow();
-                    CrateMessageBox();
-                    CreateCmdWindow();
-                    onGetUserUnreadNum();
-                    onGetUserSet();
-                }
 
             } catch (error) {
                 console.error("Error in useEffect setup:", error);

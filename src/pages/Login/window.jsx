@@ -3,6 +3,7 @@ import {setItem} from "../../utils/storage.js";
 import {getAllWindows} from "@tauri-apps/api/window";
 import {TrayIcon} from "@tauri-apps/api/tray";
 import {invoke} from "@tauri-apps/api/core";
+import Ws from "../../utils/ws.js";
 
 export default async function CreateLogin() {
     TrayIcon.getById("tray").then(async (res) => {
@@ -27,6 +28,7 @@ export default async function CreateLogin() {
         shadow: false,
     });
     webview.once("tauri://webview-created", async function () {
+        Ws.disconnect()
         let windows = await getAllWindows()
         windows?.map(w => {
             if (w.label !== 'login') {

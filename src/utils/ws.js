@@ -13,7 +13,6 @@ let isConnect = false
 
 function response(msg) {
     if (typeof msg === 'string') {
-        console.log(msg)
         onCloseHandler()
         return
     }
@@ -40,6 +39,11 @@ function response(msg) {
     } else {
         onCloseHandler()
     }
+}
+
+function disconnect() {
+    if (ws)
+        ws.disconnect()
 }
 
 function connect(tokenStr) {
@@ -112,4 +116,4 @@ const clearTimer = () => {
 }
 
 
-export default {connect};
+export default {connect, disconnect};
