@@ -7,7 +7,6 @@ import LoginApi from "../../api/login.js";
 import {useEffect, useState} from "react";
 import CreateHomeWindow from "../Home/window.jsx";
 import {invoke} from "@tauri-apps/api/core";
-import {WebviewWindow} from "@tauri-apps/api/WebviewWindow";
 import {useToast} from "../../componets/CustomToast/index.jsx";
 import {getLocalItem, setLocalItem} from "../../utils/storage.js";
 import CreateAboutWindow from "../AboutWindow/window.jsx";
@@ -19,6 +18,7 @@ import CustomBox from "../../componets/CustomBox/index.jsx";
 import {exit} from "@tauri-apps/plugin-process";
 import {getAllWindows} from "@tauri-apps/api/window";
 import Ws from "../../utils/ws.js";
+import CreateForgetWindow from "../ForgetPassword/window.jsx";
 
 export default function Login() {
     let [account, setAccount] = useState("")
@@ -168,6 +168,12 @@ export default function Login() {
                          登 录 中
                         </span>
                     }
+                </div>
+                <div
+                    style={{fontSize: 14, marginTop: 15, cursor: "pointer", color: "#4C9BFF"}}
+                    onClick={CreateForgetWindow}
+                >
+                    忘记密码?
                 </div>
                 <div
                     style={{fontSize: 14, marginTop: 15, cursor: "pointer", color: "#4C9BFF"}}
