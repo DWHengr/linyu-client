@@ -43,6 +43,8 @@ import CreateLogin from "../Login/window.jsx";
 import {check} from "@tauri-apps/plugin-updater";
 import {relaunch} from "@tauri-apps/plugin-process";
 import ProgressBar from "../../componets/ProgressBar/index.jsx";
+import {JSEncrypt} from "jsencrypt";
+import LoginApi from "../../api/login.js";
 
 export default function Home() {
     const homeStoreData = useSelector(store => store.homeData)
@@ -54,7 +56,9 @@ export default function Home() {
     const dispatch = useDispatch();
     const [unreadInfo, setUnreadInfo] = useState({})
     const [userInfo, setUserInfo] = useState({name: "", signature: "", sex: ""})
+    const [userUpdatePassword, setUserPassword] = useState({oldPassword: "", newPassword: "", confirmPassword: ""})
     const [isOpenEditInfo, setIsOpenEditInfo] = useState(false)
+    const [isOpenPasswordEdit, setisOpenPasswordEdit] = useState(false)
     const userInfoBackCache = useRef(null)
     let showToast = useToast()
     const [userInfoPosition, setUserInfoPosition] = useState(null)
@@ -348,6 +352,36 @@ export default function Home() {
         })
         setIsOpenEditInfo(false)
     }
+    const onUpatePassword = async () => {
+        if (userUpdatePassword.oldPassword.length===0||userUpdatePassword.newPassword.length===0||userUpdatePassword.confirmPassword.length===0 ){
+            showToast("密码不能为空~", true)
+            return
+        }
+        if (userUpdatePassword.newPassword !== userUpdatePassword.confirmPassword) {
+            showToast("两次密码输入不一致~", true)
+            return
+        }
+        if (userUpdatePassword.newPassword.length < 6) {
+            showToast("密码长度不能小于6位~", true)
+            return
+        }
+        const encrypt = new JSEncrypt();
+        let keyData = await LoginApi.publicKey();
+        if (keyData.code !== 0) {
+            return;
+        }
+        encrypt.setPublicKey(keyData.data);
+        // userUpdatePassword.confirmPassword = encrypt.encrypt(userUpdatePassword.password)
+        UserApi.updatePassword({...userUpdatePassword,confirmPassword: encrypt.encrypt(userUpdatePassword.confirmPassword)}).then(res => {
+            if (res.code === 0) {
+                showToast("密码修改成功~")
+                setisOpenPasswordEdit(false)
+                CreateLogin()
+            }else
+                showToast(res.msg, true)
+        })
+
+    }
 
     return (
         <div>
@@ -424,6 +458,17 @@ export default function Home() {
                             }}
                         >
                             我的说说
+                        </CustomButton>
+                        <CustomButton
+                            width={160}
+                            type="line"
+                            style={{marginTop: 10}} o
+                            onClick={() => {
+                                setUserInfoVisible({value: false})
+                                setisOpenPasswordEdit(true)
+                            }}
+                        >
+                            修改密码
                         </CustomButton>
                         <CustomButton
                             width={160}
@@ -548,6 +593,86 @@ export default function Home() {
                                         width={55}
                                         type="minor"
                                         onClick={() => setIsOpenEditInfo(false)}
+                                    >
+                                        取消
+                                    </CustomButton>
+                                </div>
+                            </div>
+                        </CustomModal
+                        >
+                        <CustomModal
+                            isOpen={isOpenPasswordEdit}
+                        >
+                            <div className="edit-info">
+                                <div className="edit-info-top">
+                                    <div style={{fontSize: 12}}>
+                                        修改密码
+                                    </div>
+
+                                </div>
+                                <div style={{
+                                    width: "90%",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    justifyContent: "center",
+                                    alignItems: "center"
+                                }}>
+
+                                    <div style={{
+                                        display: "flex",
+                                        marginBottom: 20,
+                                        width: 160,
+                                        justifyContent: "space-between"
+                                    }}>
+                                    </div>
+                                    <div style={{width: "100%"}}>
+                                        <div style={{marginBottom: 20}}>
+                                            <CustomInput
+                                                placeholder="原密码"
+                                                limit={16}
+                                                required={true}
+                                                requiredMsg="原密码不能为空"
+                                                type="password"
+                                                value={userUpdatePassword.oldPassword}
+                                                onChange={(v) => setUserPassword({...userUpdatePassword, "oldPassword": v})}
+                                            />
+                                        </div>
+                                        <div style={{marginBottom: 20}}>
+                                            <CustomInput
+                                                placeholder="新密码"
+                                                limit={16}
+                                                required={true}
+                                                requiredMsg="新密码不能为空"
+                                                type="password"
+                                                // value={userInfo.signature}
+                                                onChange={(v) => setUserPassword({...userUpdatePassword, "newPassword": v})}
+                                            />
+                                        </div>
+                                        <div style={{marginBottom: 20}}>
+                                            <CustomInput
+                                                // value={formatDateString(userInfo.birthday)}
+                                                placeholder="请确认"
+                                                limit={16}
+                                                required={true}
+                                                requiredMsg="请再次输入密码"
+                                                type="password"
+                                                // type="date"
+                                                onChange={(v) => setUserPassword({...userUpdatePassword, "confirmPassword": v})}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style={{display: "flex", position: "absolute", right: 10, bottom: 10}}>
+                                    <CustomButton
+                                        width={55}
+                                        onClick={onUpatePassword}
+                                    >
+                                        修改
+                                    </CustomButton>
+                                    <CustomButton
+                                        width={55}
+                                        type="minor"
+                                        onClick={() => setisOpenPasswordEdit(false)}
                                     >
                                         取消
                                     </CustomButton>
