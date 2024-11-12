@@ -656,7 +656,6 @@ function CommonChatFrame({chatInfo}) {
     const onMsgContentClick = (action) => {
         switch (action.key) {
             case "copy": {
-                console.log(currentRightSelectMsgRef)
                 writeText(currentRightSelectMsgRef.current.msgContent?.content)
                 break
             }
