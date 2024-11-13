@@ -12,7 +12,6 @@ import CustomButton from "../../../componets/CustomButton/index.jsx";
 export default function QrCodeLogin() {
     const h = useHistory();
     const [qrCode, setQrCode] = useState('');
-    const [qrResult, setQrResult] = useState(null);
     const [qrExpired, setQrExpired] = useState(false);
     const [countdown, setCountdown] = useState(60);
 
@@ -22,7 +21,7 @@ export default function QrCodeLogin() {
 
     useEffect(() => {
         let timer;
-        if (!qrExpired) {
+        if (!qrExpired && qrCode) {
             timer = setInterval(() => {
                 onGetQrCodeResult();
                 setCountdown(prev => {
@@ -41,11 +40,13 @@ export default function QrCodeLogin() {
     }, [qrCode, qrExpired]);
 
     const onGetQrCode = () => {
-        QrApi.code().then(res => {
+        QrApi.code({action: 'login'}).then(res => {
             if (res.code === 0) {
-                setQrCode(res.data);
-                setQrExpired(false);
-                setCountdown(60);
+                if (res.data) {
+                    setQrCode(res.data);
+                    setQrExpired(false);
+                    setCountdown(60);
+                }
             }
         });
     }
@@ -55,10 +56,10 @@ export default function QrCodeLogin() {
             if (res.code === 0) {
                 if (res.data.status === 'success') {
                     invoke('save_user_info', {
-                        userid: res.data.userInfo.userId,
-                        username: res.data.userInfo.username,
-                        token: res.data.userInfo.token,
-                        portrait: res.data.userInfo.portrait,
+                        userid: res.data.extend.userId,
+                        username: res.data.extend.username,
+                        token: res.data.extend.token,
+                        portrait: res.data.extend.portrait,
                     }).then(() => {
                         CreateHomeWindow();
                     });
