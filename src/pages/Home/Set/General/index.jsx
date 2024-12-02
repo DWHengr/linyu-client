@@ -64,6 +64,7 @@ export default function General() {
                         <div className="set-item-option">
                             <div>开机自启</div>
                             <CustomSwitch
+                                id="bootstrap"
                                 isOn={userSets.bootstrap}
                                 handleToggle={() => {
                                     if (!userSets.bootstrap) {

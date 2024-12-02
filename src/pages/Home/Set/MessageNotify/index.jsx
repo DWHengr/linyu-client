@@ -36,6 +36,7 @@ export default function MessageNotify() {
                         <div className="set-item-option">
                             <div>好友消息</div>
                             <CustomSwitch isOn={userSets.friendMsgNotify}
+                                          id="friendMsgNotify"
                                           handleToggle={() => handleOnChange("friendMsgNotify", !userSets.friendMsgNotify)}/>
                         </div>
                     </div>
@@ -46,12 +47,14 @@ export default function MessageNotify() {
                         <div className="set-item-option">
                             <div>消息提示音</div>
                             <CustomSwitch isOn={userSets.msgTone}
+                                          id="msgTone"
                                           handleToggle={() => handleOnChange("msgTone", !userSets.msgTone)}/>
                         </div>
                         <CustomLine width={1}/>
                         <div className="set-item-option">
                             <div>音视频提示音</div>
                             <CustomSwitch isOn={userSets.audioVideoTone}
+                                          id="audioVideoTone"
                                           handleToggle={() => handleOnChange("audioVideoTone", !userSets.audioVideoTone)}/>
                         </div>
                     </div>

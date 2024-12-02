@@ -1,7 +1,7 @@
 import './index.less';
 import {useEffect, useState} from "react";
 
-const CustomSwitch = ({isOn, handleToggle}) => {
+const CustomSwitch = ({id, isOn, handleToggle}) => {
 
     const [value, setValue] = useState(isOn)
 
@@ -15,12 +15,12 @@ const CustomSwitch = ({isOn, handleToggle}) => {
                 checked={value}
                 onChange={handleToggle}
                 className="switch-checkbox"
-                id={`switch-new`}
                 type="checkbox"
+                id={id}
             />
             <label
                 className="switch-label"
-                htmlFor={`switch-new`}
+                htmlFor={id}
             >
                 <span className={`switch-button`}/>
             </label>
