@@ -25,7 +25,7 @@ export default function ChatGroupInvite({existing, onCancel, onOk}) {
     }, [searchValue])
 
     const handlerSearchFriend = () => {
-        FriendApi.search({friendInfo: searchValue}).then(res => {
+        FriendApi.search({searchInfo: searchValue}).then(res => {
             if (res.code === 0) {
                 setSearchFriendData(res.data)
             }

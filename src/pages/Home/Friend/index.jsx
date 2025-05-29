@@ -151,7 +151,7 @@ export default function Friend() {
 
     useEffect(() => {
         if (searchInfo) {
-            FriendApi.search({friendInfo: searchInfo}).then(res => {
+            FriendApi.search({searchInfo: searchInfo}).then(res => {
                 if (res.code === 0) {
                     setSearchFriendsList(res.data)
                 }

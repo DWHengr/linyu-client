@@ -226,7 +226,7 @@ export default function Chat() {
 
     useEffect(() => {
         if (searchInfo) {
-            FriendApi.search({friendInfo: searchInfo}).then(res => {
+            FriendApi.search({searchInfo: searchInfo}).then(res => {
                 if (res.code === 0) {
                     setSearchFriendsList(res.data)
                 }
@@ -298,7 +298,7 @@ export default function Chat() {
 
     const onSendMsgClick = (friendId) => {
         setSearchInfo("")
-        ChatListApi.create({userId: friendId}).then(res => {
+        ChatListApi.create({toId: friendId}).then(res => {
             if (res.code === 0) {
                 dispatch(setCurrentChatId(friendId, res.data))
                 setSelectedUserInfo(res.data)
