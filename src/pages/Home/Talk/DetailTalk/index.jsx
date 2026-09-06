@@ -28,6 +28,8 @@ export default function DetailTalk() {
     const [talkCommentList, setTalkCommentList] = useState([])
     const [commentValue, setCommentValue] = useState("")
     const talksRef = useRef(null)
+    const [isCommentDelAffirmModalOpen, setIsCommentDelAffirmModalOpen] = useState(false)
+    const currentDelComment = useRef({talkId: null, commentId: null})
 
 
     useEffect(() => {
@@ -100,8 +102,8 @@ export default function DetailTalk() {
         })
     }
 
-    const onDeleteTalkComment = () => {
-        TalkCommentApi.delete({talkId: talk.talkId}).then(res => {
+    const onDeleteTalkComment = (talkId, talkCommentId) => {
+        TalkCommentApi.delete({talkId, talkCommentId}).then(res => {
             if (res.code === 0) {
                 onTalkCommentList()
                 setTalk({...talk, commentNum: talk.commentNum - 1})
@@ -139,6 +141,15 @@ export default function DetailTalk() {
                 txt="确认删除该条说说?"
                 onOk={onDeleteTalk}
                 onCancel={() => setIsTalkDelAffirmModalOpen(false)}
+            />
+            <CustomAffirmModal
+                isOpen={isCommentDelAffirmModalOpen}
+                txt="确认删除该条评论？"
+                onOk={() => {
+                    onDeleteTalkComment(currentDelComment.current.talkId, currentDelComment.current.commentId)
+                    setIsCommentDelAffirmModalOpen(false)
+                }}
+                onCancel={() => setIsCommentDelAffirmModalOpen(false)}
             />
             <div
                 style={{position: "absolute", top: 15, left: 10}}
@@ -256,6 +267,17 @@ export default function DetailTalk() {
                                                 lineHeight: "10px"
                                             }}>{formatTime(comment.createTime)}</div>
                                         </div>
+                                        {currentUserId.current === comment.userId && (
+                                            <div
+                                                style={{color: "#4C9BFF", marginLeft: 10, cursor: "pointer", fontSize: 12}}
+                                                onClick={() => {
+                                                    currentDelComment.current = {talkId: talk.talkId, commentId: comment.id}
+                                                    setIsCommentDelAffirmModalOpen(true)
+                                                }}
+                                            >
+                                                删除
+                                            </div>
+                                        )}
                                     </div>
                                     <div>
                                         {comment.content}
